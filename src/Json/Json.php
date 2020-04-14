@@ -23,7 +23,7 @@ use JsonSerializable;
 use LogicException;
 use function is_array;
 
-class Json
+final class Json
 {
 
     /**

@@ -21,10 +21,12 @@ namespace LaravelJsonApi\Core\Json;
 
 use ArrayAccess;
 use Countable;
+use Illuminate\Contracts\Support\Arrayable;
 use IteratorAggregate;
 use JsonSerializable;
+use function collect;
 
-final class Hash implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
+final class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, JsonSerializable
 {
 
     use Concerns\Hashable;
@@ -34,7 +36,7 @@ final class Hash implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @param array $value
      */
-    public function __construct(array $value)
+    public function __construct(array $value = [])
     {
         $this->value = $value;
         $this->sorted();
@@ -67,6 +69,14 @@ final class Hash implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         }
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return collect($this->value)->toArray();
     }
 
 }
