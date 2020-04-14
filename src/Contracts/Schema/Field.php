@@ -29,18 +29,14 @@ interface Field
     public function name(): string;
 
     /**
-     * Is the field mass assignable?
+     * Is the field read only?
+     *
+     * Indicates whether clients can write a value to the field, either on
+     * create or update, or both.
      *
      * @return bool
      */
-    public function isFillable(): bool;
-
-    /**
-     * Is the field guarded from mass assignment?
-     *
-     * @return bool
-     */
-    public function isGuarded(): bool;
+    public function isReadOnly(): bool;
 
     /**
      * Is the field allowed in sparse field sets?

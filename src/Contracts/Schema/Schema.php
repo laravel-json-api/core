@@ -44,4 +44,11 @@ interface Schema
      * @return string
      */
     public function baseUri(): string;
+
+    /**
+     * Does the resource have a self link?
+     *
+     * @return bool
+     */
+    public function hasSelfLink(): bool;
 }
