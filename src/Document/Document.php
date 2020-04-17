@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
+use JsonSerializable;
 use LaravelJsonApi\Core\Json\Hash;
-use LaravelJsonApi\Core\Json\Json;
 use LogicException;
 use function is_null;
 
@@ -117,8 +117,8 @@ final class Document
             return new Links($value);
         }
 
-        if (is_iterable($value)) {
-            return new Links(...$value);
+        if (is_array($value)) {
+            return Links::fromArray($value);
         }
 
         throw new LogicException('Unexpected links member value.');

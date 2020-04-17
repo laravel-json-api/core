@@ -26,7 +26,7 @@ use IteratorAggregate;
 use JsonSerializable;
 use function collect;
 
-final class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, JsonSerializable
+class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, JsonSerializable
 {
 
     use Concerns\Hashable;

@@ -35,7 +35,7 @@ class Link implements Serializable
     private $key;
 
     /**
-     * @var LinkHref
+     * @var LinkHref|null
      */
     private $href;
 
