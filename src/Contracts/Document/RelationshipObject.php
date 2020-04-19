@@ -26,17 +26,17 @@ interface RelationshipObject
 {
 
     /**
-     * Get the resource linkage.
+     * Get the related resource.
      *
      * For a to-one relationship, this will return either:
-     * - the resource identifier for the related resource; or
+     * - the related resource; or
      * - `null` if the relationship is empty.
      *
      * For a to-many relationship, this will return either:
-     * - an iterable of resource identifiers; or
+     * - an iterable of related resources; or
      * - an empty iterable for an empty relationship.
      *
-     * @return ResourceIdentifierObject|iterable|null
+     * @return mixed|iterable|null
      */
     public function data();
 
@@ -48,27 +48,22 @@ interface RelationshipObject
     public function showData(): bool;
 
     /**
-     * Get the related resource(s).
-     *
-     * For a to-one relationship, this will return either:
-     * - the related resource object; or
-     * - `null` if the relationship is empty.
-     *
-     * For a to-many relationship, this will return either:
-     * - an iterable of resource objects; or
-     * - an empty iterable for an empty relationship.
-     *
-     * @return ResourceObject|iterable|null
-     */
-    public function related();
-
-    /**
      * @return Links
      */
     public function links(): Links;
 
     /**
+     * @return bool
+     */
+    public function hasLinks(): bool;
+
+    /**
      * @return Hash
      */
     public function meta(): Hash;
+
+    /**
+     * @return bool
+     */
+    public function hasMeta(): bool;
 }

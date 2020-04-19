@@ -48,12 +48,12 @@ interface ResourceObject
     /**
      * @return iterable|null
      */
-    public function attributes(): ?iterable;
+    public function attributes(): iterable;
 
     /**
      * @return iterable|null
      */
-    public function relationships(): ?iterable;
+    public function relationships(): iterable;
 
     /**
      * @return Links
