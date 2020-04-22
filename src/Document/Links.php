@@ -24,6 +24,7 @@ use IteratorAggregate;
 use LaravelJsonApi\Core\Contracts\Document\PaginationLinks;
 use LaravelJsonApi\Core\Contracts\Serializable;
 use LaravelJsonApi\Core\Json\Json;
+use LogicException;
 use function collect;
 use function count;
 use function json_encode;
@@ -38,6 +39,33 @@ class Links implements Serializable, IteratorAggregate, Countable
      * @var array
      */
     private $stack;
+
+    /**
+     * Create a JSON API links object.
+     *
+     * @param Links|Link|iterable|null $value
+     * @return Links
+     */
+    public static function cast($value): Links
+    {
+        if ($value instanceof Links) {
+            return $value;
+        }
+
+        if (is_null($value)) {
+            return new Links();
+        }
+
+        if ($value instanceof Link) {
+            return new Links($value);
+        }
+
+        if (is_array($value)) {
+            return Links::fromArray($value);
+        }
+
+        throw new LogicException('Unexpected links member value.');
+    }
 
     /**
      * @param array $input
@@ -67,6 +95,17 @@ class Links implements Serializable, IteratorAggregate, Countable
     {
         $this->stack = [];
         $this->push(...$links);
+    }
+
+    /**
+     * Get a link by its key.
+     *
+     * @param string $key
+     * @return Link|null
+     */
+    public function get(string $key): ?Link
+    {
+        return $this->stack[$key] ?? null;
     }
 
     /**

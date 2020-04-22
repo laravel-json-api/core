@@ -56,12 +56,30 @@ interface ResourceObject
     public function relationships(): iterable;
 
     /**
+     * Get a relation by its field name.
+     *
+     * @param string $fieldName
+     * @return RelationshipObject
+     */
+    public function relation(string $fieldName): RelationshipObject;
+
+    /**
      * @return Links
      */
     public function links(): Links;
 
     /**
+     * @return bool
+     */
+    public function hasLinks(): bool;
+
+    /**
      * @return Hash
      */
     public function meta(): Hash;
+
+    /**
+     * @return bool
+     */
+    public function hasMeta(): bool;
 }

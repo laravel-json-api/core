@@ -30,10 +30,12 @@ interface RelationshipObject
      *
      * For a to-one relationship, this will return either:
      * - the related resource; or
+     * - a resource identifier for the related resource; or
      * - `null` if the relationship is empty.
      *
      * For a to-many relationship, this will return either:
      * - an iterable of related resources; or
+     * - an iterable of related resource identifiers; or
      * - an empty iterable for an empty relationship.
      *
      * @return mixed|iterable|null

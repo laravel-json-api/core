@@ -19,29 +19,39 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Contracts\Document;
 
+use LaravelJsonApi\Core\Contracts\Serializable;
+use LaravelJsonApi\Core\Document\JsonApi;
+use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 
-interface ResourceIdentifierObject
+interface DataDocument extends Serializable
 {
 
     /**
-     * @return string
+     * Get the data member.
+     *
+     * @return mixed|iterable|null
      */
-    public function type(): string;
+    public function data();
 
     /**
-     * @return string
+     * Get the JSON API member.
+     *
+     * @return JsonApi
      */
-    public function id(): string;
+    public function jsonApi(): JsonApi;
 
     /**
+     * Get the top-level links member.
+     *
+     * @return Links
+     */
+    public function links(): Links;
+
+    /**
+     * Get the top-level meta member.
+     *
      * @return Hash
      */
     public function meta(): Hash;
-
-    /**
-     * @return bool
-     */
-    public function hasMeta(): bool;
-
 }

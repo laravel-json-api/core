@@ -18,6 +18,8 @@
 namespace LaravelJsonApi\Core\Document;
 
 use LaravelJsonApi\Core\Contracts\Serializable;
+use LaravelJsonApi\Core\Json\Hash;
+use LogicException;
 use function array_filter;
 
 class JsonApi implements Serializable
@@ -30,6 +32,33 @@ class JsonApi implements Serializable
      * @var string
      */
     private $version;
+
+    /**
+     * Create a JSON API object.
+     *
+     * @param JsonApi|Hash|array|string|null $value
+     * @return JsonApi
+     */
+    public static function cast($value): JsonApi
+    {
+        if ($value instanceof JsonApi) {
+            return $value;
+        }
+
+        if ($value instanceof Hash) {
+            return (new JsonApi())->withMeta($value);
+        }
+
+        if (is_string($value) || is_null($value)) {
+            return new JsonApi($value);
+        }
+
+        if (is_array($value)) {
+            return JsonApi::fromArray($value);
+        }
+
+        throw new LogicException('Unexpected JSON API member value.');
+    }
 
     /**
      * @param array $value
@@ -54,6 +83,14 @@ class JsonApi implements Serializable
     public function __construct(string $version = null)
     {
         $this->version = $version ?: null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function version(): ?string
+    {
+        return $this->version;
     }
 
     /**

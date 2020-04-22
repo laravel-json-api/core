@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Document;
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Contracts\Serializable;
 use LaravelJsonApi\Core\Json\Hash;
+use LaravelJsonApi\Core\Json\Json;
 
 class Link implements Serializable
 {
@@ -49,29 +50,29 @@ class Link implements Serializable
         if (is_array($value) && isset($value['href'])) {
             return new self(
                 $key,
-                LinkHref::cast($value['href']),
-                Document::meta($value['meta'] ?? [])
+                $value['href'],
+                Json::hash($value['meta'] ?? [])
             );
         }
 
-        return new self($key, LinkHref::cast($value));
+        return new self($key, $value);
     }
 
     /**
      * Link constructor.
      *
      * @param string $key
-     * @param LinkHref $href
+     * @param LinkHref|string $href
      * @param Hash|null $meta
      */
-    public function __construct(string $key, LinkHref $href, Hash $meta = null)
+    public function __construct(string $key, $href, Hash $meta = null)
     {
         if (empty($key)) {
             throw new InvalidArgumentException('Expecting key to be a non-empty string.');
         }
 
         $this->key = $key;
-        $this->href = $href;
+        $this->href = LinkHref::cast($href);
         $this->meta = $meta;
     }
 

@@ -17,31 +17,25 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Contracts\Document;
+namespace LaravelJsonApi\Core\Contracts\Resources;
 
-use LaravelJsonApi\Core\Json\Hash;
+use LaravelJsonApi\Core\Contracts\Document\ResourceObject;
 
-interface ResourceIdentifierObject
+interface Factory
 {
 
     /**
-     * @return string
+     * Get the fully-qualified class names for the records that this factory handles.
+     *
+     * @return iterable
      */
-    public function type(): string;
+    public function handles(): iterable;
 
     /**
-     * @return string
+     * Create a resource object for the supplied record.
+     *
+     * @param mixed $record
+     * @return ResourceObject
      */
-    public function id(): string;
-
-    /**
-     * @return Hash
-     */
-    public function meta(): Hash;
-
-    /**
-     * @return bool
-     */
-    public function hasMeta(): bool;
-
+    public function createResource($record): ResourceObject;
 }

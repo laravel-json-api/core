@@ -19,51 +19,46 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document\Concerns;
 
-use LaravelJsonApi\Core\Document\Links;
+use LaravelJsonApi\Core\Document\Document;
+use LaravelJsonApi\Core\Document\JsonApi;
 
-trait HasLinks
+trait HasJsonApi
 {
 
     /**
-     * @var Links|null
+     * @var JsonApi|null
      */
-    private $links;
+    private $jsonApi;
 
     /**
-     * Get the links member.
-     *
-     * @return Links
+     * @return JsonApi
      */
-    public function links(): Links
+    public function jsonApi(): JsonApi
     {
-        if ($this->links) {
-            return $this->links;
+        if ($this->jsonApi) {
+            return $this->jsonApi;
         }
 
-        return $this->links = new Links();
+        return $this->jsonApi = new JsonApi();
     }
 
     /**
-     * Replace the links member.
-     *
-     * @param mixed|null $links
+     * @param mixed $jsonApi
      * @return $this
      */
-    public function withLinks($links): self
+    public function withJsonApi($jsonApi): self
     {
-        $this->links = Links::cast($links);
+        $this->jsonApi = JsonApi::cast($jsonApi);
 
         return $this;
     }
 
     /**
-     * Remove links.
-     *
      * @return $this
      */
-    public function withoutLinks(): self
+    public function withoutJsonApi(): self
     {
-        $this->links = null;
+        $this->jsonApi = null;
 
         return $this;
     }
@@ -71,10 +66,10 @@ trait HasLinks
     /**
      * @return bool
      */
-    public function hasLinks(): bool
+    public function hasJsonApi(): bool
     {
-        if ($this->links) {
-            return $this->links->isNotEmpty();
+        if ($this->jsonApi) {
+            return $this->jsonApi->isNotEmpty();
         }
 
         return false;
@@ -83,8 +78,8 @@ trait HasLinks
     /**
      * @return bool
      */
-    public function doesntHaveLinks(): bool
+    public function doesntHaveJsonApi(): bool
     {
-        return !$this->hasLinks();
+        return !$this->hasJsonApi();
     }
 }
