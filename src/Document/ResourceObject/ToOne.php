@@ -19,21 +19,17 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document\ResourceObject;
 
-use LaravelJsonApi\Core\Contracts\Document\RelationshipObject;
-use LaravelJsonApi\Core\Contracts\Document\ResourceObject;
-use LaravelJsonApi\Core\Document\Concerns\HasLinks;
-use LaravelJsonApi\Core\Document\Concerns\HasMeta;
+use InvalidArgumentException;
+use function is_null;
+use function is_object;
 
-class ToOne implements RelationshipObject
+class ToOne extends Relation
 {
 
-    use HasLinks;
-    use HasMeta;
-
     /**
-     * @var ResourceObject|null
+     * @var mixed|null
      */
-    private $resource;
+    private $data;
 
     /**
      * @var bool
@@ -43,12 +39,23 @@ class ToOne implements RelationshipObject
     /**
      * ToOne constructor.
      *
-     * @param ResourceObject|null $resource
+     * @param mixed|null $data
      * @param bool $showData
+     * @param string $baseUri
+     * @param string $fieldName
      */
-    public function __construct(?ResourceObject $resource, bool $showData = true)
-    {
-        $this->resource = $resource;
+    public function __construct(
+        $data,
+        bool $showData,
+        string $baseUri,
+        string $fieldName
+    ) {
+        if (!is_object($data) && !is_null($data)) {
+            throw new InvalidArgumentException('Expecting an object or null.');
+        }
+
+        parent::__construct($baseUri, $fieldName);
+        $this->data = $data;
         $this->showData = $showData;
     }
 
@@ -57,11 +64,7 @@ class ToOne implements RelationshipObject
      */
     public function data()
     {
-        if ($this->resource) {
-            return $this->resource->identifier();
-        }
-
-        return null;
+        return $this->data;
     }
 
     /**
@@ -70,14 +73,6 @@ class ToOne implements RelationshipObject
     public function showData(): bool
     {
         return $this->showData;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function related()
-    {
-        return $this->resource;
     }
 
 }

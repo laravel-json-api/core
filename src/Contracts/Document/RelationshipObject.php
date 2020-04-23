@@ -38,6 +38,9 @@ interface RelationshipObject
      * - an iterable of related resource identifiers; or
      * - an empty iterable for an empty relationship.
      *
+     * In either case, resource identifier(s) MUST NOT be returned
+     * if the related data will be included in a compound document.
+     *
      * @return mixed|iterable|null
      */
     public function data();

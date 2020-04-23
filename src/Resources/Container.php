@@ -78,7 +78,10 @@ class Container implements ContainerContract
             return $this->cursor($value);
         }
 
-        throw new LogicException('Unresolvable value: must be a record or an iterable of records.');
+        throw new LogicException(sprintf(
+            'Unable to resolve %s to a resource object. Check your container configuration.',
+            is_object($value) ? get_class($value) : 'non-object value'
+        ));
     }
 
     /**

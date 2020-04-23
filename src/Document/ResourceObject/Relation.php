@@ -19,48 +19,25 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document\ResourceObject;
 
-use LogicException;
-use function is_iterable;
+use LaravelJsonApi\Core\Contracts\Document\RelationshipObject;
+use LaravelJsonApi\Core\Document\Concerns\HasMeta;
+use LaravelJsonApi\Core\Document\Concerns\HasRelationLinks;
 
-class ToMany extends Relation
+abstract class Relation implements RelationshipObject
 {
 
-    /**
-     * @var iterable|null
-     */
-    private $data;
+    use HasMeta;
+    use HasRelationLinks;
 
     /**
-     * ToMany constructor.
+     * Relation constructor.
      *
-     * @param iterable|null $data
      * @param string $baseUri
      * @param string $fieldName
      */
-    public function __construct(?iterable $data, string $baseUri, string $fieldName)
+    public function __construct(string $baseUri, string $fieldName)
     {
-        parent::__construct($baseUri, $fieldName);
-        $this->data = $data;
+        $this->baseUri = $baseUri;
+        $this->fieldName = $fieldName;
     }
-
-    /**
-     * @inheritDoc
-     */
-    public function data()
-    {
-        if ($this->showData()) {
-            return $this->data;
-        }
-
-        throw new LogicException('Not expecting to show data.');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function showData(): bool
-    {
-        return is_iterable($this->data);
-    }
-
 }
