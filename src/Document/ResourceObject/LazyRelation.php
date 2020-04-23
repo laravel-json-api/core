@@ -19,39 +19,27 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document\ResourceObject;
 
-use LogicException;
-use function is_iterable;
+use Closure;
 
-class ToMany extends Relation
+class LazyRelation extends Relation
 {
 
     /**
-     * @var iterable|null
+     * @var Closure
      */
     private $data;
 
     /**
-     * @var bool
-     */
-    private $showData;
-
-    /**
-     * ToMany constructor.
+     * LazyRelation constructor.
      *
-     * @param iterable|null $data
-     * @param bool $showData
+     * @param Closure $data
      * @param string $baseUri
      * @param string $fieldName
      */
-    public function __construct(?iterable $data, bool $showData, string $baseUri, string $fieldName)
+    public function __construct(Closure $data, string $baseUri, string $fieldName)
     {
-        if (!is_iterable($data) && true === $showData) {
-            throw new LogicException('Expecting data to be iterable when show data is true.');
-        }
-
         parent::__construct($baseUri, $fieldName);
         $this->data = $data;
-        $this->showData = $showData;
     }
 
     /**
@@ -59,11 +47,7 @@ class ToMany extends Relation
      */
     public function data()
     {
-        if (is_iterable($this->data)) {
-            return $this->data;
-        }
-
-        throw new LogicException('Not expecting to show data.');
+        return ($this->data)();
     }
 
     /**
@@ -71,7 +55,7 @@ class ToMany extends Relation
      */
     public function showData(): bool
     {
-        return $this->showData;
+        return false;
     }
 
 }

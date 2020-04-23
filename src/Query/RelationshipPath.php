@@ -23,6 +23,7 @@ use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use UnexpectedValueException;
+use function collect;
 use function explode;
 use function implode;
 use function is_string;
@@ -119,6 +120,15 @@ class RelationshipPath implements IteratorAggregate, Countable
     public function count()
     {
         return count($this->names);
+    }
+
+    /**
+     * @param int $num
+     * @return $this
+     */
+    public function take(int $num): self
+    {
+        return new self(...collect($this->names)->take($num));
     }
 
 }

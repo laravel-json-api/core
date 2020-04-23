@@ -28,7 +28,7 @@ interface Container
     /**
      * Resolve the value to a resource object or a cursor of resource objects.
      *
-     * @param $value
+     * @param mixed $value
      *      a resource object, record or an iterable of records.
      * @return ResourceObject|Generator
      */

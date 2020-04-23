@@ -70,7 +70,7 @@ class Container implements ContainerContract
             return $value;
         }
 
-        if ($this->exists($value)) {
+        if (is_object($value) && $this->exists($value)) {
             return $this->create($value);
         }
 

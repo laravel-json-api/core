@@ -59,8 +59,8 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     public static function fromArray(array $value): self
     {
         return new self(...collect($value)->map(function (array $fields, string $type) {
-            return new FieldSet($type, $fields);
-        }));
+            return new FieldSet($type, ...$fields);
+        })->values());
     }
 
     /**

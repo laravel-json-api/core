@@ -21,6 +21,8 @@ namespace LaravelJsonApi\Core\Contracts\Encoder;
 
 use LaravelJsonApi\Core\Contracts\Document\DataDocument;
 use LaravelJsonApi\Core\Contracts\Document\ResourceObject;
+use LaravelJsonApi\Core\Query\FieldSets;
+use LaravelJsonApi\Core\Query\IncludePaths;
 
 interface DocumentBuilder
 {
@@ -28,18 +30,18 @@ interface DocumentBuilder
     /**
      * Set the include paths.
      *
-     * @param iterable $includePaths
+     * @param IncludePaths|mixed $includePaths
      * @return $this
      */
-    public function withIncludePaths(iterable $includePaths): self;
+    public function withIncludePaths($includePaths): self;
 
     /**
      * Set the sparse field-sets.
      *
-     * @param array $fieldSets
+     * @param FieldSets|mixed $fieldSets
      * @return $this
      */
-    public function withFieldSets(array $fieldSets): self;
+    public function withFieldSets($fieldSets): self;
 
     /**
      * Create a document with a resource object as the primary data.
