@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Document;
 use Countable;
 use IteratorAggregate;
 use LaravelJsonApi\Core\Contracts\Serializable;
+use LogicException;
 use function collect;
 
 class ErrorList implements Serializable, Countable, IteratorAggregate
@@ -35,6 +36,29 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
     private $stack;
 
     /**
+     * Create a list of JSON API error objects.
+     *
+     * @param ErrorList|Error|array $value
+     * @return ErrorList
+     */
+    public static function cast($value): ErrorList
+    {
+        if ($value instanceof ErrorList) {
+            return $value;
+        }
+
+        if ($value instanceof Error) {
+            return new ErrorList($value);
+        }
+
+        if (is_array($value)) {
+            return ErrorList::fromArray($value);
+        }
+
+        throw new LogicException('Unexpected error collection value.');
+    }
+
+    /**
      * @param array $array
      * @return ErrorList
      */
@@ -42,7 +66,7 @@ class ErrorList implements Serializable, Countable, IteratorAggregate
     {
         $errors = new self();
         $errors->stack = collect($array)->map(function ($error) {
-            return Document::error($error);
+            return Error::cast($error);
         })->values()->all();
 
         return $errors;

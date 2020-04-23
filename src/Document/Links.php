@@ -21,11 +21,12 @@ namespace LaravelJsonApi\Core\Document;
 
 use Countable;
 use IteratorAggregate;
+use LaravelJsonApi\Core\Contracts\Document\PaginationLinks;
 use LaravelJsonApi\Core\Contracts\Serializable;
-use UnexpectedValueException;
+use LaravelJsonApi\Core\Json\Json;
+use LogicException;
 use function collect;
 use function count;
-use function is_iterable;
 use function json_encode;
 use function ksort;
 
@@ -40,6 +41,52 @@ class Links implements Serializable, IteratorAggregate, Countable
     private $stack;
 
     /**
+     * Create a JSON API links object.
+     *
+     * @param Links|Link|iterable|null $value
+     * @return Links
+     */
+    public static function cast($value): Links
+    {
+        if ($value instanceof Links) {
+            return $value;
+        }
+
+        if (is_null($value)) {
+            return new Links();
+        }
+
+        if ($value instanceof Link) {
+            return new Links($value);
+        }
+
+        if (is_array($value)) {
+            return Links::fromArray($value);
+        }
+
+        throw new LogicException('Unexpected links member value.');
+    }
+
+    /**
+     * @param array $input
+     * @return static
+     */
+    public static function fromArray(array $input): self
+    {
+        $links = new self();
+
+        foreach ($input as $key => $link) {
+            if (!$link instanceof Link) {
+                $link = Link::fromArray($key, $link);
+            }
+
+            $links->push($link);
+        }
+
+        return $links;
+    }
+
+    /**
      * Links constructor.
      *
      * @param Link ...$links
@@ -48,6 +95,17 @@ class Links implements Serializable, IteratorAggregate, Countable
     {
         $this->stack = [];
         $this->push(...$links);
+    }
+
+    /**
+     * Get a link by its key.
+     *
+     * @param string $key
+     * @return Link|null
+     */
+    public function get(string $key): ?Link
+    {
+        return $this->stack[$key] ?? null;
     }
 
     /**
@@ -77,9 +135,27 @@ class Links implements Serializable, IteratorAggregate, Countable
      */
     public function put(string $key, $href, $meta = null)
     {
-        $link = new Link($key, LinkHref::cast($href), MetaMember::cast($meta));
+        $link = new Link($key, LinkHref::cast($href), Json::hash($meta));
 
         return $this->push($link);
+    }
+
+    /**
+     * Add pagination links.
+     *
+     * @param PaginationLinks $links
+     * @return $this
+     */
+    public function paginate(PaginationLinks $links): self
+    {
+        $this->put(...collect([
+            $links->first(),
+            $links->last(),
+            $links->previous(),
+            $links->next(),
+        ])->filter());
+
+        return $this;
     }
 
     /**

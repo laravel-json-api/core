@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Document;
 
 use LaravelJsonApi\Core\Contracts\Serializable;
+use LogicException;
 use function array_filter;
 
 class Error implements Serializable
@@ -58,6 +59,25 @@ class Error implements Serializable
      * @var ErrorSource|null
      */
     private $source;
+
+    /**
+     * Create a JSON API error object.
+     *
+     * @param Error|array $value
+     * @return Error
+     */
+    public static function cast($value): Error
+    {
+        if ($value instanceof Error) {
+            return $value;
+        }
+
+        if (is_array($value)) {
+            return Error::fromArray($value);
+        }
+
+        throw new LogicException('Unexpected error value.');
+    }
 
     /**
      * Create an error from an array.

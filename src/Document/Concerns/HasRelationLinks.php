@@ -19,10 +19,23 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document\Concerns;
 
+use LaravelJsonApi\Core\Document\Link;
+use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
+use function sprintf;
 
-trait HasLinks
+trait HasRelationLinks
 {
+
+    /**
+     * @var string
+     */
+    protected $fieldName;
+
+    /**
+     * @var string
+     */
+    protected $baseUri;
 
     /**
      * @var Links|null
@@ -30,8 +43,6 @@ trait HasLinks
     private $links;
 
     /**
-     * Get the links member.
-     *
      * @return Links
      */
     public function links(): Links
@@ -40,32 +51,10 @@ trait HasLinks
             return $this->links;
         }
 
-        return $this->links = new Links();
-    }
-
-    /**
-     * Replace the links member.
-     *
-     * @param mixed|null $links
-     * @return $this
-     */
-    public function withLinks($links): self
-    {
-        $this->links = Links::cast($links);
-
-        return $this;
-    }
-
-    /**
-     * Remove links.
-     *
-     * @return $this
-     */
-    public function withoutLinks(): self
-    {
-        $this->links = null;
-
-        return $this;
+        return $this->links = new Links(
+            $this->selfLink(),
+            $this->relatedLink()
+        );
     }
 
     /**
@@ -73,18 +62,38 @@ trait HasLinks
      */
     public function hasLinks(): bool
     {
-        if ($this->links) {
-            return $this->links->isNotEmpty();
-        }
-
-        return false;
+        return $this->links()->isNotEmpty();
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function doesntHaveLinks(): bool
+    protected function selfUrl(): string
     {
-        return !$this->hasLinks();
+        return sprintf('%s/relationships/%s', $this->baseUri, $this->fieldName);
+    }
+
+    /**
+     * @return Link
+     */
+    protected function selfLink(): Link
+    {
+        return new Link('self', new LinkHref($this->selfUrl()));
+    }
+
+    /**
+     * @return string
+     */
+    protected function relatedUrl(): string
+    {
+        return sprintf('%s/%s', $this->baseUri, $this->fieldName);
+    }
+
+    /**
+     * @return Link
+     */
+    protected function relatedLink(): Link
+    {
+        return new Link('related', new LinkHref($this->relatedUrl()));
     }
 }
