@@ -17,8 +17,8 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Contracts\Schema;
+namespace LaravelJsonApi\Contracts\Schema;
 
-interface Attribute extends Field
+interface Attribute extends Field, Sortable
 {
 }

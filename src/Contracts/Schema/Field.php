@@ -17,46 +17,22 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Contracts\Schema;
+namespace LaravelJsonApi\Contracts\Schema;
 
 interface Field
 {
+
     /**
-     * Get the field name.
+     * The JSON API field name.
      *
      * @return string
      */
     public function name(): string;
 
     /**
-     * Is the field read only?
-     *
-     * Indicates whether clients can write a value to the field, either on
-     * create or update, or both.
-     *
-     * @return bool
-     */
-    public function isReadOnly(): bool;
-
-    /**
-     * Is the field allowed in sparse field sets?
+     * Can the field be listed in sparse field sets?
      *
      * @return bool
      */
     public function isSparseField(): bool;
-
-    /**
-     * Is the field sortable?
-     *
-     * @return bool
-     */
-    public function isSortable(): bool;
-
-    /**
-     * Is the field filterable?
-     *
-     * @return bool
-     */
-    public function isFilter(): bool;
-
 }
