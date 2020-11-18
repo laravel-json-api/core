@@ -49,7 +49,15 @@ class JsonApiService
      */
     public function route(): Route
     {
-        return $this->container->make(Route::class);
+        try {
+            return $this->container->make(Route::class);
+        } catch (BindingResolutionException $ex) {
+            throw new LogicException(
+                'No bound JSON API route - your application may not be handling an HTTP request.',
+                0,
+                $ex
+            );
+        }
     }
 
     /**
@@ -68,7 +76,7 @@ class JsonApiService
             return $this->container->make(Server::class);
         } catch (BindingResolutionException $ex) {
             throw new LogicException(
-                'No bound JSON API server - the JSON API middleware has not been executed.',
+                'No bound JSON API server - your application may not be handling an HTTP request.',
                 0,
                 $ex
             );
