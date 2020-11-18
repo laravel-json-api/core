@@ -63,10 +63,18 @@ class ServerRepository implements RepositoryContract
 
         $class = $this->config->get("json-api.servers.{$name}");
 
+        if (empty($class) || !class_exists($class)) {
+            throw new RuntimeException("Server {$name} does not exist in config or is not a valid class.");
+        }
+
         try {
             $server = new $class($this->container, $name);
         } catch (Throwable $ex) {
-            throw new RuntimeException("Unable to construct server {$name}.");
+            throw new RuntimeException(
+                "Unable to construct server {$name} using class {$class}.",
+                0,
+                $ex
+            );
         }
 
         if ($server instanceof ServerContract) {
