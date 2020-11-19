@@ -36,24 +36,18 @@ interface Encoder
     /**
      * Create a compound document with a resource as the top-level data member.
      *
-     * @param JsonApiResource|null $resource
+     * @param JsonApiResource|object|null $resource
      * @return JsonApiDocument
      */
-    public function withResource(?JsonApiResource $resource): JsonApiDocument;
+    public function withResource(?object $resource): JsonApiDocument;
 
     /**
+     * Create a compound document with a collection of resources as the top-level data member.
+     *
      * @param iterable $resources
      * @return JsonApiDocument
      */
     public function withResources(iterable $resources): JsonApiDocument;
-
-    /**
-     * Create a compound document for a resource or resources.
-     *
-     * @param $data
-     * @return JsonApiDocument
-     */
-    public function withData($data): JsonApiDocument;
 
     /**
      * Create a compound document for a relationship identifier or identifiers.
