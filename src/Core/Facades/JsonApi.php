@@ -20,15 +20,16 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\JsonApiService;
-use LaravelJsonApi\Routing\Route;
 
 /**
  * Class JsonApi
  *
  * @method static Route route()
  * @method static Server server(string $name = null)
+ * @method static Server|null serverIfExists()
  */
 class JsonApi extends Facade
 {

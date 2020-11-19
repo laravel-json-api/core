@@ -77,7 +77,7 @@ class ResourceResponse implements Responsable
             ->withLinks($this->links)
             ->toJson($this->encodeOptions);
 
-        return response(
+        return new Response(
             $document,
             $this->status(),
             $this->headers()

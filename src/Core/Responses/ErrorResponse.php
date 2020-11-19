@@ -20,11 +20,15 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Response;
+use Illuminate\Support\Enumerable;
+use LaravelJsonApi\Contracts\ErrorProvider;
 use LaravelJsonApi\Contracts\Serializable as SerializableContract;
 use LaravelJsonApi\Core\Document\Concerns\Serializable;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\JsonApi;
+use LaravelJsonApi\Core\Facades\JsonApi as JsonApiFacade;
 use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
 class ErrorResponse implements SerializableContract, Responsable
@@ -44,9 +48,20 @@ class ErrorResponse implements SerializableContract, Responsable
     private ?int $status = null;
 
     /**
+     * Create an error response for a single error.
+     *
+     * @param  mixed $error
+     * @return ErrorResponse
+     */
+    public static function error($error): self
+    {
+        return new self(Error::cast($error));
+    }
+
+    /**
      * ErrorResponse constructor.
      *
-     * @param ErrorList|Error|Error[] $errors
+     * @param ErrorList|ErrorProvider|Error|Error[] $errors
      */
     public function __construct($errors)
     {
@@ -74,7 +89,9 @@ class ErrorResponse implements SerializableContract, Responsable
      */
     public function toResponse($request)
     {
-        return response(
+        $this->defaultJsonApi();
+
+        return new Response(
             $this->toJson($this->encodeOptions),
             $this->status ?: $this->errors->status(),
             $this->headers()
@@ -105,6 +122,24 @@ class ErrorResponse implements SerializableContract, Responsable
             'links' => $this->links()->jsonSerialize(),
             'errors' => $this->errors,
         ]);
+    }
+
+    /**
+     * Set the default top-level JSON API member.
+     *
+     * @return void
+     */
+    private function defaultJsonApi(): void
+    {
+        if ($this->jsonApi()->isEmpty()) {
+            $jsonApi = new JsonApi('1.0');
+
+            if ($server = JsonApiFacade::serverIfExists()) {
+                $jsonApi = $server->jsonApi();
+            }
+
+            $this->withJsonApi($jsonApi);
+        }
     }
 
 }

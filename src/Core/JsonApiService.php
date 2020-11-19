@@ -84,6 +84,20 @@ class JsonApiService
     }
 
     /**
+     * Get the active server, if there is one.
+     *
+     * @return Server|null
+     */
+    public function serverIfExists(): ?Server
+    {
+        if ($this->container->bound(Server::class)) {
+            return $this->server();
+        }
+
+        return null;
+    }
+
+    /**
      * @return Repository
      */
     private function servers(): Repository

@@ -79,7 +79,7 @@ class ResourceIdentifierResponse implements Responsable
             ->withLinks($this->links)
             ->toJson($this->encodeOptions);
 
-        return response(
+        return new Response(
             $document,
             Response::HTTP_OK,
             $this->headers()
