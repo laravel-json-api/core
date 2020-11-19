@@ -19,6 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
+use Illuminate\Support\Enumerable;
+use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Json\Hash;
 use LogicException;
@@ -38,7 +40,7 @@ class JsonApi implements Serializable
     /**
      * Create a JSON API object.
      *
-     * @param JsonApi|Hash|array|string|null $value
+     * @param JsonApi|Enumerable|array|string|null $value
      * @return JsonApi
      */
     public static function cast($value): JsonApi
@@ -47,15 +49,11 @@ class JsonApi implements Serializable
             return $value;
         }
 
-        if ($value instanceof Hash) {
-            return (new JsonApi())->setMeta($value);
-        }
-
         if (is_string($value) || is_null($value)) {
             return new JsonApi($value);
         }
 
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Enumerable) {
             return JsonApi::fromArray($value);
         }
 
@@ -63,11 +61,21 @@ class JsonApi implements Serializable
     }
 
     /**
-     * @param array $value
+     * Create a JSON API object from an array or enumable.
+     *
+     * @param array|Enumerable $value
      * @return JsonApi
      */
-    public static function fromArray(array $value): self
+    public static function fromArray($value): self
     {
+        if ($value instanceof Enumerable) {
+            $value = $value->all();
+        }
+
+        if (!is_array($value)) {
+            throw new InvalidArgumentException('Expecting an array or enumerable value.');
+        }
+
         $member = new self($value['version'] ?? null);
 
         if (isset($value['meta'])) {
@@ -75,6 +83,27 @@ class JsonApi implements Serializable
         }
 
         return $member;
+    }
+
+    /**
+     * Create a JSON API object, or return null for an empty value.
+     *
+     * @param JsonApi|Enumerable|array|string|null $value
+     * @return JsonApi|null
+     */
+    public static function nullable($value): ?self
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        $value = self::cast($value);
+
+        if ($value->isEmpty()) {
+            return null;
+        }
+
+        return $value;
     }
 
     /**

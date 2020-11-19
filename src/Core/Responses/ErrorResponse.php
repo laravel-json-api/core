@@ -24,6 +24,7 @@ use LaravelJsonApi\Contracts\Serializable as SerializableContract;
 use LaravelJsonApi\Core\Document\Concerns\Serializable;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
 class ErrorResponse implements SerializableContract, Responsable
@@ -88,7 +89,7 @@ class ErrorResponse implements SerializableContract, Responsable
         return array_filter([
             'jsonapi' => $this->jsonApi()->toArray() ?: null,
             'meta' => $this->meta()->toArray() ?: null,
-            'links' => $this->links->toArray() ?: null,
+            'links' => $this->links()->toArray() ?: null,
             'errors' => $this->errors,
         ]);
     }

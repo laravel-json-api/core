@@ -21,9 +21,7 @@ namespace LaravelJsonApi\Core\Responses\Concerns;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\JsonApi;
-use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
-use LaravelJsonApi\Core\Facades\JsonApi as JsonApiFacade;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
@@ -78,7 +76,7 @@ trait IsResponsable
             return $this->jsonApi;
         }
 
-        return $this->jsonApi = JsonApiFacade::server()->jsonApi();
+        return $this->jsonApi = new JsonApi();
     }
 
     /**
