@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Store;
 
+use Illuminate\Support\Collection;
 use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Store\CreatesResources;
 use LaravelJsonApi\Contracts\Store\DeletesResources;
@@ -78,6 +79,18 @@ class Store implements StoreContract
         return $this
             ->resources($resourceType)
             ->find($resourceId);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function findMany(array $identifiers): iterable
+    {
+        return collect($identifiers)->groupBy('type')->map(function(Collection $ids, $type) {
+            return collect($this->resources($type)->findMany(
+                $ids->pluck('id')->unique()->all()
+            ));
+        })->flatten();
     }
 
     /**

@@ -31,6 +31,12 @@ interface Store
     public function find(string $resourceType, string $resourceId): ?object;
 
     /**
+     * @param array $identifiers
+     * @return iterable
+     */
+    public function findMany(array $identifiers): iterable;
+
+    /**
      * Does a model exist for the supplied resource type and id?
      *
      * @param string $resourceType
