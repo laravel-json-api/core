@@ -283,6 +283,14 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     }
 
     /**
+     * @inheritDoc
+     */
+    public function authorizable(): bool
+    {
+        return true;
+    }
+
+    /**
      * @return array
      */
     private function allFields(): array

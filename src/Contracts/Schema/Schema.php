@@ -164,4 +164,11 @@ interface Schema extends Traversable
      * @return string[]|iterable
      */
      public function sortable(): iterable;
+
+    /**
+     * Determine if the resource is authorizable.
+     *
+     * @return bool
+     */
+     public function authorizable(): bool;
 }

@@ -75,6 +75,13 @@ interface Server
     public function encoder(): Encoder;
 
     /**
+     * Determine if the server is authorizable.
+     *
+     * @return bool
+     */
+    public function authorizable(): bool;
+
+    /**
      * @param $parameters
      * @param bool|null $secure
      * @return string

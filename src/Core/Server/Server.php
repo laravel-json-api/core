@@ -154,6 +154,14 @@ abstract class Server implements ServerContract
     /**
      * @inheritDoc
      */
+    public function authorizable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function url($parameters, bool $secure = null): string
     {
         return url($this->baseUri(), $parameters, $secure);
