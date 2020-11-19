@@ -75,7 +75,7 @@ class Error implements Serializable
     /**
      * Create a JSON API error object.
      *
-     * @param Error|array $value
+     * @param Error|Enumerable|array $value
      * @return Error
      */
     public static function cast($value): Error
