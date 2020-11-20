@@ -30,7 +30,7 @@ use LaravelJsonApi\Core\Responses\ErrorResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
-class JsonApiException extends Exception implements HttpExceptionInterface, Responsable
+class JsonApiException extends Exception implements HttpExceptionInterface, Responsable, ErrorProvider
 {
 
     use IsResponsable;
@@ -98,6 +98,14 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
      * @return ErrorList
      */
     public function getErrors(): ErrorList
+    {
+        return $this->toErrors();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toErrors(): ErrorList
     {
         return $this->errors;
     }

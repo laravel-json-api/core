@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
-use Illuminate\Support\Enumerable;
+use IteratorAggregate;
 use LaravelJsonApi\Contracts\ErrorProvider;
 use LaravelJsonApi\Contracts\Serializable as SerializableContract;
 use LaravelJsonApi\Core\Document\Concerns\Serializable;
@@ -31,7 +31,7 @@ use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Facades\JsonApi as JsonApiFacade;
 use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
-class ErrorResponse implements SerializableContract, Responsable
+class ErrorResponse implements SerializableContract, Responsable, ErrorProvider, IteratorAggregate
 {
 
     use IsResponsable;
@@ -82,6 +82,22 @@ class ErrorResponse implements SerializableContract, Responsable
         $this->status = $status;
 
         return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toErrors(): ErrorList
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIterator()
+    {
+        yield from $this->errors;
     }
 
     /**
