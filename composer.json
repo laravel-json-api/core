@@ -5,7 +5,6 @@
         "jsonapi.org",
         "json-api",
         "jsonapi",
-        "json:api",
         "laravel"
     ],
     "homepage": "https://github.com/laravel-json-api/core",
