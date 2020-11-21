@@ -168,6 +168,8 @@ abstract class Server implements ServerContract
     }
 
     /**
+     * The base URI namespace for this server.
+     *
      * @return string
      */
     protected function baseUri(): string

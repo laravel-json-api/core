@@ -49,7 +49,18 @@ trait MatchesIds
      */
     public function uuid(): self
     {
-        $this->pattern = '[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}';
+        return $this->matchAs('[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}');
+    }
+
+    /**
+     * Set the pattern for the ID field.
+     *
+     * @param string $pattern
+     * @return $this
+     */
+    public function matchAs(string $pattern): self
+    {
+        $this->pattern = $pattern;
 
         return $this;
     }

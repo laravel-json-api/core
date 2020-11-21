@@ -61,7 +61,7 @@ class ServerRepository implements RepositoryContract
             throw new InvalidArgumentException('Expecting a non-empty JSON API server name.');
         }
 
-        $class = $this->config->get("json-api.servers.{$name}");
+        $class = $this->config->get("jsonapi.servers.{$name}");
 
         if (empty($class) || !class_exists($class)) {
             throw new RuntimeException("Server {$name} does not exist in config or is not a valid class.");
