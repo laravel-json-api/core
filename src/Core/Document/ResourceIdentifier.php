@@ -57,6 +57,18 @@ class ResourceIdentifier
     }
 
     /**
+     * Fluent constructor.
+     *
+     * @param string $type
+     * @param string $id
+     * @return ResourceIdentifier
+     */
+    public static function make(string $type, string $id): self
+    {
+        return new self($type, $id);
+    }
+
+    /**
      * ResourceIdentifier constructor.
      *
      * @param string $type

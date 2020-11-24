@@ -157,10 +157,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function identifier(): ResourceIdentifier
     {
-        return new ResourceIdentifier(
-            $this->type(),
-            $this->id()
-        );
+        return ResourceIdentifier::make($this->type(), $this->id())
+            ->setMeta($this->identifierMeta());
     }
 
     /**
@@ -244,6 +242,16 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      * @return array
      */
     protected function selfMeta(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get meta for the resource's identifier.
+     *
+     * @return array
+     */
+    protected function identifierMeta(): array
     {
         return [];
     }
