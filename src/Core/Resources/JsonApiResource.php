@@ -71,16 +71,22 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get the resource's attributes.
+     *
      * @return iterable
      */
     abstract public function attributes(): iterable;
 
     /**
+     * Get the resource's relationships.
+     *
      * @return iterable
      */
     abstract public function relationships(): iterable;
 
     /**
+     * Get the resource's `self` link URL.
+     *
      * @return string
      */
     public function selfUrl(): string
@@ -96,6 +102,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get the resource's type.
+     *
      * @return string
      */
     public function type(): string
@@ -108,6 +116,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get the resource's id.
+     *
      * @return string
      */
     public function id(): string
@@ -120,6 +130,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Was the resource created in the current HTTP request?
+     *
      * @return bool
      */
     public function wasCreated(): bool
@@ -132,6 +144,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get the resource identifier for this resource.
+     *
      * @return ResourceIdentifier
      */
     public function identifier(): ResourceIdentifier
@@ -143,6 +157,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get the resource's meta.
+     *
      * @return array
      */
     public function meta(): array
@@ -151,14 +167,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
-     * @return bool
-     */
-    public function hasMeta(): bool
-    {
-        return !empty($this->meta());
-    }
-
-    /**
+     * Get the resource's links.
+     *
      * @return Links
      */
     public function links(): Links
@@ -167,6 +177,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get a resource relation by name.
+     *
      * @param string $name
      * @return Relation
      */
@@ -187,6 +199,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Prepare the resource to become an HTTP response.
+     *
      * @param Request $request
      * @return ResourceResponse
      */
@@ -204,6 +218,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get the `self` link for the resource.
+     *
      * @return Link
      */
     protected function selfLink(): Link
@@ -212,6 +228,8 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Create a new resource relation.
+     *
      * @param string $fieldName
      * @param string|null $keyName
      * @return Relation
@@ -222,9 +240,11 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Guess the resource's type.
+     *
      * @return string
      */
-    protected static function guessType(): string
+    private static function guessType(): string
     {
         $fqn = static::class;
 
