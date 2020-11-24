@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources;
 
 use Closure;
+use InvalidArgumentException;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Resources\Skippable;
 use LogicException;
@@ -33,18 +34,22 @@ class ConditionalAttrs implements IteratorAggregate, Skippable
     private bool $check;
 
     /**
-     * @var iterable
+     * @var Closure|iterable
      */
-    private iterable $values;
+    private $values;
 
     /**
      * ConditionalAttrs constructor.
      *
      * @param bool $bool
-     * @param iterable $values
+     * @param Closure|iterable $values
      */
-    public function __construct(bool $bool, iterable $values)
+    public function __construct(bool $bool, $values)
     {
+        if (!$values instanceof Closure && !is_iterable($values)) {
+            throw new InvalidArgumentException('Expecting an iterable value or Closure.');
+        }
+
         $this->check = $bool;
         $this->values = $values;
     }
@@ -68,13 +73,31 @@ class ConditionalAttrs implements IteratorAggregate, Skippable
             throw new LogicException('Conditional attributes must not be iterated.');
         }
 
-        foreach ($this->values as $key => $value) {
+        foreach ($this->values() as $key => $value) {
             if ($value instanceof Closure) {
                 $value = ($value)();
             }
 
             yield $key => $value;
         }
+    }
+
+    /**
+     * @return iterable
+     */
+    private function values(): iterable
+    {
+        if ($this->values instanceof Closure) {
+            $values = ($this->values)();
+
+            if (is_iterable($values)) {
+                return $values;
+            }
+
+            throw new LogicException('Conditional attributes closure must return an iterable value.');
+        }
+
+        return $this->values;
     }
 
 }

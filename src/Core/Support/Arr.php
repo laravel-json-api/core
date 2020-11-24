@@ -44,7 +44,7 @@ final class Arr
     }
 
     /**
-     * Recursively camelize all keys in the provided array.
+     * Recursively camel-case all keys in the provided array.
      *
      * @param iterable|null $data
      * @return array
@@ -65,7 +65,7 @@ final class Arr
     }
 
     /**
-     * Recursively dasherize all keys in the provided array.
+     * Recursively dash-case all keys in the provided array.
      *
      * @param iterable|null $data
      * @return array

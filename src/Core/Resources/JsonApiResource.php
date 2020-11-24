@@ -22,13 +22,13 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\DelegatesToResource;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
+use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\ResourceResponse;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
@@ -41,24 +41,28 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     use DelegatesToResource;
 
     /**
+     * The resource.
+     *
      * @var Model|object
      */
     public object $resource;
 
     /**
+     * The resource type.
+     *
      * @var string
      */
     protected string $type = '';
 
     /**
-     * @var array
-     */
-    private static array $types = [];
-
-    /**
      * @var string|null
      */
     private ?string $selfUri = null;
+
+    /**
+     * @var array
+     */
+    private static array $types = [];
 
     /**
      * JsonApiResource constructor.

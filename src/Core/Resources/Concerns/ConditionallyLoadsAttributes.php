@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Resources\Concerns;
 
+use Closure;
 use LaravelJsonApi\Core\Resources\ConditionalAttr;
 use LaravelJsonApi\Core\Resources\ConditionalAttrs;
 
@@ -41,10 +42,10 @@ trait ConditionallyLoadsAttributes
      * Conditionally include a set of attribute values.
      *
      * @param bool $check
-     * @param iterable $values
+     * @param Closure|iterable $values
      * @return ConditionalAttrs
      */
-    protected function mergeWhen(bool $check, iterable $values): ConditionalAttrs
+    protected function mergeWhen(bool $check, $values): ConditionalAttrs
     {
         return new ConditionalAttrs($check, $values);
     }
