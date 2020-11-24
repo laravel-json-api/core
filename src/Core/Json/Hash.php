@@ -32,13 +32,19 @@ class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Json
     use Concerns\Hashable;
 
     /**
-     * @param $value
+     * Cast a value to a JSON hash.
+     *
+     * @param Hash|JsonSerializable|array|null $value
      * @return static
      */
     public static function cast($value): self
     {
         if ($value instanceof self) {
             return $value;
+        }
+
+        if ($value instanceof JsonSerializable) {
+            $value = $value->jsonSerialize();
         }
 
         if (is_array($value) || is_null($value)) {

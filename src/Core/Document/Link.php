@@ -63,9 +63,9 @@ class Link implements Serializable
      *
      * @param string $key
      * @param LinkHref|string $href
-     * @param Hash|null $meta
+     * @param mixed|null $meta
      */
-    public function __construct(string $key, $href, Hash $meta = null)
+    public function __construct(string $key, $href, $meta = null)
     {
         if (empty($key)) {
             throw new InvalidArgumentException('Expecting key to be a non-empty string.');
@@ -73,7 +73,7 @@ class Link implements Serializable
 
         $this->key = $key;
         $this->href = LinkHref::cast($href);
-        $this->meta = $meta;
+        $this->setMeta($meta);
     }
 
     /**

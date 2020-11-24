@@ -57,7 +57,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * @var string|null
      */
-    private ?string $selfUri = null;
+    protected ?string $selfUri = null;
 
     /**
      * @var array
@@ -80,13 +80,6 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      * @return iterable
      */
     abstract public function attributes(): iterable;
-
-    /**
-     * Get the resource's relationships.
-     *
-     * @return iterable
-     */
-    abstract public function relationships(): iterable;
 
     /**
      * Get the resource's `self` link URL.
@@ -131,6 +124,16 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
         }
 
         throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
+    }
+
+    /**
+     * Get the resource's relationships.
+     *
+     * @return iterable
+     */
+    public function relationships(): iterable
+    {
+        return [];
     }
 
     /**
@@ -228,7 +231,21 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     protected function selfLink(): Link
     {
-        return new Link('self', new LinkHref($this->selfUrl()));
+        return new Link(
+            'self',
+            new LinkHref($this->selfUrl()),
+            $this->selfMeta()
+        );
+    }
+
+    /**
+     * Get meta for the `self` link.
+     *
+     * @return array
+     */
+    protected function selfMeta(): array
+    {
+        return [];
     }
 
     /**

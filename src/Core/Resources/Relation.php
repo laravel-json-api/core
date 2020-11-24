@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Resources;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Support\Str;
@@ -43,6 +44,11 @@ class Relation
      * @var string|null
      */
     private ?string $keyName;
+
+    /**
+     * @var string|null
+     */
+    private ?string $uriName = null;
 
     /**
      * @var mixed|null
@@ -88,7 +94,7 @@ class Relation
     ) {
         $this->resource = $resource;
         $this->fieldName = $fieldName;
-        $this->keyName = $keyName ?: $fieldName;
+        $this->keyName = $keyName ?: Str::camel($fieldName);
         $this->hasData = false;
         $this->showData = false;
         $this->showSelf = true;
@@ -165,7 +171,7 @@ class Relation
         return \sprintf(
             '%s/relationships/%s',
             $this->resource->selfUrl(),
-            Str::dasherize($this->fieldName)
+            $this->uriFieldName()
         );
     }
 
@@ -177,8 +183,37 @@ class Relation
         return \sprintf(
             '%s/%s',
             $this->resource->selfUrl(),
-            Str::dasherize($this->fieldName)
+            $this->uriFieldName()
         );
+    }
+
+    /**
+     * Use the field-name as-is for relationship URLs.
+     *
+     * @return $this
+     */
+    public function retainFieldName(): self
+    {
+        $this->uriName = $this->fieldName();
+
+        return $this;
+    }
+
+    /**
+     * Use the provided string as the URI fragment for the field name.
+     *
+     * @param string $uri
+     * @return $this
+     */
+    public function withUriFieldName(string $uri): self
+    {
+        if (empty($uri)) {
+            throw new InvalidArgumentException('Expecting a non-empty string URI fragment.');
+        }
+
+        $this->uriName = $uri;
+
+        return $this;
     }
 
     /**
@@ -213,7 +248,7 @@ class Relation
     }
 
     /**
-     * @param $data
+     * @param mixed $data
      * @return $this
      */
     public function withData($data): self
@@ -259,12 +294,26 @@ class Relation
     public function withMeta($meta): self
     {
         if (!is_array($meta) && !$meta instanceof Closure) {
-            throw new \InvalidArgumentException('Expecting meta to be an array or a closure.');
+            throw new InvalidArgumentException('Expecting meta to be an array or a closure.');
         }
 
         $this->meta = $meta;
 
         return $this;
+    }
+
+    /**
+     * Get the field name for URIs.
+     *
+     * @return string
+     */
+    private function uriFieldName(): string
+    {
+        if ($this->uriName) {
+            return $this->uriName;
+        }
+
+        return $this->uriName = Str::dasherize($this->fieldName);
     }
 
 }
