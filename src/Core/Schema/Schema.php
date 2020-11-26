@@ -25,6 +25,8 @@ use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LaravelJsonApi\Core\Auth\Authorizer;
+use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LogicException;
 use function array_keys;
@@ -34,16 +36,6 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
 {
 
     use SchemaAware;
-
-    /**
-     * @var callable|null
-     */
-    public static $resourceTypeResolver;
-
-    /**
-     * @var callable|null
-     */
-    protected static $resourceResolver;
 
     /**
      * The maximum depth of include paths.
@@ -56,6 +48,21 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      * @var array|null
      */
     private ?array $fields = null;
+
+    /**
+     * @var callable|null
+     */
+    private static $resourceTypeResolver;
+
+    /**
+     * @var callable|null
+     */
+    private static $resourceResolver;
+
+    /**
+     * @var callable|null
+     */
+    private static $authorizerResolver;
 
     /**
      * Get the resource fields.
@@ -104,6 +111,27 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
         $resolver = static::$resourceResolver ?: new ResourceResolver();
 
         return $resolver(static::class);
+    }
+
+    /**
+     * Specify the callback to use to guess the authorizer class from the schema class.
+     *
+     * @param callable $resolver
+     * @return void
+     */
+    public static function guessAuthorizerUsing(callable $resolver): void
+    {
+        static::$authorizerResolver = $resolver;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public static function authorizer(): string
+    {
+        $resolver = static::$authorizerResolver ?: new AuthorizerResolver();
+
+        return $resolver(static::class) ?: Authorizer::class;
     }
 
     /**
