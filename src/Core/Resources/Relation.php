@@ -58,22 +58,27 @@ class Relation
     /**
      * @var bool
      */
-    private bool $hasData;
+    private bool $hasData = false;
 
     /**
      * @var bool
      */
-    private bool $showData;
+    private bool $showData = false;
 
     /**
      * @var bool
      */
-    private bool $showSelf;
+    private bool $showSelf = true;
 
     /**
      * @var bool
      */
-    private bool $showRelated;
+    private bool $showRelated = true;
+
+    /**
+     * @var bool
+     */
+    private bool $validated = false;
 
     /**
      * @var array|Closure
@@ -95,10 +100,6 @@ class Relation
         $this->resource = $resource;
         $this->fieldName = $fieldName;
         $this->keyName = $keyName ?: Str::camel($fieldName);
-        $this->hasData = false;
-        $this->showData = false;
-        $this->showSelf = true;
-        $this->showRelated = true;
     }
 
     /**
@@ -300,6 +301,26 @@ class Relation
         $this->meta = $meta;
 
         return $this;
+    }
+
+    /**
+     * Mark the relation as required for validation.
+     *
+     * @return $this
+     */
+    public function mustValidate(): self
+    {
+        $this->validated = true;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValidated(): bool
+    {
+        return $this->validated;
     }
 
     /**
