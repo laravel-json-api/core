@@ -131,7 +131,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     {
         $resolver = static::$authorizerResolver ?: new AuthorizerResolver();
 
-        return $resolver(static::class) ?: Authorizer::class;
+        return $resolver(static::class);
     }
 
     /**

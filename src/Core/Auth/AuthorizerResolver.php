@@ -26,6 +26,13 @@ final class AuthorizerResolver
 {
 
     /**
+     * The default authorizer.
+     *
+     * @var string
+     */
+    private static string $defaultAuthorizer = Authorizer::class;
+
+    /**
      * @var array
      */
     private static array $cache = [];
@@ -40,6 +47,22 @@ final class AuthorizerResolver
     public static function register(string $schemaClass, string $authorizerClass): void
     {
         self::$cache[$schemaClass] = $authorizerClass;
+    }
+
+    /**
+     * Set the default authorizer class.
+     *
+     * @param string $authorizerClass
+     * @return void
+     */
+    public static function useDefault(string $authorizerClass): void
+    {
+        if (class_exists($authorizerClass)) {
+            self::$defaultAuthorizer = $authorizerClass;
+            return;
+        }
+
+        throw new \InvalidArgumentException('Expecting a default authorizer class that exists.');
     }
 
     /**
@@ -60,6 +83,6 @@ final class AuthorizerResolver
             return self::$cache[$schemaClass] = $guess;
         }
 
-        return self::$cache[$schemaClass] = Authorizer::class;
+        return self::$cache[$schemaClass] = self::$defaultAuthorizer;
     }
 }
