@@ -68,13 +68,19 @@ class ResourceResponse implements Responsable
      */
     public function toResponse($request)
     {
+        $links = $this->links();
+
+        if ($this->resource) {
+            $links->push($this->resource->selfLink());
+        }
+
         $document = JsonApi::server()->encoder()
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withResource($this->resource)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->meta)
-            ->withLinks($this->links)
+            ->withLinks($links)
             ->toJson($this->encodeOptions);
 
         return new Response(

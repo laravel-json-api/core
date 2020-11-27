@@ -48,6 +48,19 @@ class RelationshipResponse implements Responsable
     private $related;
 
     /**
+     * Fluent constructor.
+     *
+     * @param object $resource
+     * @param string $fieldName
+     * @param Page|Model|iterable|null $related
+     * @return static
+     */
+    public static function make(object $resource, string $fieldName, $related): self
+    {
+        return new self($resource, $fieldName, $related);
+    }
+
+    /**
      * RelationshipResponse constructor.
      *
      * @param object $resource

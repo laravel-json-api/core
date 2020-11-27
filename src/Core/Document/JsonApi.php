@@ -38,6 +38,17 @@ class JsonApi implements Serializable
     private ?string $version;
 
     /**
+     * Fluently construct a JSON:API object.
+     *
+     * @param string|null $version
+     * @return JsonApi
+     */
+    public static function make(string $version = null): self
+    {
+        return new self($version);
+    }
+
+    /**
      * Create a JSON API object.
      *
      * @param JsonApi|Enumerable|array|string|null $value

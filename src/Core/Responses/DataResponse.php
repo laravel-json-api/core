@@ -39,6 +39,22 @@ class DataResponse implements Responsable
     private $value;
 
     /**
+     * @var bool
+     */
+    private bool $created;
+
+    /**
+     * Fluent constructor.
+     *
+     * @param Page|Model|iterable|null $value
+     * @return DataResponse
+     */
+    public static function make($value): self
+    {
+        return new self($value);
+    }
+
+    /**
      * DataResponse constructor.
      *
      * @param Page|Model|iterable|null $value
@@ -46,6 +62,16 @@ class DataResponse implements Responsable
     public function __construct($value)
     {
         $this->value = $value;
+    }
+
+    /**
+     * @return $this
+     */
+    public function didCreate(): self
+    {
+        $this->created = true;
+
+        return $this;
     }
 
     /**
@@ -94,7 +120,8 @@ class DataResponse implements Responsable
             ->resolve($this->value);
 
         if ($parsed instanceof JsonApiResource) {
-            return $parsed->prepareResponse($request);
+            $response = $parsed->prepareResponse($request);
+            return $this->created ? $response->didCreate() : $response;
         }
 
         return (new ResourceCollection($parsed))->prepareResponse($request);

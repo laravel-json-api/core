@@ -99,6 +99,20 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     }
 
     /**
+     * Get the `self` link for the resource.
+     *
+     * @return Link
+     */
+    public function selfLink(): Link
+    {
+        return new Link(
+            'self',
+            new LinkHref($this->selfUrl()),
+            $this->selfMeta()
+        );
+    }
+
+    /**
      * Get the resource's type.
      *
      * @return string
@@ -220,20 +234,6 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     public function toResponse($request)
     {
         return $this->prepareResponse($request)->toResponse($request);
-    }
-
-    /**
-     * Get the `self` link for the resource.
-     *
-     * @return Link
-     */
-    protected function selfLink(): Link
-    {
-        return new Link(
-            'self',
-            new LinkHref($this->selfUrl()),
-            $this->selfMeta()
-        );
     }
 
     /**

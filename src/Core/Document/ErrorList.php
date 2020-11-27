@@ -230,5 +230,4 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
             ->toResponse($request);
     }
 
-
 }

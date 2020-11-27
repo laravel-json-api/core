@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Responses\Concerns;
 
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
@@ -143,6 +144,20 @@ trait IsResponsable
     }
 
     /**
+     * Set a header.
+     *
+     * @param string $name
+     * @param string|null $value
+     * @return $this
+     */
+    public function withHeader(string $name, string $value = null): self
+    {
+        $this->headers[$name] = $value;
+
+        return $this;
+    }
+
+    /**
      * Set response headers.
      *
      * @param array $headers
@@ -171,6 +186,10 @@ trait IsResponsable
      */
     protected function includePaths($request): ?IncludePaths
     {
+        if ($request instanceof QueryParameters) {
+            return $request->includePaths();
+        }
+
         if ($request->query->has('include')) {
             return IncludePaths::fromString($request->query('include') ?: '');
         }
@@ -184,6 +203,10 @@ trait IsResponsable
      */
     protected function fieldSets($request): ?FieldSets
     {
+        if ($request instanceof QueryParameters) {
+            return $request->sparseFieldSets();
+        }
+
         if ($request->query->has('fields')) {
             return FieldSets::fromArray($request->query('fields') ?: []);
         }

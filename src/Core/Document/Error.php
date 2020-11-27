@@ -19,13 +19,15 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Enumerable;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable;
+use LaravelJsonApi\Core\Responses\ErrorResponse;
 use LogicException;
 use function array_filter;
 
-class Error implements Serializable
+class Error implements Serializable, Responsable
 {
 
     use Concerns\HasLinks;
@@ -430,4 +432,22 @@ class Error implements Serializable
             'title' => $this->title(),
         ]);
     }
+
+    /**
+     * @param $request
+     * @return ErrorResponse
+     */
+    public function prepareResponse($request): ErrorResponse
+    {
+        return new ErrorResponse($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toResponse($request)
+    {
+        return $this->prepareResponse($request)->toResponse($request);
+    }
+
 }

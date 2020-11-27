@@ -59,6 +59,17 @@ class ErrorResponse implements SerializableContract, Responsable, ErrorProvider,
     }
 
     /**
+     * Fluently construct an error response.
+     *
+     * @param ErrorList|ErrorProvider|Error|Error[] $errors
+     * @return static
+     */
+    public static function make($errors): self
+    {
+        return new self($errors);
+    }
+
+    /**
      * ErrorResponse constructor.
      *
      * @param ErrorList|ErrorProvider|Error|Error[] $errors
