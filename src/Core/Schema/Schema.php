@@ -273,11 +273,15 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function includePaths(): iterable
     {
-        return new IncludePathIterator(
-            $this->schemas(),
-            $this,
-            $this->maxDepth
-        );
+        if (0 < $this->maxDepth) {
+            return new IncludePathIterator(
+                $this->schemas(),
+                $this,
+                $this->maxDepth
+            );
+        }
+
+        return [];
     }
 
     /**
