@@ -21,12 +21,12 @@ namespace LaravelJsonApi\Core\Pagination;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Responses\PaginatedResourceResponse;
+use LaravelJsonApi\Core\Support\Arr;
 use function array_filter;
 use function collect;
 use function count;
@@ -61,6 +61,11 @@ class Page implements PageContract
     private string $perPageParam = 'size';
 
     /**
+     * @var string|null
+     */
+    private ?string $metaCase = null;
+
+    /**
      * @param PageContract|Paginator $page
      * @return PageContract
      */
@@ -78,6 +83,17 @@ class Page implements PageContract
     }
 
     /**
+     * Fluent constructor.
+     *
+     * @param Paginator $paginator
+     * @return Page
+     */
+    public static function make(Paginator $paginator): self
+    {
+        return new self($paginator);
+    }
+
+    /**
      * Page constructor.
      *
      * @param Paginator $paginator
@@ -88,20 +104,70 @@ class Page implements PageContract
     }
 
     /**
+     * Use snake-case keys in the meta object.
+     *
+     * @return $this
+     */
+    public function withSnakeCaseMeta(): self
+    {
+        return $this->withMetaCase('snake');
+    }
+
+    /**
+     * Use dash-case keys in the meta object.
+     *
+     * @return $this
+     */
+    public function withDashCaseMeta(): self
+    {
+        return $this->withMetaCase('dash');
+    }
+
+    /**
+     * Use camel-case keys in the meta object.
+     *
+     * @return $this
+     */
+    public function withCamelCaseMeta(): self
+    {
+        return $this->withMetaCase(null);
+    }
+
+    /**
+     * Set the key-case to use for meta.
+     *
+     * @param string|null $case
+     * @return $this
+     */
+    public function withMetaCase(?string $case): self
+    {
+        if (in_array($case, [null, 'snake', 'dash'], true)) {
+            $this->metaCase = $case;
+            return $this;
+        }
+
+        throw new \InvalidArgumentException('Invalid meta case: ' . $case ?? 'null');
+    }
+
+    /**
      * @inheritDoc
      */
     public function meta(): array
     {
         $meta = collect([
-            'current_page' => (int) $this->paginator->currentPage(),
+            'currentPage' => (int) $this->paginator->currentPage(),
             'from' => (int) $this->paginator->firstItem(),
-            'last_page' => $this->isLengthAware() ? (int) $this->paginator->lastPage() : null,
-            'per_page' => (int) $this->paginator->perPage(),
+            'lastPage' => $this->isLengthAware() ? (int) $this->paginator->lastPage() : null,
+            'perPage' => (int) $this->paginator->perPage(),
             'to' => (int) $this->paginator->lastItem(),
             'total' => $this->isLengthAware() ? (int) $this->paginator->total() : null,
-        ])->reject(function ($value) {
-            return is_null($value);
-        })->all();
+        ])->reject(fn ($value) => is_null($value))->all();
+
+        if ('snake' === $this->metaCase) {
+            $meta = Arr::underscore($meta);
+        } else if ('dash' === $this->metaCase) {
+            $meta = Arr::dasherize($meta);
+        }
 
         if ($this->metaKey) {
             return [$this->metaKey => $meta];
@@ -150,7 +216,7 @@ class Page implements PageContract
      */
     public function next(): ?Link
     {
-        if ($this->isLengthAware() && $this->paginator->hasMorePages()) {
+        if ($this->paginator->hasMorePages()) {
             return new Link('next', $this->url(
                 $this->paginator->currentPage() + 1
             ));
