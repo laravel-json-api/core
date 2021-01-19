@@ -158,7 +158,18 @@ abstract class AbstractPage implements PageContract
      */
     public function withoutMeta(): self
     {
-        $this->hasMeta = false;
+        return $this->withMeta(false);
+    }
+
+    /**
+     * Set whether to include page meta using a boolean flag.
+     *
+     * @param bool $bool
+     * @return $this
+     */
+    public function withMeta(bool $bool): self
+    {
+        $this->hasMeta = $bool;
 
         return $this;
     }
