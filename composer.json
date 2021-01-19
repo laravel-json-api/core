@@ -30,7 +30,7 @@
         "illuminate/support": "^8.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
@@ -45,7 +45,6 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.x-dev",
             "dev-develop": "1.x-dev"
         }
     },
