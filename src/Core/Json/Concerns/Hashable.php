@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Json\Concerns;
 
 use Generator;
+use InvalidArgumentException;
 use LaravelJsonApi\Core\Support\Arr;
-use LaravelJsonApi\Core\Support\Str;
 use function iterator_to_array;
 
 trait Hashable
@@ -97,9 +97,9 @@ trait Hashable
      */
     public function camelize(): self
     {
-        $this->using(static fn(string $name) => Str::camel($name));
-
-        return $this;
+        return $this->serializeUsing(
+            static fn(array $values) => Arr::camelize($values)
+        );
     }
 
     /**
@@ -109,9 +109,22 @@ trait Hashable
      */
     public function dasherize(): self
     {
-        $this->using(static fn(string $name) => Str::dasherize($name));
+        return $this->serializeUsing(
+            static fn(array $values) => Arr::dasherize($values)
+        );
+    }
 
-        return $this;
+    /**
+     * Mark the hash as having snake-case keys.
+     *
+     * We use underscore because this correctly converts both camel and
+     * dash case keys to snake case.
+     *
+     * @return $this
+     */
+    public function snake(): self
+    {
+        return $this->underscore();
     }
 
     /**
@@ -121,22 +134,56 @@ trait Hashable
      */
     public function underscore(): self
     {
-        $this->using(static fn(string $name) => Str::underscore($name));
+        return $this->serializeUsing(
+            static fn(array $values) => Arr::underscore($values)
+        );
+    }
+
+    /**
+     * Mark the hash as using the provided case for keys.
+     *
+     * @param string $case
+     * @return $this
+     */
+    public function useCase(string $case): self
+    {
+        switch ($case) {
+            case 'snake' :
+                $this->snake();
+                break;
+
+            case 'underscore' :
+                $this->underscore();
+                break;
+
+            case 'dash' :
+            case 'dasherize' :
+                $this->dasherize();
+                break;
+
+            case 'camel' :
+            case 'camelize' :
+                $this->camelize();
+                break;
+
+            default :
+                throw new InvalidArgumentException('Unexpected case.');
+        }
 
         return $this;
     }
 
     /**
-     * Use the callback to transform keys.
+     * Use the callback to serialize the array.
      *
-     * Transforming keys is deferred until when the hash is traversed.
-     * This ensures that the cost of converting keys is only incurred
+     * Serialization is deferred until when the hash is traversed.
+     * This ensures that the cost of serialization is only incurred
      * if the hash is iterated.
      *
      * @param callable $callback
      * @return $this
      */
-    public function using(callable $callback): self
+    public function serializeUsing(callable $callback): self
     {
         $this->serializer = $callback;
 
@@ -187,16 +234,17 @@ trait Hashable
      */
     public function cursor(): Generator
     {
+        if ($fn = $this->serializer) {
+            $values = $fn($this->value);
+        } else {
+            $values = $this->value;
+        }
+
         if (is_int($this->fieldNameOrder)) {
-            ksort($this->value, $this->fieldNameOrder);
+            ksort($values, $this->fieldNameOrder);
         }
 
-        $fn = $this->serializer;
-
-        foreach ($this->value as $key => $value) {
-            $key = $fn ? $fn($key) : $key;
-            yield $key => $value;
-        }
+        yield from $values;
     }
 
     /**
