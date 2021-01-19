@@ -24,31 +24,17 @@ use Illuminate\Contracts\Pagination\Paginator;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
-use LaravelJsonApi\Core\Document\Links;
-use LaravelJsonApi\Core\Responses\PaginatedResourceResponse;
-use LaravelJsonApi\Core\Support\Arr;
-use function array_filter;
 use function collect;
 use function count;
 use function is_null;
 
-class Page implements PageContract
+class Page extends AbstractPage
 {
 
     /**
      * @var Paginator|LengthAwarePaginator
      */
     private Paginator $paginator;
-
-    /**
-     * @var array|null
-     */
-    private ?array $queryParameters = null;
-
-    /**
-     * @var string|null
-     */
-    private ?string $metaKey = null;
 
     /**
      * @var string
@@ -59,11 +45,6 @@ class Page implements PageContract
      * @var string
      */
     private string $perPageParam = 'size';
-
-    /**
-     * @var string|null
-     */
-    private ?string $metaCase = null;
 
     /**
      * @param PageContract|Paginator $page
@@ -104,101 +85,15 @@ class Page implements PageContract
     }
 
     /**
-     * Use snake-case keys in the meta object.
-     *
-     * @return $this
-     */
-    public function withSnakeCaseMeta(): self
-    {
-        return $this->withMetaCase('snake');
-    }
-
-    /**
-     * Use dash-case keys in the meta object.
-     *
-     * @return $this
-     */
-    public function withDashCaseMeta(): self
-    {
-        return $this->withMetaCase('dash');
-    }
-
-    /**
-     * Use camel-case keys in the meta object.
-     *
-     * @return $this
-     */
-    public function withCamelCaseMeta(): self
-    {
-        return $this->withMetaCase(null);
-    }
-
-    /**
-     * Set the key-case to use for meta.
-     *
-     * @param string|null $case
-     * @return $this
-     */
-    public function withMetaCase(?string $case): self
-    {
-        if (in_array($case, [null, 'snake', 'dash'], true)) {
-            $this->metaCase = $case;
-            return $this;
-        }
-
-        throw new \InvalidArgumentException('Invalid meta case: ' . $case ?? 'null');
-    }
-
-    /**
      * @inheritDoc
      */
-    public function meta(): array
-    {
-        $meta = collect([
-            'currentPage' => (int) $this->paginator->currentPage(),
-            'from' => (int) $this->paginator->firstItem(),
-            'lastPage' => $this->isLengthAware() ? (int) $this->paginator->lastPage() : null,
-            'perPage' => (int) $this->paginator->perPage(),
-            'to' => (int) $this->paginator->lastItem(),
-            'total' => $this->isLengthAware() ? (int) $this->paginator->total() : null,
-        ])->reject(fn ($value) => is_null($value))->all();
-
-        if ('snake' === $this->metaCase) {
-            $meta = Arr::underscore($meta);
-        } else if ('dash' === $this->metaCase) {
-            $meta = Arr::dasherize($meta);
-        }
-
-        if ($this->metaKey) {
-            return [$this->metaKey => $meta];
-        }
-
-        return $meta;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function links(): Links
-    {
-        return new Links(...array_filter([
-            $this->first(),
-            $this->prev(),
-            $this->next(),
-            $this->last(),
-        ]));
-    }
-
-    /**
-     * @return Link
-     */
-    public function first(): Link
+    public function first(): ?Link
     {
         return new Link('first', $this->url(1));
     }
 
     /**
-     * @return Link|null
+     * @inheritDoc
      */
     public function prev(): ?Link
     {
@@ -212,7 +107,7 @@ class Page implements PageContract
     }
 
     /**
-     * @return Link|null
+     * @inheritDoc
      */
     public function next(): ?Link
     {
@@ -226,7 +121,7 @@ class Page implements PageContract
     }
 
     /**
-     * @return Link|null
+     * @inheritDoc
      */
     public function last(): ?Link
     {
@@ -243,35 +138,12 @@ class Page implements PageContract
      */
     public function url(int $page): string
     {
-        $params = collect($this->queryParameters)->put('page', [
+        $params = $this->stringifyQuery([
             $this->pageParam => $page,
             $this->perPageParam => $this->paginator->perPage(),
-        ])->sortKeys()->all();
+        ]);
 
-        return $this->paginator->path() . '?' . Arr::query($params);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withQuery(iterable $query): PageContract
-    {
-        $this->queryParameters = collect($query)->all();
-
-        return $this;
-    }
-
-    /**
-     * Nest page meta using the provided key.
-     *
-     * @param string|null $key
-     * @return $this
-     */
-    public function withNestedMeta(?string $key = 'page'): self
-    {
-        $this->metaKey = $key;
-
-        return $this;
+        return $this->paginator->path() . '?' . $params;
     }
 
     /**
@@ -325,26 +197,24 @@ class Page implements PageContract
     }
 
     /**
-     * @param $request
-     * @return PaginatedResourceResponse
-     */
-    public function prepareResponse($request): PaginatedResourceResponse
-    {
-        return new PaginatedResourceResponse($this);
-    }
-
-    /**
      * @inheritDoc
      */
-    public function toResponse($request)
+    protected function metaForPage(): array
     {
-        return $this->prepareResponse($request)->toResponse($request);
+        return collect([
+            'currentPage' => (int) $this->paginator->currentPage(),
+            'from' => (int) $this->paginator->firstItem(),
+            'lastPage' => $this->isLengthAware() ? (int) $this->paginator->lastPage() : null,
+            'perPage' => (int) $this->paginator->perPage(),
+            'to' => (int) $this->paginator->lastItem(),
+            'total' => $this->isLengthAware() ? (int) $this->paginator->total() : null,
+        ])->reject(static fn ($value) => is_null($value))->all();
     }
 
     /**
      * @return bool
      */
-    protected function isLengthAware(): bool
+    private function isLengthAware(): bool
     {
         return $this->paginator instanceof LengthAwarePaginator;
     }

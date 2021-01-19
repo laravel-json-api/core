@@ -1,0 +1,254 @@
+<?php
+/*
+ * Copyright 2021 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+declare(strict_types=1);
+
+namespace LaravelJsonApi\Core\Pagination;
+
+use Illuminate\Support\Arr;
+use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
+use LaravelJsonApi\Core\Document\Link;
+use LaravelJsonApi\Core\Document\Links;
+use LaravelJsonApi\Core\Json\Hash;
+use LaravelJsonApi\Core\Responses\PaginatedResourceResponse;
+
+abstract class AbstractPage implements PageContract
+{
+
+    /**
+     * The key-case of the page meta.
+     *
+     * @var string|null
+     */
+    private ?string $metaCase = null;
+
+    /**
+     * The key to nest page meta under.
+     *
+     * @var string|null
+     */
+    private ?string $metaKey = null;
+
+    /**
+     * Whether the page has meta.
+     *
+     * @var bool
+     */
+    private bool $hasMeta = true;
+
+    /**
+     * The query parameters that must be used for links.
+     *
+     * @var array|null
+     */
+    private ?array $queryParameters = null;
+
+    /**
+     * Get the link to the first page.
+     *
+     * @return Link|null
+     */
+    abstract public function first(): ?Link;
+
+    /**
+     * Get the link to the previous page.
+     *
+     * @return Link|null
+     */
+    abstract public function prev(): ?Link;
+
+    /**
+     * Get the link to the next page.
+     *
+     * @return Link|null
+     */
+    abstract public function next(): ?Link;
+
+    /**
+     * Get the link to the last page.
+     *
+     * @return Link|null
+     */
+    abstract public function last(): ?Link;
+
+    /**
+     * Get the page's meta.
+     *
+     * @return array
+     */
+    abstract protected function metaForPage(): array;
+
+    /**
+     * Use snake-case keys in the meta object.
+     *
+     * @return $this
+     */
+    public function withSnakeCaseMeta(): self
+    {
+        return $this->withMetaCase('snake');
+    }
+
+    /**
+     * Use dash-case keys in the meta object.
+     *
+     * @return $this
+     */
+    public function withDashCaseMeta(): self
+    {
+        return $this->withMetaCase('dash');
+    }
+
+    /**
+     * Use camel-case keys in the meta object.
+     *
+     * @return $this
+     */
+    public function withCamelCaseMeta(): self
+    {
+        return $this->withMetaCase('camel');
+    }
+
+    /**
+     * Set the key-case to use for meta.
+     *
+     * @param string|null $case
+     * @return $this
+     */
+    public function withMetaCase(?string $case): self
+    {
+        if (in_array($case, [null, 'snake', 'dash'], true)) {
+            $this->metaCase = $case;
+            return $this;
+        }
+
+        throw new \InvalidArgumentException('Invalid meta case: ' . $case ?? 'null');
+    }
+
+    /**
+     * Nest page meta using the provided key.
+     *
+     * @param string|null $key
+     * @return $this
+     */
+    public function withNestedMeta(?string $key = 'page'): self
+    {
+        $this->metaKey = $key;
+
+        return $this;
+    }
+
+    /**
+     * Do not show page meta.
+     *
+     * @return $this
+     */
+    public function withoutMeta(): self
+    {
+        $this->hasMeta = false;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function withQuery(iterable $query): PageContract
+    {
+        $this->queryParameters = collect($query)->all();
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function meta(): array
+    {
+        if (false === $this->hasMeta) {
+            return [];
+        }
+
+        $hash = Hash::cast($this->metaForPage())->sorted();
+
+        if ($this->metaCase) {
+            $hash->useCase($this->metaCase);
+        }
+
+        if ($this->metaKey) {
+            return [$this->metaKey => $hash->all()];
+        }
+
+        return $hash->all();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function links(): Links
+    {
+        return new Links(...array_filter([
+            $this->first(),
+            $this->prev(),
+            $this->next(),
+            $this->last(),
+        ]));
+    }
+
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return PaginatedResourceResponse
+     */
+    public function prepareResponse($request): PaginatedResourceResponse
+    {
+        return new PaginatedResourceResponse($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toResponse($request)
+    {
+        return $this->prepareResponse($request)->toResponse($request);
+    }
+
+    /**
+     * Build new query parameters for the supplied page.
+     *
+     * @param array $page
+     * @return array
+     */
+    protected function buildQuery(array $page): array
+    {
+        ksort($page);
+
+        return collect($this->queryParameters)
+            ->put('page', $page)
+            ->sortKeys()
+            ->all();
+    }
+
+    /**
+     * Get string query parameters for the supplied page.
+     *
+     * @param array $page
+     * @return string
+     */
+    protected function stringifyQuery(array $page): string
+    {
+        return Arr::query($this->buildQuery($page));
+    }
+}
