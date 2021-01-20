@@ -36,4 +36,11 @@ interface ID extends Field, Sortable
      * @return bool
      */
     public function match(string $value): bool;
+
+    /**
+     * Does the resource accept client generated ids?
+     *
+     * @return bool
+     */
+    public function acceptsClientIds(): bool;
 }
