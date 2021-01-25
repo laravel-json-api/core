@@ -1,10 +1,14 @@
 # laravel-json-api/core
 
-Core contracts and support classes for Laravel JSON API packages.
+Core contracts and support classes for [Laravel JSON:API](https://laraveljsonapi.io) packages.
 
-## Status
+## Installation
 
-This package is in development.
+Install using [Composer](https://getcomposer.org)
+
+```bash
+composer require laravel-json-api/core
+```
 
 ## License
 

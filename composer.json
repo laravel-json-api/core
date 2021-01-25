@@ -23,15 +23,19 @@
         }
     ],
     "require": {
-        "php": "^7.3",
-        "ext-json": "*"
+        "php": "^7.4|^8.0",
+        "ext-json": "*",
+        "illuminate/contracts": "^8.0",
+        "illuminate/http": "^8.0",
+        "illuminate/support": "^8.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
-            "LaravelJsonApi\\Core\\": "src/"
+            "LaravelJsonApi\\Contracts\\": "src/Contracts",
+            "LaravelJsonApi\\Core\\": "src/Core"
         }
     },
     "autoload-dev": {
@@ -41,11 +45,10 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.x-dev",
             "dev-develop": "1.x-dev"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
