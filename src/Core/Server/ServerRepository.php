@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Server\Repository as RepositoryContract;
+use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use RuntimeException;
 use Throwable;
-use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 
 class ServerRepository implements RepositoryContract
 {

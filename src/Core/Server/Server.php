@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
-use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
 use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
+use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;

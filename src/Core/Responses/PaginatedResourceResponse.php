@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright 2020 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Pagination\Page;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
-use LaravelJsonApi\Core\Responses\ResourceCollectionResponse;
 
 class PaginatedResourceResponse extends ResourceCollectionResponse
 {
