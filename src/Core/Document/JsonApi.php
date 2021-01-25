@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Core\Document;
 use Illuminate\Support\Enumerable;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable;
-use LaravelJsonApi\Core\Json\Hash;
 use LogicException;
 use function array_filter;
 

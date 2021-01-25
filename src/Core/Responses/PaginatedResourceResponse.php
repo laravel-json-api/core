@@ -26,7 +26,6 @@ use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Pagination\Page;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
-use LaravelJsonApi\Core\Responses\ResourceCollectionResponse;
 
 class PaginatedResourceResponse extends ResourceCollectionResponse
 {

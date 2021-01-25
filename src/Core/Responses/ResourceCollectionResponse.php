@@ -23,8 +23,8 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Document\Links;
-use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Facades\JsonApi;
+use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
 
 class ResourceCollectionResponse implements Responsable

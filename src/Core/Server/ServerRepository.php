@@ -23,9 +23,9 @@ use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Server\Repository as RepositoryContract;
+use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use RuntimeException;
 use Throwable;
-use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 
 class ServerRepository implements RepositoryContract
 {

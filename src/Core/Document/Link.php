@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Document;
 
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable;
-use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Json\Json;
 
 class Link implements Serializable
