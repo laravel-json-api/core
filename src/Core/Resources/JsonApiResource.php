@@ -181,7 +181,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      * Get the resource's meta.
      *
      * @param Request|null $request
-     * @return array
+     * @return iterable
      */
     public function meta($request): iterable
     {

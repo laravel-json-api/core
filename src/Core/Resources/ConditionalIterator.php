@@ -67,7 +67,7 @@ class ConditionalIterator implements IteratorAggregate, JsonSerializable
      */
     public function all(): array
     {
-        return iterator_to_array($this->cursor());
+        return iterator_to_array($this);
     }
 
     /**
