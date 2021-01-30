@@ -19,6 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Resources;
 
+use LaravelJsonApi\Contracts\Resources\Serializer\Attribute;
+use LaravelJsonApi\Contracts\Resources\Serializer\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 
 class SchemaResource extends JsonApiResource
@@ -44,9 +46,28 @@ class SchemaResource extends JsonApiResource
     /**
      * @inheritDoc
      */
-    public function attributes(): iterable
+    public function attributes($request): iterable
     {
-        // TODO: Implement attributes() method.
+        foreach ($this->schema->attributes() as $attr) {
+            if ($attr instanceof Attribute && $attr->isNotHidden($request)) {
+                yield $attr->serializedFieldName() => $attr->serialize($this->resource);
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function relationships($request): iterable
+    {
+        foreach ($this->schema->relationships() as $relation) {
+            if ($relation instanceof Relation && $relation->isNotHidden($request)) {
+                yield $relation->serializedFieldName() => $relation->serialize(
+                    $this->resource,
+                    $this->selfUrl(),
+                );
+            }
+        }
     }
 
 }

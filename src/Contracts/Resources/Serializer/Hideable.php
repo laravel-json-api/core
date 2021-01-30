@@ -17,22 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Schema;
+namespace LaravelJsonApi\Contracts\Resources\Serializer;
 
-interface Field
+use Illuminate\Http\Request;
+
+interface Hideable
 {
 
     /**
-     * The JSON:API field name.
+     * Is the field hidden?
      *
-     * @return string
-     */
-    public function name(): string;
-
-    /**
-     * Can the field be listed in sparse field sets?
-     *
+     * @param Request|null $request
      * @return bool
      */
-    public function isSparseField(): bool;
+    public function isHidden($request): bool;
+
+    /**
+     * Is the field not hidden?
+     *
+     * @param Request|null $request
+     * @return bool
+     */
+    public function isNotHidden($request): bool;
 }

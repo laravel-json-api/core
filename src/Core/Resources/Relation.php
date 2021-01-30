@@ -20,20 +20,25 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources;
 
 use Closure;
-use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
+use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 
-class Relation
+class Relation implements JsonApiRelation
 {
 
     /**
-     * @var JsonApiResource
+     * @var object
      */
-    private JsonApiResource $resource;
+    private object $resource;
+
+    /**
+     * @var string
+     */
+    private string $baseUri;
 
     /**
      * @var string
@@ -88,22 +93,25 @@ class Relation
     /**
      * Relation constructor.
      *
-     * @param JsonApiResource $resource
+     * @param object $resource
+     * @param string $baseUri
      * @param string $fieldName
      * @param string|null $keyName
      */
     public function __construct(
-        JsonApiResource $resource,
+        object $resource,
+        string $baseUri,
         string $fieldName,
         string $keyName = null
     ) {
         $this->resource = $resource;
+        $this->baseUri = $baseUri;
         $this->fieldName = $fieldName;
         $this->keyName = $keyName ?: Str::camel($fieldName);
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public function fieldName(): string
     {
@@ -111,7 +119,7 @@ class Relation
     }
 
     /**
-     * @return Links
+     * @inheritDoc
      */
     public function links(): Links
     {
@@ -129,7 +137,7 @@ class Relation
     }
 
     /**
-     * @return array|null
+     * @inheritDoc
      */
     public function meta(): ?array
     {
@@ -141,7 +149,7 @@ class Relation
     }
 
     /**
-     * @return mixed
+     * @inheritDoc
      */
     public function data()
     {
@@ -157,7 +165,7 @@ class Relation
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function showData(): bool
     {
@@ -171,7 +179,7 @@ class Relation
     {
         return \sprintf(
             '%s/relationships/%s',
-            $this->resource->selfUrl(),
+            $this->baseUri,
             $this->uriFieldName()
         );
     }
@@ -183,7 +191,7 @@ class Relation
     {
         return \sprintf(
             '%s/%s',
-            $this->resource->selfUrl(),
+            $this->baseUri,
             $this->uriFieldName()
         );
     }
@@ -191,9 +199,9 @@ class Relation
     /**
      * Use the field-name as-is for relationship URLs.
      *
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function retainFieldName(): self
+    public function retainFieldName(): JsonApiRelation
     {
         $this->uriName = $this->fieldName();
 
@@ -204,9 +212,9 @@ class Relation
      * Use the provided string as the URI fragment for the field name.
      *
      * @param string $uri
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function withUriFieldName(string $uri): self
+    public function withUriFieldName(string $uri): JsonApiRelation
     {
         if (empty($uri)) {
             throw new InvalidArgumentException('Expecting a non-empty string URI fragment.');
@@ -218,9 +226,9 @@ class Relation
     }
 
     /**
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function withoutSelfLink(): self
+    public function withoutSelfLink(): JsonApiRelation
     {
         $this->showSelf = false;
 
@@ -228,9 +236,9 @@ class Relation
     }
 
     /**
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function withoutRelatedLink(): self
+    public function withoutRelatedLink(): JsonApiRelation
     {
         $this->showRelated = false;
 
@@ -238,9 +246,9 @@ class Relation
     }
 
     /**
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function withoutLinks(): self
+    public function withoutLinks(): JsonApiRelation
     {
         $this->withoutSelfLink();
         $this->withoutRelatedLink();
@@ -250,9 +258,9 @@ class Relation
 
     /**
      * @param mixed $data
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function withData($data): self
+    public function withData($data): JsonApiRelation
     {
         $this->data = $data;
         $this->hasData = true;
@@ -263,9 +271,9 @@ class Relation
     /**
      * Always show the data member of the relation.
      *
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function alwaysShowData(): self
+    public function alwaysShowData(): JsonApiRelation
     {
         $this->showData = true;
 
@@ -275,24 +283,23 @@ class Relation
     /**
      * Always show the data member of the relation if it is loaded on the model.
      *
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function showDataIfLoaded(): self
+    public function showDataIfLoaded(): JsonApiRelation
     {
-        if (!$this->resource->resource instanceof Model) {
-            throw new LogicException('Resource is not a model.');
+        if (method_exists($this->resource, 'relationLoaded')) {
+            $this->showData = $this->resource->relationLoaded($this->keyName);
+            return $this;
         }
 
-        $this->showData = $this->resource->resource->relationLoaded($this->keyName);
-
-        return $this;
+        throw new LogicException('Expecting resource to have a relationLoaded method.');
     }
 
     /**
      * @param $meta
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function withMeta($meta): self
+    public function withMeta($meta): JsonApiRelation
     {
         if (!is_array($meta) && !$meta instanceof Closure) {
             throw new InvalidArgumentException('Expecting meta to be an array or a closure.');
@@ -306,9 +313,9 @@ class Relation
     /**
      * Mark the relation as required for validation.
      *
-     * @return $this
+     * @return JsonApiRelation
      */
-    public function mustValidate(): self
+    public function mustValidate(): JsonApiRelation
     {
         $this->validated = true;
 

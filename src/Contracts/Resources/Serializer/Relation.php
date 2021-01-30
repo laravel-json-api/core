@@ -17,22 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Schema;
+namespace LaravelJsonApi\Contracts\Resources\Serializer;
 
-interface Field
+use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
+
+interface Relation extends Hideable
 {
 
     /**
-     * The JSON:API field name.
+     * Get the JSON:API field name for the serialized relation.
      *
      * @return string
      */
-    public function name(): string;
+    public function serializedFieldName(): string;
 
     /**
-     * Can the field be listed in sparse field sets?
+     * Get the JSON representation of the relationship.
      *
-     * @return bool
+     * @param object $model
+     * @param string $baseUri
+     * @return JsonApiRelation
      */
-    public function isSparseField(): bool;
+    public function serialize(object $model, string $baseUri): JsonApiRelation;
 }

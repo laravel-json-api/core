@@ -49,6 +49,16 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     private ?array $fields = null;
 
     /**
+     * @var array|null
+     */
+    private ?array $attributes = null;
+
+    /**
+     * @var array|null
+     */
+    private ?array $relations = null;
+
+    /**
      * @var callable|null
      */
     private static $resourceTypeResolver;
@@ -192,11 +202,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function attributes(): iterable
     {
-        foreach ($this as $field) {
-            if ($field instanceof Attribute) {
-                yield $field->name() => $field;
-            }
-        }
+        yield from $this->allAttributes();
     }
 
     /**
@@ -204,9 +210,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function attribute(string $name): Attribute
     {
-        $field = $this->allFields()[$name] ?? null;
-
-        if ($field instanceof Attribute) {
+        if ($field = $this->allAttributes()[$name] ?? null) {
             return $field;
         }
 
@@ -222,7 +226,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function isAttribute(string $name): bool
     {
-        $field = $this->allFields()[$name] ?? null;
+        $field = $this->allAttributes()[$name] ?? null;
 
         return $field instanceof Attribute;
     }
@@ -232,11 +236,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function relationships(): iterable
     {
-        foreach ($this as $field) {
-            if ($field instanceof Relation) {
-                yield $field->name() => $field;
-            }
-        }
+        yield from $this->allRelations();
     }
 
     /**
@@ -244,9 +244,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function relationship(string $name): Relation
     {
-        $field = $this->allFields()[$name] ?? null;
-
-        if ($field instanceof Relation) {
+        if ($field = $this->allRelations()[$name] ?? null) {
             return $field;
         }
 
@@ -262,7 +260,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      */
     public function isRelationship(string $name): bool
     {
-        $field = $this->allFields()[$name] ?? null;
+        $field = $this->allRelations()[$name] ?? null;
 
         return $field instanceof Relation;
     }
@@ -337,5 +335,33 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
 
             return $field->name();
         })->sortKeys()->all();
+    }
+
+    /**
+     * @return array
+     */
+    private function allAttributes(): array
+    {
+        if (is_array($this->attributes)) {
+            return $this->attributes;
+        }
+
+        return $this->attributes = collect($this->allFields())
+            ->whereInstanceOf(Attribute::class)
+            ->all();
+    }
+
+    /**
+     * @return array
+     */
+    private function allRelations(): array
+    {
+        if (is_array($this->relations)) {
+            return $this->relations;
+        }
+
+        return $this->relations = collect($this->allFields())
+            ->whereInstanceOf(Relation::class)
+            ->all();
     }
 }

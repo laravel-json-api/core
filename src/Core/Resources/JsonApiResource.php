@@ -20,8 +20,8 @@ namespace LaravelJsonApi\Core\Resources;
 use ArrayAccess;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
@@ -41,9 +41,9 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     use DelegatesToResource;
 
     /**
-     * The resource.
+     * The model that the resource represents.
      *
-     * @var Model|object
+     * @var object
      */
     public object $resource;
 
@@ -67,7 +67,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * JsonApiResource constructor.
      *
-     * @param Model|object $resource
+     * @param object $resource
      */
     public function __construct(object $resource)
     {
@@ -77,9 +77,10 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the resource's attributes.
      *
+     * @param Request|null $request
      * @return iterable
      */
-    abstract public function attributes(): iterable;
+    abstract public function attributes($request): iterable;
 
     /**
      * Get the resource's `self` link URL.
@@ -143,9 +144,10 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the resource's relationships.
      *
+     * @param Request|null $request
      * @return iterable
      */
-    public function relationships(): iterable
+    public function relationships($request): iterable
     {
         return [];
     }
@@ -157,7 +159,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function wasCreated(): bool
     {
-        if ($this->resource instanceof Model) {
+        if (property_exists($this->resource, 'wasRecentlyCreated')) {
             return $this->resource->wasRecentlyCreated;
         }
 
@@ -199,12 +201,12 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      * Get a resource relation by name.
      *
      * @param string $name
-     * @return Relation
+     * @return JsonApiRelation
      */
-    public function relationship(string $name): Relation
+    public function relationship(string $name): JsonApiRelation
     {
-        /** @var Relation $relation */
-        foreach ($this->relationships() as $relation) {
+        /** @var JsonApiRelation $relation */
+        foreach ($this->relationships(null) as $relation) {
             if ($relation->fieldName() === $name) {
                 return $relation;
             }
@@ -261,11 +263,16 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      *
      * @param string $fieldName
      * @param string|null $keyName
-     * @return Relation
+     * @return JsonApiRelation
      */
-    protected function relation(string $fieldName, string $keyName = null): Relation
+    protected function relation(string $fieldName, string $keyName = null): JsonApiRelation
     {
-        return new Relation($this, $fieldName, $keyName);
+        return new Relation(
+            $this->resource,
+            $this->selfUrl(),
+            $fieldName,
+            $keyName
+        );
     }
 
     /**

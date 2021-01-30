@@ -17,22 +17,23 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Schema;
+namespace LaravelJsonApi\Contracts\Resources\Serializer;
 
-interface Field
+interface Attribute extends Hideable
 {
 
     /**
-     * The JSON:API field name.
+     * Get the JSON:API field name for the serialized attribute.
      *
      * @return string
      */
-    public function name(): string;
+    public function serializedFieldName(): string;
 
     /**
-     * Can the field be listed in sparse field sets?
+     * Get the JSON value from the provided model.
      *
-     * @return bool
+     * @param object $model
+     * @return mixed
      */
-    public function isSparseField(): bool;
+    public function serialize(object $model);
 }
