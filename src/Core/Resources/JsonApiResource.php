@@ -180,9 +180,10 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the resource's meta.
      *
+     * @param Request|null $request
      * @return array
      */
-    public function meta(): array
+    public function meta($request): iterable
     {
         return [];
     }
@@ -190,9 +191,10 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the resource's links.
      *
+     * @param Request|null $request
      * @return Links
      */
-    public function links(): Links
+    public function links($request): Links
     {
         return new Links($this->selfLink());
     }
