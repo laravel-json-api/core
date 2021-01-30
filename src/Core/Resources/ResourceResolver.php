@@ -61,7 +61,7 @@ final class ResourceResolver
             return;
         }
 
-        throw new InvalidArgumentException('Expecting a default authorizer class that exists.');
+        throw new InvalidArgumentException('Expecting a default resource class that exists.');
     }
 
     /**
