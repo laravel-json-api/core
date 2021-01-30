@@ -17,25 +17,36 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Resources;
+namespace LaravelJsonApi\Core\Resources;
 
-use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Contracts\Schema\Schema;
 
-interface Factory
+class SchemaResource extends JsonApiResource
 {
 
     /**
-     * Get the fully-qualified class names for the records that this factory handles.
-     *
-     * @return iterable
+     * @var Schema
      */
-    public function handles(): iterable;
+    private Schema $schema;
 
     /**
-     * Create a resource object for the supplied model.
+     * SchemaResource constructor.
      *
-     * @param object $model
-     * @return JsonApiResource
+     * @param Schema $schema
+     * @param object $resource
      */
-    public function createResource(object $model): JsonApiResource;
+    public function __construct(Schema $schema, object $resource)
+    {
+        parent::__construct($resource);
+        $this->schema = $schema;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function attributes(): iterable
+    {
+        // TODO: Implement attributes() method.
+    }
+
 }

@@ -24,12 +24,12 @@ use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
-use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
+use LaravelJsonApi\Core\Resources\DefaultFactory as DefaultResourceFactory;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Store\Store;
@@ -60,9 +60,9 @@ abstract class Server implements ServerContract
     private ?SchemaContainerContract $schemas = null;
 
     /**
-     * @var ResourceFactoryContract|null
+     * @var ResourceContainerContract|null
      */
-    private ?ResourceFactoryContract $resources = null;
+    private ?ResourceContainerContract $resources = null;
 
     /**
      * Bootstrap the server when it is handling an HTTP request.
@@ -129,7 +129,16 @@ abstract class Server implements ServerContract
      */
     public function resources(): ResourceContainerContract
     {
-        return new ResourceContainer($this->allResources());
+        if ($this->resources) {
+            return $this->resources;
+        }
+
+        $schemas = $this->schemas();
+
+        return $this->resources = new ResourceContainer(
+            ResourceFactory::make($schemas),
+            DefaultResourceFactory::make($schemas),
+        );
     }
 
     /**
@@ -179,20 +188,6 @@ abstract class Server implements ServerContract
         }
 
         throw new \LogicException('No base URI set on server.');
-    }
-
-    /**
-     * @return ResourceFactoryContract
-     */
-    private function allResources(): ResourceFactoryContract
-    {
-        if ($this->resources) {
-            return $this->resources;
-        }
-
-        return $this->resources = new ResourceFactory(
-            $this->schemas()->resources()
-        );
     }
 
 }

@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Schema;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
@@ -27,6 +28,9 @@ use LogicException;
 use RuntimeException;
 use Throwable;
 use function collect;
+use function get_class;
+use function is_object;
+use function is_string;
 
 class Container implements ContainerContract
 {
@@ -81,7 +85,25 @@ class Container implements ContainerContract
             return $this->resolve($this->types[$resourceType]);
         }
 
-        throw new LogicException("No schema for JSON API resource type {$resourceType}.");
+        throw new LogicException("No schema for JSON:API resource type {$resourceType}.");
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function schemaForModel($model): Schema
+    {
+        $model = is_object($model) ? get_class($model) : $model;
+
+        if (!is_string($model)) {
+            throw new InvalidArgumentException('Expecting a string or object.');
+        }
+
+        if (isset($this->models[$model])) {
+            return $this->resolve($this->models[$model]);
+        }
+
+        throw new LogicException("No JSON:API schema for model {$model}.");
     }
 
     /**

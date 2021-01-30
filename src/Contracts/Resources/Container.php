@@ -37,18 +37,18 @@ interface Container
     /**
      * Can the provided record be converted to a resource object?
      *
-     * @param mixed $record
+     * @param object $record
      * @return bool
      */
-    public function exists($record): bool;
+    public function exists(object $record): bool;
 
     /**
      * Create a resource object for the supplied record.
      *
-     * @param mixed $record
+     * @param object $record
      * @return JsonApiResource
      */
-    public function create($record): JsonApiResource;
+    public function create(object $record): JsonApiResource;
 
     /**
      * Create resource objects for the supplied records.

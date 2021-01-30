@@ -19,16 +19,29 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Resources;
 
+use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Resources\Factory as FactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LogicException;
 use Throwable;
 use function array_keys;
+use function class_exists;
 use function get_class;
 use function sprintf;
 
-class Factory implements FactoryContract
+class DefaultFactory implements FactoryContract
 {
+
+    /**
+     * @var SchemaContainer
+     */
+    private SchemaContainer $schemas;
+
+    /**
+     * @var string
+     */
+    private string $class;
 
     /**
      * @var array
@@ -36,26 +49,33 @@ class Factory implements FactoryContract
     private array $bindings;
 
     /**
-     * Make a new resource factory.
+     * Construct a new default factory.
      *
      * @param SchemaContainer $schemas
      * @return static
      */
     public static function make(SchemaContainer $schemas): self
     {
-        return new self(collect($schemas->resources())
-            ->reject(static fn($class) => ResourceResolver::defaultResource() === $class)
-            ->all());
+        return new self($schemas, ResourceResolver::defaultResource());
     }
 
     /**
-     * Factory constructor.
+     * DefaultFactory constructor.
      *
-     * @param array $bindings
+     * @param SchemaContainer $schemas
+     * @param string $class
      */
-    public function __construct(array $bindings)
+    public function __construct(SchemaContainer $schemas, string $class)
     {
-        $this->bindings = $bindings;
+        if (!class_exists($class)) {
+            throw new InvalidArgumentException("Expecting resource class {$class} to exist.");
+        }
+
+        $this->schemas = $schemas;
+        $this->class = $class;
+        $this->bindings = collect($schemas->resources())
+            ->filter(static fn($resourceClass) => $class === $resourceClass)
+            ->all();
     }
 
     /**
@@ -71,9 +91,9 @@ class Factory implements FactoryContract
      */
     public function createResource(object $model): JsonApiResource
     {
-        $resource = $this->bindings[get_class($model)] ?? null;
+        $exists = $this->bindings[get_class($model)] ?? false;
 
-        if (!$resource) {
+        if (false === $exists) {
             throw new LogicException(sprintf(
                 'Unexpected model class - %s',
                 get_class($model)
@@ -81,11 +101,13 @@ class Factory implements FactoryContract
         }
 
         try {
-            return $this->build($resource, $model);
+            return $this->build(
+                $this->schemas->schemaForModel($model),
+                $model
+            );
         } catch (Throwable $ex) {
             throw new LogicException(sprintf(
-                'Failed to build %s resource object for model %s.',
-                $resource,
+                'Failed to build a default resource object for model %s.',
                 get_class($model),
             ), 0, $ex);
         }
@@ -94,13 +116,15 @@ class Factory implements FactoryContract
     /**
      * Build a new resource object instance.
      *
-     * @param string $fqn
+     * @param Schema $schema
      * @param object $record
      * @return JsonApiResource
      */
-    protected function build(string $fqn, object $record): JsonApiResource
+    protected function build(Schema $schema, object $record): JsonApiResource
     {
-        return new $fqn($record);
+        $fqn = $this->class;
+
+        return new $fqn($schema, $record);
     }
 
 }

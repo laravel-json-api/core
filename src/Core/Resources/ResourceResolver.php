@@ -19,10 +19,17 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Resources;
 
+use InvalidArgumentException;
 use LaravelJsonApi\Core\Support\Str;
+use function class_exists;
 
 final class ResourceResolver
 {
+
+    /**
+     * @var string
+     */
+    private static string $defaultResource = SchemaResource::class;
 
     /**
      * @var array
@@ -42,6 +49,32 @@ final class ResourceResolver
     }
 
     /**
+     * Set the default resource class.
+     *
+     * @param string $resourceClass
+     * @return void
+     */
+    public static function useDefault(string $resourceClass): void
+    {
+        if (class_exists($resourceClass)) {
+            self::$defaultResource = $resourceClass;
+            return;
+        }
+
+        throw new InvalidArgumentException('Expecting a default authorizer class that exists.');
+    }
+
+    /**
+     * Get the default resource class.
+     *
+     * @return string
+     */
+    public static function defaultResource(): string
+    {
+        return self::$defaultResource;
+    }
+
+    /**
      * Resolve the fully-qualified resource class from the fully-qualified schema class.
      *
      * @param string $schemaClass
@@ -53,6 +86,12 @@ final class ResourceResolver
             return self::$cache[$schemaClass];
         }
 
-        return self::$cache[$schemaClass] = Str::replaceLast('Schema', 'Resource', $schemaClass);
+        $guess = Str::replaceLast('Schema', 'Resource', $schemaClass);
+
+        if (class_exists($guess)) {
+            return self::$cache[$schemaClass] = $guess;
+        }
+
+        return self::$cache[$schemaClass] = self::$defaultResource;
     }
 }
