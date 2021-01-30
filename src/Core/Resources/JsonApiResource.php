@@ -265,9 +265,9 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      *
      * @param string $fieldName
      * @param string|null $keyName
-     * @return JsonApiRelation
+     * @return Relation
      */
-    protected function relation(string $fieldName, string $keyName = null): JsonApiRelation
+    protected function relation(string $fieldName, string $keyName = null): Relation
     {
         return new Relation(
             $this->resource,

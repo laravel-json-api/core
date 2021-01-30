@@ -87,27 +87,27 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
-    public function exists(object $record): bool
+    public function exists(object $model): bool
     {
-        return isset($this->bindings[get_class($record)]);
+        return isset($this->bindings[get_class($model)]);
     }
 
     /**
      * @inheritDoc
      */
-    public function create(object $record): JsonApiResource
+    public function create(object $model): JsonApiResource
     {
-        return $this->factoryFor($record)->createResource(
-            $record
+        return $this->factoryFor($model)->createResource(
+            $model
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function cursor(iterable $records): Generator
+    public function cursor(iterable $models): Generator
     {
-        foreach ($records as $record) {
+        foreach ($models as $record) {
             if ($record instanceof JsonApiResource) {
                 yield $record;
                 continue;

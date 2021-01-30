@@ -199,9 +199,9 @@ class Relation implements JsonApiRelation
     /**
      * Use the field-name as-is for relationship URLs.
      *
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function retainFieldName(): JsonApiRelation
+    public function retainFieldName(): self
     {
         $this->uriName = $this->fieldName();
 
@@ -212,9 +212,9 @@ class Relation implements JsonApiRelation
      * Use the provided string as the URI fragment for the field name.
      *
      * @param string $uri
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function withUriFieldName(string $uri): JsonApiRelation
+    public function withUriFieldName(string $uri): self
     {
         if (empty($uri)) {
             throw new InvalidArgumentException('Expecting a non-empty string URI fragment.');
@@ -226,9 +226,9 @@ class Relation implements JsonApiRelation
     }
 
     /**
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function withoutSelfLink(): JsonApiRelation
+    public function withoutSelfLink(): self
     {
         $this->showSelf = false;
 
@@ -236,9 +236,9 @@ class Relation implements JsonApiRelation
     }
 
     /**
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function withoutRelatedLink(): JsonApiRelation
+    public function withoutRelatedLink(): self
     {
         $this->showRelated = false;
 
@@ -246,9 +246,9 @@ class Relation implements JsonApiRelation
     }
 
     /**
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function withoutLinks(): JsonApiRelation
+    public function withoutLinks(): self
     {
         $this->withoutSelfLink();
         $this->withoutRelatedLink();
@@ -258,9 +258,9 @@ class Relation implements JsonApiRelation
 
     /**
      * @param mixed $data
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function withData($data): JsonApiRelation
+    public function withData($data): self
     {
         $this->data = $data;
         $this->hasData = true;
@@ -271,9 +271,9 @@ class Relation implements JsonApiRelation
     /**
      * Always show the data member of the relation.
      *
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function alwaysShowData(): JsonApiRelation
+    public function alwaysShowData(): self
     {
         $this->showData = true;
 
@@ -283,9 +283,9 @@ class Relation implements JsonApiRelation
     /**
      * Always show the data member of the relation if it is loaded on the model.
      *
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function showDataIfLoaded(): JsonApiRelation
+    public function showDataIfLoaded(): self
     {
         if (method_exists($this->resource, 'relationLoaded')) {
             $this->showData = $this->resource->relationLoaded($this->keyName);
@@ -297,9 +297,9 @@ class Relation implements JsonApiRelation
 
     /**
      * @param $meta
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function withMeta($meta): JsonApiRelation
+    public function withMeta($meta): self
     {
         if (!is_array($meta) && !$meta instanceof Closure) {
             throw new InvalidArgumentException('Expecting meta to be an array or a closure.');
@@ -313,9 +313,9 @@ class Relation implements JsonApiRelation
     /**
      * Mark the relation as required for validation.
      *
-     * @return JsonApiRelation
+     * @return $this
      */
-    public function mustValidate(): JsonApiRelation
+    public function mustValidate(): self
     {
         $this->validated = true;
 

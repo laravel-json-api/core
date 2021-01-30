@@ -117,14 +117,14 @@ class DefaultFactory implements FactoryContract
      * Build a new resource object instance.
      *
      * @param Schema $schema
-     * @param object $record
+     * @param object $model
      * @return JsonApiResource
      */
-    protected function build(Schema $schema, object $record): JsonApiResource
+    protected function build(Schema $schema, object $model): JsonApiResource
     {
         $fqn = $this->class;
 
-        return new $fqn($schema, $record);
+        return new $fqn($schema, $model);
     }
 
 }

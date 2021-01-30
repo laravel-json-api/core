@@ -29,32 +29,32 @@ interface Container
      * Resolve the value to a resource object or a cursor of resource objects.
      *
      * @param mixed $value
-     *      a resource object, record or an iterable of records.
+     *      a resource object, model or an iterable of models.
      * @return JsonApiResource|Generator
      */
     public function resolve($value);
 
     /**
-     * Can the provided record be converted to a resource object?
+     * Can the provided model be converted to a resource object?
      *
-     * @param object $record
+     * @param object $model
      * @return bool
      */
-    public function exists(object $record): bool;
+    public function exists(object $model): bool;
 
     /**
-     * Create a resource object for the supplied record.
+     * Create a resource object for the supplied models.
      *
-     * @param object $record
+     * @param object $model
      * @return JsonApiResource
      */
-    public function create(object $record): JsonApiResource;
+    public function create(object $model): JsonApiResource;
 
     /**
-     * Create resource objects for the supplied records.
+     * Create resource objects for the supplied models.
      *
-     * @param iterable $records
+     * @param iterable $models
      * @return Generator
      */
-    public function cursor(iterable $records): Generator;
+    public function cursor(iterable $models): Generator;
 }

@@ -95,12 +95,12 @@ class Factory implements FactoryContract
      * Build a new resource object instance.
      *
      * @param string $fqn
-     * @param object $record
+     * @param object $model
      * @return JsonApiResource
      */
-    protected function build(string $fqn, object $record): JsonApiResource
+    protected function build(string $fqn, object $model): JsonApiResource
     {
-        return new $fqn($record);
+        return new $fqn($model);
     }
 
 }
