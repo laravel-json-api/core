@@ -41,6 +41,7 @@ class SchemaResource extends JsonApiResource
     {
         parent::__construct($resource);
         $this->schema = $schema;
+        $this->type = $schema->type();
     }
 
     /**
