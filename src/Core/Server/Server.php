@@ -29,7 +29,6 @@ use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
-use LaravelJsonApi\Core\Resources\DefaultFactory as DefaultResourceFactory;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Store\Store;
@@ -133,11 +132,8 @@ abstract class Server implements ServerContract
             return $this->resources;
         }
 
-        $schemas = $this->schemas();
-
         return $this->resources = new ResourceContainer(
-            ResourceFactory::make($schemas),
-            DefaultResourceFactory::make($schemas),
+            new ResourceFactory($this->schemas()),
         );
     }
 

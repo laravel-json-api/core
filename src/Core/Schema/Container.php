@@ -95,11 +95,7 @@ class Container implements ContainerContract
     {
         $model = is_object($model) ? get_class($model) : $model;
 
-        if (!is_string($model)) {
-            throw new InvalidArgumentException('Expecting a string or object.');
-        }
-
-        if (isset($this->models[$model])) {
+        if (is_string($model) && isset($this->models[$model])) {
             return $this->resolve($this->models[$model]);
         }
 

@@ -25,10 +25,17 @@ use LogicException;
 use Throwable;
 use function array_keys;
 use function get_class;
+use function is_array;
 use function sprintf;
 
 class Factory implements FactoryContract
 {
+
+    /**
+     * @var SchemaContainer
+     *
+     */
+    protected SchemaContainer $schemas;
 
     /**
      * @var array
@@ -36,26 +43,15 @@ class Factory implements FactoryContract
     private array $bindings;
 
     /**
-     * Make a new resource factory.
-     *
-     * @param SchemaContainer $schemas
-     * @return static
-     */
-    public static function make(SchemaContainer $schemas): self
-    {
-        return new self(collect($schemas->resources())
-            ->reject(static fn($class) => ResourceResolver::defaultResource() === $class)
-            ->all());
-    }
-
-    /**
      * Factory constructor.
      *
-     * @param array $bindings
+     * @param SchemaContainer $schemas
+     * @param array|null $bindings
      */
-    public function __construct(array $bindings)
+    public function __construct(SchemaContainer $schemas, array $bindings = null)
     {
-        $this->bindings = $bindings;
+        $this->schemas = $schemas;
+        $this->bindings = is_array($bindings) ? $bindings : $schemas->resources();
     }
 
     /**
@@ -100,7 +96,10 @@ class Factory implements FactoryContract
      */
     protected function build(string $fqn, object $model): JsonApiResource
     {
-        return new $fqn($model);
+        return new $fqn(
+            $this->schemas->schemaForModel($model),
+            $model,
+        );
     }
 
 }

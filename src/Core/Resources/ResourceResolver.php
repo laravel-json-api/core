@@ -29,7 +29,7 @@ final class ResourceResolver
     /**
      * @var string
      */
-    private static string $defaultResource = SchemaResource::class;
+    private static string $defaultResource = JsonApiResource::class;
 
     /**
      * @var array

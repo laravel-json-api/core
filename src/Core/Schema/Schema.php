@@ -44,6 +44,13 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     protected int $maxDepth = 1;
 
     /**
+     * The key name for the resource "id".
+     *
+     * @var string|null
+     */
+    protected ?string $idKeyName = null;
+
+    /**
      * @var array|null
      */
     private ?array $fields = null;
@@ -163,6 +170,18 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
         }
 
         throw new LogicException('Expecting an id field to exist.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function idKeyName(): ?string
+    {
+        if ($this->idKeyName) {
+            return $this->idKeyName;
+        }
+
+        return $this->id()->key();
     }
 
     /**

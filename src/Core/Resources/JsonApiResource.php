@@ -22,6 +22,9 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
+use LaravelJsonApi\Contracts\Resources\Serializer\Attribute as SerializableAttribute;
+use LaravelJsonApi\Contracts\Resources\Serializer\Relation as SerializableRelation;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
@@ -30,11 +33,10 @@ use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\ResourceResponse;
-use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use function sprintf;
 
-abstract class JsonApiResource implements ArrayAccess, Responsable
+class JsonApiResource implements ArrayAccess, Responsable
 {
 
     use ConditionallyLoadsAttributes;
@@ -46,6 +48,11 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      * @var object
      */
     public object $resource;
+
+    /**
+     * @var Schema
+     */
+    protected Schema $schema;
 
     /**
      * The resource type.
@@ -67,20 +74,14 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * JsonApiResource constructor.
      *
+     * @param Schema $schema
      * @param object $resource
      */
-    public function __construct(object $resource)
+    public function __construct(Schema $schema, object $resource)
     {
+        $this->schema = $schema;
         $this->resource = $resource;
     }
-
-    /**
-     * Get the resource's attributes.
-     *
-     * @param Request|null $request
-     * @return iterable
-     */
-    abstract public function attributes($request): iterable;
 
     /**
      * Get the resource's `self` link URL.
@@ -124,7 +125,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
             return $this->type;
         }
 
-        return $this->type = $this->guessType();
+        return $this->type = $this->schema->type();
     }
 
     /**
@@ -134,11 +135,30 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function id(): string
     {
+        if ($key = $this->schema->idKeyName()) {
+            return (string) $this->resource->{$key};
+        }
+
         if ($this->resource instanceof UrlRoutable) {
-            return $this->resource->getRouteKey();
+            return (string) $this->resource->getRouteKey();
         }
 
         throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
+    }
+
+    /**
+     * Get the resource's attributes.
+     *
+     * @param Request|null $request
+     * @return iterable
+     */
+    public function attributes($request): iterable
+    {
+        foreach ($this->schema->attributes() as $attr) {
+            if ($attr instanceof SerializableAttribute && $attr->isNotHidden($request)) {
+                yield $attr->serializedFieldName() => $attr->serialize($this->resource);
+            }
+        }
     }
 
     /**
@@ -149,7 +169,14 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function relationships($request): iterable
     {
-        return [];
+        foreach ($this->schema->relationships() as $relation) {
+            if ($relation instanceof SerializableRelation && $relation->isNotHidden($request)) {
+                yield $relation->serializedFieldName() => $relation->serialize(
+                    $this->resource,
+                    $this->selfUrl(),
+                );
+            }
+        }
     }
 
     /**
@@ -277,21 +304,4 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
         );
     }
 
-    /**
-     * Guess the resource's type.
-     *
-     * @return string
-     */
-    private static function guessType(): string
-    {
-        $fqn = static::class;
-
-        if (isset(static::$types[$fqn])) {
-            return static::$types[$fqn];
-        }
-
-        return static::$types[$fqn] = Str::dasherize(Str::plural(
-            Str::before(class_basename($fqn), 'Resource')
-        ));
-    }
 }
