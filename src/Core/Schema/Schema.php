@@ -27,6 +27,7 @@ use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use LaravelJsonApi\Core\Resources\ResourceResolver;
+use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use function array_keys;
 use function sprintf;
@@ -37,11 +38,11 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     use SchemaAware;
 
     /**
-     * The maximum depth of include paths.
+     * The resource type as it appears in URIs.
      *
-     * @var int
+     * @var string|null
      */
-    protected int $maxDepth = 1;
+    protected ?string $uriType = null;
 
     /**
      * The key name for the resource "id".
@@ -49,6 +50,13 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
      * @var string|null
      */
     protected ?string $idKeyName = null;
+
+    /**
+     * The maximum depth of include paths.
+     *
+     * @var int
+     */
+    protected int $maxDepth = 1;
 
     /**
      * @var array|null
@@ -161,6 +169,18 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     /**
      * @inheritDoc
      */
+    public function uriType(): string
+    {
+        if ($this->uriType) {
+            return $this->uriType;
+        }
+
+        return $this->uriType = Str::dasherize($this->type());
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function id(): ID
     {
         $field = $this->allFields()['id'] ?? null;
@@ -181,7 +201,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
             return $this->idKeyName;
         }
 
-        return $this->id()->key();
+        return $this->idKeyName = $this->id()->key();
     }
 
     /**

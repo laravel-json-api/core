@@ -21,7 +21,9 @@ the request through to the encoder in their `toResponse()` methods.
 lookup a schema by providing either a model instance, or the fully-qualified class name of a model.
 - **BREAKING** The `Contracts\Schema\ID` contract now has a `key()` method, that can return
 the model key for the ID.
-- **BREAKING** The `Contracts\Schema\Schema` contract now has a `idKeyName()` method
+- **BREAKING** The `Contracts\Schema\Schema` contract now has new methods:
+  - `uriType()` which returns the resource type as it appears in URIs.
+  - `idKeyName()` which returns the object key for the `id` value.
 - New `Contracts\Resources\JsonApiRelation` contract for the relation object returned by the
 `JsonApiResource::relationships()` method. This has the methods on it that encoders can rely on when
 encoding the relationship to JSON.

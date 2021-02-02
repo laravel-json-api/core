@@ -95,7 +95,7 @@ class JsonApiResource implements ArrayAccess, Responsable
         }
 
         return $this->selfUri = JsonApi::server()->url([
-            $this->type(),
+            $this->schema->uriType(),
             $this->id(),
         ]);
     }

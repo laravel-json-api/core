@@ -62,6 +62,13 @@ interface Schema extends Traversable
     public function repository(): Repository;
 
     /**
+     * Get the resource type as it appears in URIs.
+     *
+     * @return string
+     */
+    public function uriType(): string;
+
+    /**
      * Get the "id" field.
      *
      * @return ID
