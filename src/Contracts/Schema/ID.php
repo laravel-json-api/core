@@ -23,6 +23,13 @@ interface ID extends Field, Sortable
 {
 
     /**
+     * Get the model key for the id.
+     *
+     * @return string|null
+     */
+    public function key(): ?string;
+
+    /**
      * Get the regex pattern for the ID field.
      *
      * @return string

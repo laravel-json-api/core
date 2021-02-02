@@ -23,6 +23,13 @@ interface Relation extends Field
 {
 
     /**
+     * Get the relationship's field name as it appears in a URI.
+     *
+     * @return string
+     */
+    public function uriName(): string;
+
+    /**
      * Is this a to-one relation?
      *
      * @return bool

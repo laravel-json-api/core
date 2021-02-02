@@ -17,10 +17,18 @@
 
 namespace LaravelJsonApi\Contracts\Encoder;
 
+use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 interface Encoder
 {
+
+    /**
+     * @param Request|null $request
+     * @return $this
+     */
+    public function withRequest($request): self;
+
     /**
      * @param $includePaths
      * @return $this

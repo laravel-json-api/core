@@ -19,17 +19,23 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Resources;
 
-use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Resources\Factory as FactoryContract;
+use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LogicException;
 use Throwable;
 use function array_keys;
 use function get_class;
-use function is_object;
+use function is_array;
 use function sprintf;
 
 class Factory implements FactoryContract
 {
+
+    /**
+     * @var SchemaContainer
+     *
+     */
+    protected SchemaContainer $schemas;
 
     /**
      * @var array
@@ -39,40 +45,13 @@ class Factory implements FactoryContract
     /**
      * Factory constructor.
      *
-     * @param iterable $bindings
+     * @param SchemaContainer $schemas
+     * @param array|null $bindings
      */
-    public function __construct(iterable $bindings = [])
+    public function __construct(SchemaContainer $schemas, array $bindings = null)
     {
-        $this->bindings = [];
-
-        foreach ($bindings as $record => $resource) {
-            $this->attach($record, $resource);
-        }
-    }
-
-    /**
-     * @param string $record
-     *      the fully-qualified class name for the record.
-     * @param string $resource
-     *      the fully-qualified class name for the resource object.
-     * @return void
-     */
-    public function attach(string $record, string $resource): void
-    {
-        $this->bindings[$record] = $resource;
-    }
-
-    /**
-     * Attach
-     *
-     * @param iterable $bindings
-     * @return void
-     */
-    public function attachAll(iterable $bindings): void
-    {
-        foreach ($bindings as $record => $resource) {
-            $this->attach($record, $resource);
-        }
+        $this->schemas = $schemas;
+        $this->bindings = is_array($bindings) ? $bindings : $schemas->resources();
     }
 
     /**
@@ -86,28 +65,24 @@ class Factory implements FactoryContract
     /**
      * @inheritDoc
      */
-    public function createResource($record): JsonApiResource
+    public function createResource(object $model): JsonApiResource
     {
-        if (!is_object($record)) {
-            throw new InvalidArgumentException('Expecting an object.');
-        }
-
-        $resource = $this->bindings[get_class($record)] ?? null;
+        $resource = $this->bindings[get_class($model)] ?? null;
 
         if (!$resource) {
             throw new LogicException(sprintf(
-                'Unexpected record class - %s',
-                get_class($record)
+                'Unexpected model class - %s',
+                get_class($model)
             ));
         }
 
         try {
-            return $this->build($resource, $record);
+            return $this->build($resource, $model);
         } catch (Throwable $ex) {
             throw new LogicException(sprintf(
-                'Failed to build %s resource object for record %s.',
+                'Failed to build %s resource object for model %s.',
                 $resource,
-                get_class($record)
+                get_class($model),
             ), 0, $ex);
         }
     }
@@ -116,12 +91,15 @@ class Factory implements FactoryContract
      * Build a new resource object instance.
      *
      * @param string $fqn
-     * @param $record
-     * @return mixed
+     * @param object $model
+     * @return JsonApiResource
      */
-    protected function build(string $fqn, $record)
+    protected function build(string $fqn, object $model): JsonApiResource
     {
-        return new $fqn($record);
+        return new $fqn(
+            $this->schemas->schemaForModel($model),
+            $model,
+        );
     }
 
 }

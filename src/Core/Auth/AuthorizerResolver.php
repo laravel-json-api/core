@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Auth;
 
+use InvalidArgumentException;
 use LaravelJsonApi\Core\Support\Str;
 use function class_exists;
 
@@ -62,7 +63,7 @@ final class AuthorizerResolver
             return;
         }
 
-        throw new \InvalidArgumentException('Expecting a default authorizer class that exists.');
+        throw new InvalidArgumentException('Expecting a default authorizer class that exists.');
     }
 
     /**

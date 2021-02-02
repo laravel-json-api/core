@@ -34,7 +34,7 @@ class HashTest extends TestCase
                 'foo_bar' => 'baz',
                 'baz-bat' => 'bat',
             ],
-        ])->camelize()->all();
+        ])->camelize()->sortKeys()->jsonSerialize();
 
         $this->assertSame($expected = [
             'bazBat' => 'bat',
@@ -56,7 +56,10 @@ class HashTest extends TestCase
     {
         [$value, $expected] = $args;
 
-        $actual = Hash::cast($value)->useCase('camel')->all();
+        $actual = Hash::cast($value)
+            ->useCase('camel')
+            ->sortKeys()
+            ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
     }
@@ -69,7 +72,10 @@ class HashTest extends TestCase
     {
         [$value, $expected] = $args;
 
-        $actual = Hash::cast($value)->useCase('camelize')->all();
+        $actual = Hash::cast($value)
+            ->useCase('camelize')
+            ->sortKeys()
+            ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
     }
@@ -83,7 +89,7 @@ class HashTest extends TestCase
                 'fooBar' => 'baz',
                 'baz-bat' => 'bat',
             ],
-        ])->snake()->all();
+        ])->snake()->sortKeys()->all();
 
         $this->assertSame($expected = [
             'baz_bat' => 'bat',
@@ -105,7 +111,10 @@ class HashTest extends TestCase
     {
         [$value, $expected] = $args;
 
-        $actual = Hash::cast($value)->useCase('snake')->all();
+        $actual = Hash::cast($value)
+            ->useCase('snake')
+            ->sortKeys()
+            ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
     }
@@ -118,7 +127,10 @@ class HashTest extends TestCase
     {
         [$value, $expected] = $args;
 
-        $actual = Hash::cast($value)->underscore()->all();
+        $actual = Hash::cast($value)
+            ->underscore()
+            ->sortKeys()
+            ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
     }
@@ -131,7 +143,10 @@ class HashTest extends TestCase
     {
         [$value, $expected] = $args;
 
-        $actual = Hash::cast($value)->useCase('underscore')->all();
+        $actual = Hash::cast($value)
+            ->useCase('underscore')
+            ->sortKeys()
+            ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
     }
@@ -145,7 +160,7 @@ class HashTest extends TestCase
                 'fooBar' => 'baz',
                 'baz_bat' => 'bat',
             ],
-        ])->dasherize()->all();
+        ])->dasherize()->sortKeys()->all();
 
         $this->assertSame($expected = [
             'baz-bat' => 'bat',
@@ -167,7 +182,10 @@ class HashTest extends TestCase
     {
         [$value, $expected] = $args;
 
-        $actual = Hash::cast($value)->useCase('dash')->all();
+        $actual = Hash::cast($value)
+            ->useCase('dash')
+            ->sortKeys()
+            ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
     }
@@ -176,12 +194,60 @@ class HashTest extends TestCase
      * @param array $args
      * @depends testDasherize
      */
-    public function testUseCaseDasherizer(array $args): void
+    public function testUseCaseDasherize(array $args): void
     {
         [$value, $expected] = $args;
 
-        $actual = Hash::cast($value)->useCase('dasherize')->all();
+        $actual = Hash::cast($value)
+            ->useCase('dasherize')
+            ->sortKeys()
+            ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
+    }
+
+    public function testUseCaseNull(): void
+    {
+        $value = [
+            'foo_bar' => 'baz',
+            'baz-bat' => 'bat',
+            'foo' => [
+                'foo_bar' => 'baz',
+                'baz-bat' => 'bat',
+            ],
+        ];
+
+        $actual = Hash::cast($value)
+            ->useCase('camelize')
+            ->useCase(null)
+            ->jsonSerialize();
+
+        $this->assertEquals($value, $actual);
+    }
+
+    public function testItIsEmpty(): void
+    {
+        $hash = new Hash([]);
+
+        $this->assertTrue($hash->isEmpty());
+        $this->assertFalse($hash->isNotEmpty());
+        $this->assertNull($hash->jsonSerialize());
+    }
+
+    public function testItIsNotEmpty(): void
+    {
+        $hash = new Hash(['foo' => 'bar']);
+
+        $this->assertFalse($hash->isEmpty());
+        $this->assertTrue($hash->isNotEmpty());
+    }
+
+    public function testItSortsValues(): void
+    {
+        $actual = Hash::cast(['foo' => 'b', 'bar' => 'a', 'baz' => 'c'])
+            ->sorted()
+            ->jsonSerialize();
+
+        $this->assertSame(['bar' => 'a', 'foo' => 'b', 'baz' => 'c'], $actual);
     }
 }

@@ -17,25 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Resources;
+namespace LaravelJsonApi\Contracts\Resources\Serializer;
 
-use LaravelJsonApi\Core\Resources\JsonApiResource;
+use Illuminate\Http\Request;
 
-interface Factory
+interface Hideable
 {
 
     /**
-     * Get the fully-qualified class names for the records that this factory handles.
+     * Is the field hidden?
      *
-     * @return iterable
+     * @param Request|null $request
+     * @return bool
      */
-    public function handles(): iterable;
+    public function isHidden($request): bool;
 
     /**
-     * Create a resource object for the supplied model.
+     * Is the field not hidden?
      *
-     * @param object $model
-     * @return JsonApiResource
+     * @param Request|null $request
+     * @return bool
      */
-    public function createResource(object $model): JsonApiResource;
+    public function isNotHidden($request): bool;
 }

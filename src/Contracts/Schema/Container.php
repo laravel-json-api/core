@@ -23,12 +23,20 @@ interface Container
 {
 
     /**
-     * Get a schema by JSON API resource type.
+     * Get a schema by JSON:API resource type.
      *
      * @param string $resourceType
      * @return Schema
      */
     public function schemaFor(string $resourceType): Schema;
+
+    /**
+     * Get a schema for the provided model class.
+     *
+     * @param string|object $model
+     * @return Schema
+     */
+    public function schemaForModel($model): Schema;
 
     /**
      * Does a schema exist for the supplied resource type?

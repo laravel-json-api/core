@@ -20,8 +20,11 @@ namespace LaravelJsonApi\Core\Resources;
 use ArrayAccess;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
+use LaravelJsonApi\Contracts\Resources\Serializer\Attribute as SerializableAttribute;
+use LaravelJsonApi\Contracts\Resources\Serializer\Relation as SerializableRelation;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
@@ -30,22 +33,26 @@ use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\ResourceResponse;
-use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use function sprintf;
 
-abstract class JsonApiResource implements ArrayAccess, Responsable
+class JsonApiResource implements ArrayAccess, Responsable
 {
 
     use ConditionallyLoadsAttributes;
     use DelegatesToResource;
 
     /**
-     * The resource.
+     * The model that the resource represents.
      *
-     * @var Model|object
+     * @var object
      */
     public object $resource;
+
+    /**
+     * @var Schema
+     */
+    protected Schema $schema;
 
     /**
      * The resource type.
@@ -67,19 +74,14 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * JsonApiResource constructor.
      *
-     * @param Model|object $resource
+     * @param Schema $schema
+     * @param object $resource
      */
-    public function __construct(object $resource)
+    public function __construct(Schema $schema, object $resource)
     {
+        $this->schema = $schema;
         $this->resource = $resource;
     }
-
-    /**
-     * Get the resource's attributes.
-     *
-     * @return iterable
-     */
-    abstract public function attributes(): iterable;
 
     /**
      * Get the resource's `self` link URL.
@@ -93,7 +95,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
         }
 
         return $this->selfUri = JsonApi::server()->url([
-            $this->type(),
+            $this->schema->uriType(),
             $this->id(),
         ]);
     }
@@ -123,7 +125,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
             return $this->type;
         }
 
-        return $this->type = $this->guessType();
+        return $this->type = $this->schema->type();
     }
 
     /**
@@ -133,21 +135,48 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function id(): string
     {
+        if ($key = $this->schema->idKeyName()) {
+            return (string) $this->resource->{$key};
+        }
+
         if ($this->resource instanceof UrlRoutable) {
-            return $this->resource->getRouteKey();
+            return (string) $this->resource->getRouteKey();
         }
 
         throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
     }
 
     /**
-     * Get the resource's relationships.
+     * Get the resource's attributes.
      *
+     * @param Request|null $request
      * @return iterable
      */
-    public function relationships(): iterable
+    public function attributes($request): iterable
     {
-        return [];
+        foreach ($this->schema->attributes() as $attr) {
+            if ($attr instanceof SerializableAttribute && $attr->isNotHidden($request)) {
+                yield $attr->serializedFieldName() => $attr->serialize($this->resource);
+            }
+        }
+    }
+
+    /**
+     * Get the resource's relationships.
+     *
+     * @param Request|null $request
+     * @return iterable
+     */
+    public function relationships($request): iterable
+    {
+        foreach ($this->schema->relationships() as $relation) {
+            if ($relation instanceof SerializableRelation && $relation->isNotHidden($request)) {
+                yield $relation->serializedFieldName() => $relation->serialize(
+                    $this->resource,
+                    $this->selfUrl(),
+                );
+            }
+        }
     }
 
     /**
@@ -157,7 +186,7 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     public function wasCreated(): bool
     {
-        if ($this->resource instanceof Model) {
+        if (property_exists($this->resource, 'wasRecentlyCreated')) {
             return $this->resource->wasRecentlyCreated;
         }
 
@@ -178,9 +207,10 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the resource's meta.
      *
-     * @return array
+     * @param Request|null $request
+     * @return iterable
      */
-    public function meta(): array
+    public function meta($request): iterable
     {
         return [];
     }
@@ -188,9 +218,10 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the resource's links.
      *
+     * @param Request|null $request
      * @return Links
      */
-    public function links(): Links
+    public function links($request): Links
     {
         return new Links($this->selfLink());
     }
@@ -199,12 +230,12 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      * Get a resource relation by name.
      *
      * @param string $name
-     * @return Relation
+     * @return JsonApiRelation
      */
-    public function relationship(string $name): Relation
+    public function relationship(string $name): JsonApiRelation
     {
-        /** @var Relation $relation */
-        foreach ($this->relationships() as $relation) {
+        /** @var JsonApiRelation $relation */
+        foreach ($this->relationships(null) as $relation) {
             if ($relation->fieldName() === $name) {
                 return $relation;
             }
@@ -265,24 +296,13 @@ abstract class JsonApiResource implements ArrayAccess, Responsable
      */
     protected function relation(string $fieldName, string $keyName = null): Relation
     {
-        return new Relation($this, $fieldName, $keyName);
+        return new Relation(
+            $this->resource,
+            $this->selfUrl(),
+            $fieldName,
+            $keyName,
+            $this->schema->relationship($fieldName)->uriName()
+        );
     }
 
-    /**
-     * Guess the resource's type.
-     *
-     * @return string
-     */
-    private static function guessType(): string
-    {
-        $fqn = static::class;
-
-        if (isset(static::$types[$fqn])) {
-            return static::$types[$fqn];
-        }
-
-        return static::$types[$fqn] = Str::dasherize(Str::plural(
-            Str::before(class_basename($fqn), 'Resource')
-        ));
-    }
 }

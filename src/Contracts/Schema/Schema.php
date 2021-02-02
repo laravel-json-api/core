@@ -62,11 +62,28 @@ interface Schema extends Traversable
     public function repository(): Repository;
 
     /**
+     * Get the resource type as it appears in URIs.
+     *
+     * @return string
+     */
+    public function uriType(): string;
+
+    /**
      * Get the "id" field.
      *
      * @return ID
      */
     public function id(): ID;
+
+    /**
+     * Get the key name for the resource "id".
+     *
+     * If this method returns `null`, resource classes should fall-back to a
+     * sensible default. E.g. `UrlRoutable::getRouteKeyName()`.
+     *
+     * @return string|null
+     */
+    public function idKeyName(): ?string;
 
     /**
      * Get all the field names.
