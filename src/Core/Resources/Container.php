@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources;
 
 use Generator;
-use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Resources\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Resources\Factory;
 use LogicException;
@@ -88,27 +87,27 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
-    public function exists($record): bool
+    public function exists(object $model): bool
     {
-        return isset($this->bindings[get_class($record)]);
+        return isset($this->bindings[get_class($model)]);
     }
 
     /**
      * @inheritDoc
      */
-    public function create($record): JsonApiResource
+    public function create(object $model): JsonApiResource
     {
-        return $this->factoryFor($record)->createResource(
-            $record
+        return $this->factoryFor($model)->createResource(
+            $model
         );
     }
 
     /**
      * @inheritDoc
      */
-    public function cursor(iterable $records): Generator
+    public function cursor(iterable $models): Generator
     {
-        foreach ($records as $record) {
+        foreach ($models as $record) {
             if ($record instanceof JsonApiResource) {
                 yield $record;
                 continue;
@@ -119,15 +118,11 @@ class Container implements ContainerContract
     }
 
     /**
-     * @param mixed $record
+     * @param object $record
      * @return Factory
      */
-    private function factoryFor($record): Factory
+    private function factoryFor(object $record): Factory
     {
-        if (!is_object($record)) {
-            throw new InvalidArgumentException('Expecting record to be an object.');
-        }
-
         if ($binding = $this->bindings[get_class($record)] ?? null) {
             return $binding;
         }

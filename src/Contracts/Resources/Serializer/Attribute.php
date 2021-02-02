@@ -17,25 +17,23 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Resources;
+namespace LaravelJsonApi\Contracts\Resources\Serializer;
 
-use LaravelJsonApi\Core\Resources\JsonApiResource;
-
-interface Factory
+interface Attribute extends Hideable
 {
 
     /**
-     * Get the fully-qualified class names for the records that this factory handles.
+     * Get the JSON:API field name for the serialized attribute.
      *
-     * @return iterable
+     * @return string
      */
-    public function handles(): iterable;
+    public function serializedFieldName(): string;
 
     /**
-     * Create a resource object for the supplied model.
+     * Get the JSON value from the provided model.
      *
      * @param object $model
-     * @return JsonApiResource
+     * @return mixed
      */
-    public function createResource(object $model): JsonApiResource;
+    public function serialize(object $model);
 }

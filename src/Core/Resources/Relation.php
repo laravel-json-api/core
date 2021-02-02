@@ -20,20 +20,25 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources;
 
 use Closure;
-use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
+use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 
-class Relation
+class Relation implements JsonApiRelation
 {
 
     /**
-     * @var JsonApiResource
+     * @var object
      */
-    private JsonApiResource $resource;
+    private object $resource;
+
+    /**
+     * @var string
+     */
+    private string $baseUri;
 
     /**
      * @var string
@@ -88,22 +93,25 @@ class Relation
     /**
      * Relation constructor.
      *
-     * @param JsonApiResource $resource
+     * @param object $resource
+     * @param string $baseUri
      * @param string $fieldName
      * @param string|null $keyName
      */
     public function __construct(
-        JsonApiResource $resource,
+        object $resource,
+        string $baseUri,
         string $fieldName,
         string $keyName = null
     ) {
         $this->resource = $resource;
+        $this->baseUri = $baseUri;
         $this->fieldName = $fieldName;
         $this->keyName = $keyName ?: Str::camel($fieldName);
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public function fieldName(): string
     {
@@ -111,7 +119,7 @@ class Relation
     }
 
     /**
-     * @return Links
+     * @inheritDoc
      */
     public function links(): Links
     {
@@ -129,7 +137,7 @@ class Relation
     }
 
     /**
-     * @return array|null
+     * @inheritDoc
      */
     public function meta(): ?array
     {
@@ -141,7 +149,7 @@ class Relation
     }
 
     /**
-     * @return mixed
+     * @inheritDoc
      */
     public function data()
     {
@@ -157,7 +165,7 @@ class Relation
     }
 
     /**
-     * @return bool
+     * @inheritDoc
      */
     public function showData(): bool
     {
@@ -171,7 +179,7 @@ class Relation
     {
         return \sprintf(
             '%s/relationships/%s',
-            $this->resource->selfUrl(),
+            $this->baseUri,
             $this->uriFieldName()
         );
     }
@@ -183,7 +191,7 @@ class Relation
     {
         return \sprintf(
             '%s/%s',
-            $this->resource->selfUrl(),
+            $this->baseUri,
             $this->uriFieldName()
         );
     }
@@ -279,13 +287,12 @@ class Relation
      */
     public function showDataIfLoaded(): self
     {
-        if (!$this->resource->resource instanceof Model) {
-            throw new LogicException('Resource is not a model.');
+        if (method_exists($this->resource, 'relationLoaded')) {
+            $this->showData = $this->resource->relationLoaded($this->keyName);
+            return $this;
         }
 
-        $this->showData = $this->resource->resource->relationLoaded($this->keyName);
-
-        return $this;
+        throw new LogicException('Expecting resource to have a relationLoaded method.');
     }
 
     /**

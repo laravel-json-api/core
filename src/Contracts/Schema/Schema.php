@@ -69,6 +69,16 @@ interface Schema extends Traversable
     public function id(): ID;
 
     /**
+     * Get the key name for the resource "id".
+     *
+     * If this method returns `null`, resource classes should fall-back to a
+     * sensible default. E.g. `UrlRoutable::getRouteKeyName()`.
+     *
+     * @return string|null
+     */
+    public function idKeyName(): ?string;
+
+    /**
      * Get all the field names.
      *
      * @return array

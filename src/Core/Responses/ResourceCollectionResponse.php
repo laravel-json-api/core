@@ -74,6 +74,7 @@ class ResourceCollectionResponse implements Responsable
     public function toResponse($request)
     {
         $document = JsonApi::server()->encoder()
+            ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withResources($this->resources)

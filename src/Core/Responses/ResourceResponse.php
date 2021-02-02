@@ -75,6 +75,7 @@ class ResourceResponse implements Responsable
         }
 
         $document = JsonApi::server()->encoder()
+            ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withResource($this->resource)

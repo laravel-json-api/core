@@ -23,7 +23,7 @@ interface Field
 {
 
     /**
-     * The JSON API field name.
+     * The JSON:API field name.
      *
      * @return string
      */

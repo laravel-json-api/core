@@ -71,6 +71,7 @@ class ResourceIdentifierCollectionResponse implements Responsable
     public function toResponse($request)
     {
         $document = JsonApi::server()->encoder()
+            ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
             ->withIdentifiers($this->resource, $this->fieldName, $this->related)

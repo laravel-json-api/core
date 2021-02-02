@@ -17,25 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Resources;
+namespace LaravelJsonApi\Contracts\Resources\Serializer;
 
-use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
 
-interface Factory
+interface Relation extends Hideable
 {
 
     /**
-     * Get the fully-qualified class names for the records that this factory handles.
+     * Get the JSON:API field name for the serialized relation.
      *
-     * @return iterable
+     * @return string
      */
-    public function handles(): iterable;
+    public function serializedFieldName(): string;
 
     /**
-     * Create a resource object for the supplied model.
+     * Get the JSON representation of the relationship.
      *
      * @param object $model
-     * @return JsonApiResource
+     * @param string $baseUri
+     * @return JsonApiRelation
      */
-    public function createResource(object $model): JsonApiResource;
+    public function serialize(object $model, string $baseUri): JsonApiRelation;
 }
