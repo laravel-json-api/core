@@ -25,6 +25,8 @@ the model key for the ID.
 - New `Contracts\Resources\JsonApiRelation` contract for the relation object returned by the
 `JsonApiResource::relationships()` method. This has the methods on it that encoders can rely on when
 encoding the relationship to JSON.
+- **BREAKING** The `Contracts\Schema\Relation` contract now has a `uriName()` method for
+  retrieving the relationship's field name as it appears in a URI.
 - New `Core\Resources\ConditionalIterator` class for iterating over values that could contain
 conditional attributes.
 
