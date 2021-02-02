@@ -300,7 +300,8 @@ class JsonApiResource implements ArrayAccess, Responsable
             $this->resource,
             $this->selfUrl(),
             $fieldName,
-            $keyName
+            $keyName,
+            $this->schema->relationship($fieldName)->uriName()
         );
     }
 

@@ -53,7 +53,7 @@ class Relation implements JsonApiRelation
     /**
      * @var string|null
      */
-    private ?string $uriName = null;
+    private ?string $uriName;
 
     /**
      * @var mixed|null
@@ -97,17 +97,20 @@ class Relation implements JsonApiRelation
      * @param string $baseUri
      * @param string $fieldName
      * @param string|null $keyName
+     * @param string|null $uriName
      */
     public function __construct(
         object $resource,
         string $baseUri,
         string $fieldName,
-        string $keyName = null
+        string $keyName = null,
+        string $uriName = null
     ) {
         $this->resource = $resource;
         $this->baseUri = $baseUri;
         $this->fieldName = $fieldName;
         $this->keyName = $keyName ?: Str::camel($fieldName);
+        $this->uriName = $uriName;
     }
 
     /**
