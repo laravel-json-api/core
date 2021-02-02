@@ -247,7 +247,7 @@ trait Hashable
      * @return $this
      * @see ksort()
      */
-    public function sortedKeys(int $flags = SORT_REGULAR): self
+    public function sortKeys(int $flags = SORT_REGULAR): self
     {
         $this->sortKeys = $flags;
         $this->sortValues = null;
@@ -261,10 +261,10 @@ trait Hashable
      * @param int|null $flags
      * @return $this
      */
-    public function maybeSortedKeys(?int $flags): self
+    public function maybeSortKeys(?int $flags): self
     {
         if (is_int($flags)) {
-            return $this->sortedKeys($flags);
+            return $this->sortKeys($flags);
         }
 
         return $this;

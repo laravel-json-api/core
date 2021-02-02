@@ -34,7 +34,7 @@ class HashTest extends TestCase
                 'foo_bar' => 'baz',
                 'baz-bat' => 'bat',
             ],
-        ])->camelize()->jsonSerialize();
+        ])->camelize()->sortKeys()->jsonSerialize();
 
         $this->assertSame($expected = [
             'bazBat' => 'bat',
@@ -58,6 +58,7 @@ class HashTest extends TestCase
 
         $actual = Hash::cast($value)
             ->useCase('camel')
+            ->sortKeys()
             ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
@@ -73,6 +74,7 @@ class HashTest extends TestCase
 
         $actual = Hash::cast($value)
             ->useCase('camelize')
+            ->sortKeys()
             ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
@@ -87,7 +89,7 @@ class HashTest extends TestCase
                 'fooBar' => 'baz',
                 'baz-bat' => 'bat',
             ],
-        ])->snake()->sortedKeys()->all();
+        ])->snake()->sortKeys()->all();
 
         $this->assertSame($expected = [
             'baz_bat' => 'bat',
@@ -111,6 +113,7 @@ class HashTest extends TestCase
 
         $actual = Hash::cast($value)
             ->useCase('snake')
+            ->sortKeys()
             ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
@@ -126,6 +129,7 @@ class HashTest extends TestCase
 
         $actual = Hash::cast($value)
             ->underscore()
+            ->sortKeys()
             ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
@@ -141,6 +145,7 @@ class HashTest extends TestCase
 
         $actual = Hash::cast($value)
             ->useCase('underscore')
+            ->sortKeys()
             ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
@@ -155,7 +160,7 @@ class HashTest extends TestCase
                 'fooBar' => 'baz',
                 'baz_bat' => 'bat',
             ],
-        ])->dasherize()->sortedKeys()->all();
+        ])->dasherize()->sortKeys()->all();
 
         $this->assertSame($expected = [
             'baz-bat' => 'bat',
@@ -179,6 +184,7 @@ class HashTest extends TestCase
 
         $actual = Hash::cast($value)
             ->useCase('dash')
+            ->sortKeys()
             ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
@@ -194,6 +200,7 @@ class HashTest extends TestCase
 
         $actual = Hash::cast($value)
             ->useCase('dasherize')
+            ->sortKeys()
             ->jsonSerialize();
 
         $this->assertSame($expected, $actual);
