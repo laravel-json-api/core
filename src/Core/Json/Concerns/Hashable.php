@@ -22,7 +22,9 @@ namespace LaravelJsonApi\Core\Json\Concerns;
 use Generator;
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Support\Arr;
+use function asort;
 use function iterator_to_array;
+use function ksort;
 
 trait Hashable
 {
@@ -38,9 +40,18 @@ trait Hashable
     private $serializer;
 
     /**
+     * Flags for sorting by keys.
+     *
      * @var int|null
      */
-    private ?int $fieldNameOrder = null;
+    private ?int $sortKeys = null;
+
+    /**
+     * Flags for sorting by values.
+     *
+     * @var int|null
+     */
+    private ?int $sortValues = null;
 
     /**
      * @inheritDoc
@@ -142,10 +153,10 @@ trait Hashable
     /**
      * Mark the hash as using the provided case for keys.
      *
-     * @param string $case
+     * @param string|null $case
      * @return $this
      */
-    public function useCase(string $case): self
+    public function useCase(?string $case): self
     {
         switch ($case) {
             case 'snake' :
@@ -164,6 +175,10 @@ trait Hashable
             case 'camel' :
             case 'camelize' :
                 $this->camelize();
+                break;
+
+            case null :
+                $this->serializer = null;
                 break;
 
             default :
@@ -191,7 +206,37 @@ trait Hashable
     }
 
     /**
-     * Iterate through fields names in a sorted order.
+     * Iterate through values in a sorted order.
+     *
+     * @param int $flags
+     * @return $this
+     * @see asort
+     */
+    public function sorted(int $flags = SORT_REGULAR): self
+    {
+        $this->sortValues = $flags;
+        $this->sortKeys = null;
+
+        return $this;
+    }
+
+    /**
+     * Iterate through values in a sorted order, if sorting flags are provided.
+     *
+     * @param int|null $flags
+     * @return $this
+     */
+    public function maybeSorted(?int $flags): self
+    {
+        if (is_int($flags)) {
+            return $this->sorted($flags);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Iterate through field names in a sorted order.
      *
      * Sorting is deferred until when the hash is traversed.
      * This ensures that the cost of sorting keys is only incurred
@@ -202,9 +247,38 @@ trait Hashable
      * @return $this
      * @see ksort()
      */
-    public function sorted(int $flags = 0): self
+    public function sortedKeys(int $flags = SORT_REGULAR): self
     {
-        $this->fieldNameOrder = $flags;
+        $this->sortKeys = $flags;
+        $this->sortValues = null;
+
+        return $this;
+    }
+
+    /**
+     * Iterate through field names in a sorted order, if sorting flags are provided.
+     *
+     * @param int|null $flags
+     * @return $this
+     */
+    public function maybeSortedKeys(?int $flags): self
+    {
+        if (is_int($flags)) {
+            return $this->sortedKeys($flags);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove any sorting.
+     *
+     * @return $this
+     */
+    public function notSorted(): self
+    {
+        $this->sortValues = null;
+        $this->sortKeys = null;
 
         return $this;
     }
@@ -240,8 +314,10 @@ trait Hashable
             $values = $this->value;
         }
 
-        if (is_int($this->fieldNameOrder)) {
-            ksort($values, $this->fieldNameOrder);
+        if (is_int($this->sortKeys)) {
+            ksort($values, $this->sortKeys);
+        } else if (is_int($this->sortValues)) {
+            asort($values, $this->sortValues);
         }
 
         yield from $values;

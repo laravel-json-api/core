@@ -62,7 +62,7 @@ class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Json
     public function __construct(array $value = null)
     {
         $this->value = $value ?: [];
-        $this->sorted();
+        $this->sortedKeys();
     }
 
     /**

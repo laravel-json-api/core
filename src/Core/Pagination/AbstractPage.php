@@ -193,7 +193,7 @@ abstract class AbstractPage implements PageContract
             return [];
         }
 
-        $hash = Hash::cast($this->metaForPage())->sorted();
+        $hash = Hash::cast($this->metaForPage())->sortedKeys();
 
         if ($this->metaCase) {
             $hash->useCase($this->metaCase);
