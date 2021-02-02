@@ -1,6 +1,6 @@
 {
     "name": "laravel-json-api/core",
-    "description": "Contracts and support classes for Laravel JSON API packages.",
+    "description": "Contracts and support classes for Laravel JSON:API packages.",
     "keywords": [
         "jsonapi.org",
         "json-api",
