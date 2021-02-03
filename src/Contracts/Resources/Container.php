@@ -30,7 +30,7 @@ interface Container
      *
      * @param mixed $value
      *      a resource object, model or an iterable of models.
-     * @return JsonApiResource|Generator
+     * @return JsonApiResource|iterable
      */
     public function resolve($value);
 
@@ -51,7 +51,18 @@ interface Container
     public function create(object $model): JsonApiResource;
 
     /**
-     * Create resource objects for the supplied models.
+     * Get an iterator that converts the models to resource objects.
+     *
+     * Unlike `cursor()` this method returns an iterator that can be iterated
+     * more than once.
+     *
+     * @param iterable $models
+     * @return iterable
+     */
+    public function iterator(iterable $models): iterable;
+
+    /**
+     * Get a generator that converts the models to resource objects.
      *
      * @param iterable $models
      * @return Generator
