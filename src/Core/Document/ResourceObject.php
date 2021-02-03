@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Document;
 
 use ArrayAccess;
-use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
@@ -28,12 +28,15 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
+use LaravelJsonApi\Core\Document\Concerns\Serializable;
 use LogicException;
 use UnexpectedValueException;
 use function json_decode;
 
-class ResourceObject implements Arrayable, IteratorAggregate, JsonSerializable, ArrayAccess
+class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess, Jsonable
 {
+
+    use Serializable;
 
     /**
      * @var string
@@ -166,6 +169,14 @@ class ResourceObject implements Arrayable, IteratorAggregate, JsonSerializable, 
         $this->meta = $meta;
         $this->links = $links;
         $this->normalize();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
     }
 
     /**
@@ -703,7 +714,7 @@ class ResourceObject implements Arrayable, IteratorAggregate, JsonSerializable, 
     /**
      * @inheritDoc
      */
-    public function toArray()
+    public function jsonSerialize()
     {
         return collect([
             'type' => $this->type,
@@ -715,14 +726,6 @@ class ResourceObject implements Arrayable, IteratorAggregate, JsonSerializable, 
             'links' => $this->links,
             'meta' => $this->meta,
         ])->filter()->all();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return $this->toArray();
     }
 
     /**

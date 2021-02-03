@@ -18,10 +18,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Removed
 
-- Removed the `mustValidate()` and `isValidated()` methods from the `Core\Resources\Relation` class. These fields are
-  now defined on the schema's relation field instead of the resource's relation.
-- Removed the deprecated `Core\Documents\ResourceObject::create()` method. (This was never intended to be brought in
-  from the old package.)
+- **BREAKING** Removed the `mustValidate()` and `isValidated()` methods from the `Core\Resources\Relation` class. These
+  fields are now defined on the schema's relation field instead of the resource's relation.
+- **BREAKING** Made changes to the `Core\Documents\ResourceObject` class:
+    - Removed the deprecated `create()` method, as this was never intended to be brought in from the old package.
+    - Remove the `Arrayable` contract (and therefore the `toArray()` method). This is because `toArray()` was always
+      ambiguous - would it return the field values, or the JSON representation of the resource? Replace `toArray()`
+      with `jsonSerialize()`. The `all()` method continues to return the field values.
 
 ## [1.0.0-alpha.2] - 2021-02-02
 

@@ -321,8 +321,8 @@ class ResourceObjectTest extends TestCase
         unset($expected['relationships']['comments']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->forget('content', 'comments'));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testOnly(): void
@@ -340,8 +340,8 @@ class ResourceObjectTest extends TestCase
         ];
 
         $this->assertNotSame($this->resource, $actual = $this->resource->only('content', 'comments'));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testReplaceTypeAndId(): void
@@ -355,8 +355,8 @@ class ResourceObjectTest extends TestCase
             ->replace('id', '999');
 
         $this->assertNotSame($this->resource, $actual);
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testReplaceAttribute(): void
@@ -365,8 +365,8 @@ class ResourceObjectTest extends TestCase
         $expected['attributes']['content'] = 'My first post.';
 
         $this->assertNotSame($this->resource, $actual = $this->resource->replace('content', 'My first post.'));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testReplaceToOne(): void
@@ -377,8 +377,8 @@ class ResourceObjectTest extends TestCase
         $expected['relationships']['author']['data'] = $author;
 
         $this->assertNotSame($this->resource, $actual = $this->resource->replace('author', $author));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testReplaceToOneNull(): void
@@ -387,8 +387,8 @@ class ResourceObjectTest extends TestCase
         $expected['relationships']['author']['data'] = null;
 
         $this->assertNotSame($this->resource, $actual = $this->resource->replace('author', null));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testReplaceToMany(): void
@@ -401,8 +401,8 @@ class ResourceObjectTest extends TestCase
         $expected['relationships']['comments']['data'] = $comments;
 
         $this->assertNotSame($this->resource, $actual = $this->resource->replace('comments', $comments));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testPutAttribute(): void
@@ -411,8 +411,8 @@ class ResourceObjectTest extends TestCase
         $expected['attributes']['foobar'] = 'My first post.';
 
         $this->assertNotSame($this->resource, $actual = $this->resource->put('foobar', 'My first post.'));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testPutArrayAttribute(): void
@@ -421,8 +421,8 @@ class ResourceObjectTest extends TestCase
         $expected['attributes']['foobar'] = ['baz', 'bat'];
 
         $this->assertNotSame($this->resource, $actual = $this->resource->put('foobar', ['baz', 'bat']));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testPutToOne(): void
@@ -433,8 +433,8 @@ class ResourceObjectTest extends TestCase
         $expected['relationships']['foobar']['data'] = $author;
 
         $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', $author));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testPutToOneNull(): void
@@ -443,8 +443,8 @@ class ResourceObjectTest extends TestCase
         $expected['relationships']['foobar']['data'] = null;
 
         $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', null));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testPutToMany(): void
@@ -457,8 +457,8 @@ class ResourceObjectTest extends TestCase
         $expected['relationships']['foobar']['data'] = $comments;
 
         $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', $comments));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testWithType(): void
@@ -467,8 +467,8 @@ class ResourceObjectTest extends TestCase
         $expected['type'] = 'foobar';
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withType('foobar'));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testWithoutId(): void
@@ -477,8 +477,8 @@ class ResourceObjectTest extends TestCase
         unset($expected['id']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withoutId());
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testWithId(): void
@@ -487,8 +487,8 @@ class ResourceObjectTest extends TestCase
         $expected['id'] = '99';
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withId('99'));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testWithAttributes(): void
@@ -497,8 +497,8 @@ class ResourceObjectTest extends TestCase
         $expected['attributes'] = ['foo' => 'bar'];
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withAttributes($expected['attributes']));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testWithoutAttributes(): void
@@ -507,8 +507,8 @@ class ResourceObjectTest extends TestCase
         unset($expected['attributes']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withoutAttributes());
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testWithRelationships(): void
@@ -519,8 +519,8 @@ class ResourceObjectTest extends TestCase
         ];
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withRelationships($expected['relationships']));
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testWithoutRelationships(): void
@@ -529,8 +529,8 @@ class ResourceObjectTest extends TestCase
         unset($expected['relationships']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withoutRelationships());
-        $this->assertSame($this->values, $this->resource->toArray(), 'original resource is not modified');
-        $this->assertSame($expected, $actual->toArray());
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
     }
 
     public function testJsonSerialize(): void
@@ -565,5 +565,9 @@ class ResourceObjectTest extends TestCase
         $this->assertTrue($resource->has('comments'));
         $this->assertTrue($resource->isRelationship('comments'));
         $this->assertNull($resource->get('comments'));
+
+        $fields = $resource->all();
+
+        $this->assertArrayNotHasKey('comments', $fields);
     }
 }
