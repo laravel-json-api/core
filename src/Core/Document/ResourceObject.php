@@ -107,11 +107,11 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     {
         $decoded = json_decode($json, true);
 
-        if (is_array($decoded) && isset($decoded['data'])) {
-            return self::fromArray($decoded);
+        if (is_array($decoded) && isset($decoded['data']) && is_array($decoded['data'])) {
+            return self::fromArray($decoded['data']);
         }
 
-        throw new UnexpectedValueException('Expecting JSON to decode to a JSON:API resource object.');
+        throw new UnexpectedValueException('Expecting JSON to be a JSON:API document with a top-level data member.');
     }
 
     /**
@@ -588,6 +588,34 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Return a new resource object with the provided one merged.
+     *
+     * @param mixed $other
+     * @return $this
+     */
+    public function merge($other): self
+    {
+        $other = self::cast($other);
+
+        $copy = clone $this;
+
+        foreach ($other->attributes as $name => $value) {
+            $copy->attributes[$name] = $value;
+        }
+
+        foreach ($other->relationships as $name => $relation) {
+            $copy->relationships[$name] = array_replace_recursive(
+                $this->relationships[$name] ?? [],
+                $relation,
+            );
+        }
+
+        $copy->normalize();
+
+        return $copy;
+    }
+
+    /**
      * Set a field.
      *
      * Sets the provided value as a relation if it is already defined as a relation.
@@ -758,6 +786,9 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
      */
     private function normalize(): void
     {
+        ksort($this->attributes);
+        ksort($this->relationships);
+
         $this->fieldValues = $this->fieldValues();
         $this->fieldNames = $this->fieldNames();
     }

@@ -44,9 +44,9 @@ class ResourceObjectTest extends TestCase
             'type' => 'posts',
             'id' => '1',
             'attributes' => [
-                'title' => 'Hello World',
                 'content' => '...',
                 'published' => null,
+                'title' => 'Hello World',
             ],
             'relationships' => [
                 'author' => [
@@ -409,6 +409,7 @@ class ResourceObjectTest extends TestCase
     {
         $expected = $this->values;
         $expected['attributes']['foobar'] = 'My first post.';
+        ksort($expected['attributes']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->put('foobar', 'My first post.'));
         $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
@@ -419,6 +420,7 @@ class ResourceObjectTest extends TestCase
     {
         $expected = $this->values;
         $expected['attributes']['foobar'] = ['baz', 'bat'];
+        ksort($expected['attributes']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->put('foobar', ['baz', 'bat']));
         $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
@@ -431,6 +433,7 @@ class ResourceObjectTest extends TestCase
 
         $expected = $this->values;
         $expected['relationships']['foobar']['data'] = $author;
+        ksort($expected['relationships']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', $author));
         $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
@@ -441,6 +444,7 @@ class ResourceObjectTest extends TestCase
     {
         $expected = $this->values;
         $expected['relationships']['foobar']['data'] = null;
+        ksort($expected['relationships']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', null));
         $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
@@ -455,6 +459,7 @@ class ResourceObjectTest extends TestCase
 
         $expected = $this->values;
         $expected['relationships']['foobar']['data'] = $comments;
+        ksort($expected['relationships']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', $comments));
         $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
@@ -569,5 +574,52 @@ class ResourceObjectTest extends TestCase
         $fields = $resource->all();
 
         $this->assertArrayNotHasKey('comments', $fields);
+    }
+
+    public function testMerge(): void
+    {
+        $merge = [
+            'type' => 'posts',
+            'id' => '1',
+            'attributes' => [
+                'slug' => 'hello-world',
+                'title' => 'Helloooooo World!',
+            ],
+            'relationships' => [
+                'author' => [
+                    'data' => [
+                        'type' => 'blog-users',
+                        'id' => '456',
+                    ],
+                ],
+                'site' => [
+                    'data' => [
+                        'type' => 'sites',
+                        'id' => '2',
+                    ],
+                ],
+            ],
+        ];
+
+        $expected = $this->values;
+        $expected['attributes']['slug'] = $merge['attributes']['slug'];
+        $expected['attributes']['title'] = $merge['attributes']['title'];
+        $expected['relationships']['author']['data'] = $merge['relationships']['author']['data'];
+        $expected['relationships']['site'] = $merge['relationships']['site'];
+
+        ksort($expected['attributes']);
+        ksort($expected['relationships']);
+
+        $this->assertNotSame($this->resource, $merged = $this->resource->merge($merge));
+
+        $this->assertSame($this->values, $this->resource->jsonSerialize());
+        $this->assertSame($expected, $merged->jsonSerialize());
+    }
+
+    public function testFromString(): void
+    {
+        $json = json_encode(['data' => $this->values]);
+
+        $this->assertEquals($this->resource, ResourceObject::fromString($json));
     }
 }
