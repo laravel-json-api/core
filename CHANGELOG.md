@@ -12,9 +12,11 @@ All notable changes to this project will be documented in this file. This projec
   trait that can be used on relationship fields to implement the required method.
 - **BREAKING** The `Contracts\Resources\Container` contract now has an `iterator()` method, for returning an iterable
   that can be iterated over more than once. (Unlike `cursor()` which returns a single-use generator.)
-- The `Core\Documents\ResourceObject` now has a `merge()` method for merging two resource objects together. This is
-  useful for update validation, where the values supplied by a client need to be merged over the existing resource field
-  values.
+- New features for the `Core\Documents\ResourceObject` class:
+    - New `merge()` method for merging two resource objects together. This is useful for update validation, where the
+      values supplied by a client need to be merged over the existing resource field values.
+    - The `putRelation` and `replace` methods now accept an instance of `UrlRoutable` for the `id` value of to-one
+      or to-many relations.
 
 ### Changed
 

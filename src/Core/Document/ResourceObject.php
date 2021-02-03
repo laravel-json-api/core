@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Document;
 
 use ArrayAccess;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -32,6 +33,7 @@ use LaravelJsonApi\Core\Document\Concerns\Serializable;
 use LogicException;
 use UnexpectedValueException;
 use function json_decode;
+use function strval;
 
 class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess, Jsonable
 {
@@ -659,6 +661,18 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
      */
     public function putRelation(string $field, ?array $value): self
     {
+        if (is_array($value) && isset($value['id']) && $value['id'] instanceof UrlRoutable) {
+            $value['id'] = strval($value['id']->getRouteKey());
+        } else if (!empty($value) && is_array($value) && !Arr::isAssoc($value)) {
+            $value = collect($value)->map(function (array $data) {
+                if (isset($data['id']) && $data['id'] instanceof UrlRoutable) {
+                    $data['id'] = strval($data['id']->getRouteKey());
+                }
+
+                return $data;
+            })->all();
+        }
+
         $copy = clone $this;
         $copy->relationships[$field] = $copy->relationships[$field] ?? [];
         $copy->relationships[$field]['data'] = $value;

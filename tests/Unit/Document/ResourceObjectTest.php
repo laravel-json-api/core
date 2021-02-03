@@ -17,6 +17,7 @@
 
 namespace LaravelJsonApi\Core\Tests\Unit\Document;
 
+use Illuminate\Contracts\Routing\UrlRoutable;
 use LaravelJsonApi\Core\Document\ResourceObject;
 use PHPUnit\Framework\TestCase;
 
@@ -381,6 +382,21 @@ class ResourceObjectTest extends TestCase
         $this->assertSame($expected, $actual->jsonSerialize());
     }
 
+    public function testReplaceToOneWithUrlRoutable(): void
+    {
+        $mock = $this->createMock(UrlRoutable::class);
+        $mock->method('getRouteKey')->willReturn(999);
+
+        $author = ['type' => 'users', 'id' => $mock];
+
+        $expected = $this->values;
+        $expected['relationships']['author']['data'] = ['type' => 'users', 'id' => '999'];
+
+        $this->assertNotSame($this->resource, $actual = $this->resource->replace('author', $author));
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
+    }
+
     public function testReplaceToOneNull(): void
     {
         $expected = $this->values;
@@ -393,12 +409,19 @@ class ResourceObjectTest extends TestCase
 
     public function testReplaceToMany(): void
     {
+        $mock = $this->createMock(UrlRoutable::class);
+        $mock->method('getRouteKey')->willReturn(999);
+
         $comments = [
             ['type' => 'comments', 'id' => '123456'],
+            ['type' => 'comments', 'id' => $mock],
         ];
 
         $expected = $this->values;
-        $expected['relationships']['comments']['data'] = $comments;
+        $expected['relationships']['comments']['data'] = [
+            ['type' => 'comments', 'id' => '123456'],
+            ['type' => 'comments', 'id' => '999'],
+        ];
 
         $this->assertNotSame($this->resource, $actual = $this->resource->replace('comments', $comments));
         $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
@@ -440,6 +463,22 @@ class ResourceObjectTest extends TestCase
         $this->assertSame($expected, $actual->jsonSerialize());
     }
 
+    public function testPutToOneWithUrlRoutable(): void
+    {
+        $mock = $this->createMock(UrlRoutable::class);
+        $mock->method('getRouteKey')->willReturn(999);
+
+        $author = ['type' => 'users', 'id' => $mock];
+
+        $expected = $this->values;
+        $expected['relationships']['foobar']['data'] = ['type' => 'users', 'id' => '999'];
+        ksort($expected['relationships']);
+
+        $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', $author));
+        $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
+    }
+
     public function testPutToOneNull(): void
     {
         $expected = $this->values;
@@ -453,12 +492,19 @@ class ResourceObjectTest extends TestCase
 
     public function testPutToMany(): void
     {
+        $mock = $this->createMock(UrlRoutable::class);
+        $mock->method('getRouteKey')->willReturn(999);
+
         $comments = [
             ['type' => 'comments', 'id' => '123456'],
+            ['type' => 'comments', 'id' => $mock],
         ];
 
         $expected = $this->values;
-        $expected['relationships']['foobar']['data'] = $comments;
+        $expected['relationships']['foobar']['data'] = [
+            ['type' => 'comments', 'id' => '123456'],
+            ['type' => 'comments', 'id' => '999'],
+        ];
         ksort($expected['relationships']);
 
         $this->assertNotSame($this->resource, $actual = $this->resource->putRelation('foobar', $comments));
