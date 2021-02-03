@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- **BREAKING** The `Contracts\Schema\Relation` contract now has a `isValidated()` method, to determine if the relation
+  value should be merged when validating update requests. There is now a `Core\Schema\Concerns\RequiredForValidation`
+  trait that can be used on relationship fields to implement the required method.
+
+### Removed
+
+- Removed the `mustValidate()` and `isValidated()` methods from the `Core\Resources\Relation` class. These fields are
+  now defined on the schema's relation field instead of the resource's relation.
+
 ## [1.0.0-alpha.2] - 2021-02-02
 
 ### Added
