@@ -19,14 +19,20 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
+use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use IteratorAggregate;
+use JsonSerializable;
+use LogicException;
+use UnexpectedValueException;
+use function json_decode;
 
-class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable, \ArrayAccess
+class ResourceObject implements Arrayable, IteratorAggregate, JsonSerializable, ArrayAccess
 {
 
     /**
@@ -70,13 +76,39 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     private Collection $fieldNames;
 
     /**
-     * @param array $data
+     * @param ResourceObject|Enumerable|array $value
      * @return static
-     * @deprecated use `fromArray`
      */
-    public static function create(array $data): self
+    public static function cast($value): self
     {
-        return self::fromArray($data);
+        if ($value instanceof self) {
+            return $value;
+        }
+
+        if (is_array($value) || $value instanceof Enumerable) {
+            return self::fromArray($value);
+        }
+
+        if (is_string($value)) {
+            return self::fromString($value);
+        }
+
+        throw new InvalidArgumentException('Unexpected resource object.');
+    }
+
+    /**
+     * @param string $json
+     * @return static
+     */
+    public static function fromString(string $json): self
+    {
+        $decoded = json_decode($json, true);
+
+        if (is_array($decoded) && isset($decoded['data'])) {
+            return self::fromArray($decoded);
+        }
+
+        throw new UnexpectedValueException('Expecting JSON to decode to a JSON:API resource object.');
     }
 
     /**
@@ -160,7 +192,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function __set($field, $value)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -177,7 +209,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function __unset($field)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -185,7 +217,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function offsetExists($offset)
     {
-        return $this->fieldValues->offsetExists($offset);
+        return $this->has($offset);
     }
 
     /**
@@ -201,7 +233,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function offsetSet($offset, $value)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -209,7 +241,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function offsetUnset($offset)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -435,7 +467,14 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function withoutLinks(): self
     {
-        return $this->withLinks([]);
+        $copy = clone $this;
+        $copy->links = [];
+        $copy->relationships = collect($copy->relationships)->map(
+            fn(array $relation) => collect($relation)->forget('links')->all()
+        )->all();
+        $copy->normalize();
+
+        return $copy;
     }
 
     /**
@@ -670,7 +709,9 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
             'type' => $this->type,
             'id' => $this->id,
             'attributes' => $this->attributes,
-            'relationships' => $this->relationships,
+            'relationships' => collect($this->relationships)->filter(
+                fn(array $relation) => Arr::hasAny($relation, ['links', 'data', 'meta'])
+            )->all(),
             'links' => $this->links,
             'meta' => $this->meta,
         ])->filter()->all();

@@ -11,10 +11,17 @@ All notable changes to this project will be documented in this file. This projec
   value should be merged when validating update requests. There is now a `Core\Schema\Concerns\RequiredForValidation`
   trait that can be used on relationship fields to implement the required method.
 
+### Changed
+
+- The `Core\Document\ResourceObject::withoutLinks()` method now correctly removes both resource links and relationship
+  links.
+
 ### Removed
 
 - Removed the `mustValidate()` and `isValidated()` methods from the `Core\Resources\Relation` class. These fields are
   now defined on the schema's relation field instead of the resource's relation.
+- Removed the deprecated `Core\Documents\ResourceObject::create()` method. (This was never intended to be brought in
+  from the old package.)
 
 ## [1.0.0-alpha.2] - 2021-02-02
 
