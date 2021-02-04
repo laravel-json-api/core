@@ -38,6 +38,11 @@ abstract class Schema implements SchemaContract, IteratorAggregate
 {
 
     /**
+     * @var SchemaContainer
+     */
+    protected SchemaContainer $schemas;
+
+    /**
      * The resource type as it appears in URIs.
      *
      * @var string|null
@@ -57,11 +62,6 @@ abstract class Schema implements SchemaContract, IteratorAggregate
      * @var int
      */
     protected int $maxDepth = 1;
-
-    /**
-     * @var SchemaContainer
-     */
-    private SchemaContainer $schemas;
 
     /**
      * @var array|null
