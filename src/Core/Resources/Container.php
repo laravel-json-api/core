@@ -66,7 +66,7 @@ class Container implements ContainerContract
      */
     public function resolve($value)
     {
-        if ($value instanceof JsonApiResource || $value instanceof ResourceIterator) {
+        if ($value instanceof JsonApiResource) {
             return $value;
         }
 
@@ -75,7 +75,7 @@ class Container implements ContainerContract
         }
 
         if (is_iterable($value)) {
-            return $this->iterator($value);
+            return $this->cursor($value);
         }
 
         throw new LogicException(sprintf(
@@ -100,14 +100,6 @@ class Container implements ContainerContract
         return $this->factoryFor($model)->createResource(
             $model
         );
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function iterator(iterable $models): iterable
-    {
-        return new ResourceIterator($this, $models);
     }
 
     /**

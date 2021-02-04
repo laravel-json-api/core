@@ -10,8 +10,6 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING** The `Contracts\Schema\Relation` contract now has a `isValidated()` method, to determine if the relation
   value should be merged when validating update requests. There is now a `Core\Schema\Concerns\RequiredForValidation`
   trait that can be used on relationship fields to implement the required method.
-- **BREAKING** The `Contracts\Resources\Container` contract now has an `iterator()` method, for returning an iterable
-  that can be iterated over more than once. (Unlike `cursor()` which returns a single-use generator.)
 - New features for the `Core\Documents\ResourceObject` class:
     - New `merge()` method for merging two resource objects together. This is useful for update validation, where the
       values supplied by a client need to be merged over the existing resource field values.
