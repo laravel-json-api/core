@@ -13,8 +13,11 @@ All notable changes to this project will be documented in this file. This projec
 - New features for the `Core\Documents\ResourceObject` class:
     - New `merge()` method for merging two resource objects together. This is useful for update validation, where the
       values supplied by a client need to be merged over the existing resource field values.
-    - The `putRelation` and `replace` methods now accept an instance of `UrlRoutable` for the `id` value of to-one
-      or to-many relations.
+    - The `putRelation` and `replace` methods now accept an instance of `UrlRoutable` for the `id` value of to-one or
+      to-many relations.
+- The schema container instance is now injected into schema classes via the constructor `$schemas` property. This has
+  been added so that a schema class can be instantiated directly from the service container if the schema container is
+  bound in the service container.
 
 ### Changed
 
