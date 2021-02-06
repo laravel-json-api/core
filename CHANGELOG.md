@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file. This projec
 - The schema container instance is now injected into schema classes via the constructor `$schemas` property. This has
   been added so that a schema class can be instantiated directly from the service container if the schema container is
   bound in the service container.
+- New `Core\Resources\ConditionalList` class, for iterating over conditional attributes but yielding them as a
+  zero-indexed array list.
 
 ### Changed
 
