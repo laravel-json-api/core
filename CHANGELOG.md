@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file. This projec
     - The `Core\Resources\Concerns\ConditionallyLoadsAttributes` trait is now `ConditionallyLoadsFields`.
     - The `Core\Resources\ConditionalAttr` is now `ConditionalField`.
     - The `Core\Resources\ConditionalAttrs` is now `ConditionalFields`.
+- **BREAKING** The first argument on the `Contracts\Server\Server` interface (`$parameters`) has been made optional.
 
 ### Removed
 

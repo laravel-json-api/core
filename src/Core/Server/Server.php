@@ -32,6 +32,7 @@ use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Store\Store;
+use LogicException;
 
 abstract class Server implements ServerContract
 {
@@ -167,7 +168,7 @@ abstract class Server implements ServerContract
     /**
      * @inheritDoc
      */
-    public function url($parameters, bool $secure = null): string
+    public function url($parameters = [], bool $secure = null): string
     {
         return url($this->baseUri(), $parameters, $secure);
     }
@@ -183,7 +184,7 @@ abstract class Server implements ServerContract
             return $this->baseUri;
         }
 
-        throw new \LogicException('No base URI set on server.');
+        throw new LogicException('No base URI set on server.');
     }
 
 }
