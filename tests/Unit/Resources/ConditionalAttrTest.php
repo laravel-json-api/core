@@ -19,13 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Resources;
 
-use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
+use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use PHPUnit\Framework\TestCase;
 
 class ConditionalAttrTest extends TestCase
 {
 
-    use ConditionallyLoadsAttributes;
+    use ConditionallyLoadsFields;
 
     public function test(): void
     {

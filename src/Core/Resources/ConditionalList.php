@@ -53,7 +53,7 @@ class ConditionalList implements IteratorAggregate, JsonSerializable
                 continue;
             }
 
-            if ($value instanceof ConditionalAttrs) {
+            if ($value instanceof ConditionalFields) {
                 foreach ($value as $v) {
                     yield $v;
                 }

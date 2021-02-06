@@ -25,6 +25,11 @@ All notable changes to this project will be documented in this file. This projec
 
 - The `Core\Document\ResourceObject::withoutLinks()` method now correctly removes both resource links and relationship
   links.
+- **BREAKING** As conditional values are now supported in relationships (previously only supported in attributes), the
+  following have been renamed to make it clear that they are not just for use in attributes:
+    - The `Core\Resources\Concerns\ConditionallyLoadsAttributes` trait is now `ConditionallyLoadsFields`.
+    - The `Core\Resources\ConditionalAttr` is now `ConditionalField`.
+    - The `Core\Resources\ConditionalAttrs` is now `ConditionalFields`.
 
 ### Removed
 

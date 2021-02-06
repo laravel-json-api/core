@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Resources;
 
-use LaravelJsonApi\Core\Resources\ConditionalAttr;
-use LaravelJsonApi\Core\Resources\ConditionalAttrs;
+use LaravelJsonApi\Core\Resources\ConditionalField;
+use LaravelJsonApi\Core\Resources\ConditionalFields;
 use LaravelJsonApi\Core\Resources\ConditionalIterator;
 use PHPUnit\Framework\TestCase;
 
@@ -31,13 +31,13 @@ class ConditionalIteratorTest extends TestCase
     {
         $attrs = [
             'foo' => 'bar',
-            'baz' => new ConditionalAttr(true, 'bat'),
-            'foobar' => new ConditionalAttr(false, 'bazbat'),
-            new ConditionalAttrs(true, [
+            'baz' => new ConditionalField(true, 'bat'),
+            'foobar' => new ConditionalField(false, 'bazbat'),
+            new ConditionalFields(true, [
                 'a' => 'b',
                 'c' => fn() => 'd',
             ]),
-            new ConditionalAttrs(false, [
+            new ConditionalFields(false, [
                 'e' => 'f',
             ]),
         ];

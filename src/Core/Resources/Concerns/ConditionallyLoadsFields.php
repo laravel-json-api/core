@@ -20,33 +20,33 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Resources\Concerns;
 
 use Closure;
-use LaravelJsonApi\Core\Resources\ConditionalAttr;
-use LaravelJsonApi\Core\Resources\ConditionalAttrs;
+use LaravelJsonApi\Core\Resources\ConditionalField;
+use LaravelJsonApi\Core\Resources\ConditionalFields;
 
-trait ConditionallyLoadsAttributes
+trait ConditionallyLoadsFields
 {
 
     /**
-     * Conditionally include an attribute value.
+     * Conditionally include a field value.
      *
      * @param bool $check
      * @param mixed $value
-     * @return ConditionalAttr
+     * @return ConditionalField
      */
-    protected function when(bool $check, $value): ConditionalAttr
+    protected function when(bool $check, $value): ConditionalField
     {
-        return new ConditionalAttr($check, $value);
+        return new ConditionalField($check, $value);
     }
 
     /**
-     * Conditionally include a set of attribute values.
+     * Conditionally include a set of field values.
      *
      * @param bool $check
      * @param Closure|iterable $values
-     * @return ConditionalAttrs
+     * @return ConditionalFields
      */
-    protected function mergeWhen(bool $check, $values): ConditionalAttrs
+    protected function mergeWhen(bool $check, $values): ConditionalFields
     {
-        return new ConditionalAttrs($check, $values);
+        return new ConditionalFields($check, $values);
     }
 }

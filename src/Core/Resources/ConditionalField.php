@@ -24,7 +24,7 @@ use JsonSerializable;
 use LaravelJsonApi\Contracts\Resources\Skippable;
 use LogicException;
 
-class ConditionalAttr implements JsonSerializable, Skippable
+class ConditionalField implements JsonSerializable, Skippable
 {
 
     /**

@@ -30,7 +30,7 @@ use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Facades\JsonApi;
-use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsAttributes;
+use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\ResourceResponse;
 use LogicException;
@@ -39,7 +39,7 @@ use function sprintf;
 class JsonApiResource implements ArrayAccess, Responsable
 {
 
-    use ConditionallyLoadsAttributes;
+    use ConditionallyLoadsFields;
     use DelegatesToResource;
 
     /**

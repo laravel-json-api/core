@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Resources;
 
-use LaravelJsonApi\Core\Resources\ConditionalAttr;
-use LaravelJsonApi\Core\Resources\ConditionalAttrs;
+use LaravelJsonApi\Core\Resources\ConditionalField;
+use LaravelJsonApi\Core\Resources\ConditionalFields;
 use LaravelJsonApi\Core\Resources\ConditionalList;
 use PHPUnit\Framework\TestCase;
 
@@ -31,16 +31,16 @@ class ConditionalListTest extends TestCase
     {
         $values = [
             'foo',
-            new ConditionalAttr(true, 'bar'),
-            new ConditionalAttr(true, fn() => 'baz'),
-            new ConditionalAttr(false, 'boom!'),
+            new ConditionalField(true, 'bar'),
+            new ConditionalField(true, fn() => 'baz'),
+            new ConditionalField(false, 'boom!'),
             'blah' => 'bazbat',
-            new ConditionalAttrs(true, [
+            new ConditionalFields(true, [
                 'a',
                 fn() => 'b',
                 'blah' => 'c',
             ]),
-            new ConditionalAttrs(false, [
+            new ConditionalFields(false, [
                 'd',
                 'e',
             ]),
