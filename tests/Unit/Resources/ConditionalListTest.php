@@ -21,41 +21,48 @@ namespace LaravelJsonApi\Core\Tests\Unit\Resources;
 
 use LaravelJsonApi\Core\Resources\ConditionalField;
 use LaravelJsonApi\Core\Resources\ConditionalFields;
-use LaravelJsonApi\Core\Resources\ConditionalIterator;
+use LaravelJsonApi\Core\Resources\ConditionalList;
 use PHPUnit\Framework\TestCase;
 
-class ConditionalIteratorTest extends TestCase
+class ConditionalListTest extends TestCase
 {
 
     public function test(): void
     {
-        $attrs = [
-            'foo' => 'bar',
-            'baz' => new ConditionalField(true, 'bat'),
-            'foobar' => new ConditionalField(false, 'bazbat'),
+        $values = [
+            'foo',
+            new ConditionalField(true, 'bar'),
+            new ConditionalField(true, fn() => 'baz'),
+            new ConditionalField(false, 'boom!'),
+            'blah' => 'bazbat',
             new ConditionalFields(true, [
-                'a' => 'b',
-                'c' => fn() => 'd',
+                'a',
+                fn() => 'b',
+                'blah' => 'c',
             ]),
             new ConditionalFields(false, [
-                'e' => 'f',
+                'd',
+                'e',
             ]),
         ];
 
-        $iterator = new ConditionalIterator($attrs);
+        $iterator = new ConditionalList($values);
 
         $this->assertJsonStringEqualsJsonString(json_encode([
-            'foo' => 'bar',
-            'baz' => 'bat',
-            'a' => 'b',
-            'c' => 'd',
+            'foo',
+            'bar',
+            'baz',
+            'bazbat',
+            'a',
+            'b',
+            'c',
         ]), json_encode($iterator));
     }
 
     public function testEmpty(): void
     {
-        $iterator = new ConditionalIterator([]);
+        $iterator = new ConditionalList([]);
 
-        $this->assertNull($iterator->jsonSerialize());
+        $this->assertSame([], $iterator->jsonSerialize());
     }
 }

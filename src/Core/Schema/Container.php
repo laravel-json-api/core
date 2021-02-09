@@ -20,10 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Schema;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
-use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
-use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LogicException;
 use RuntimeException;
 use Throwable;
@@ -148,20 +146,15 @@ class Container implements ContainerContract
     private function make(string $schemaClass): Schema
     {
         try {
-            $schema = $this->container->make($schemaClass);
+            $schema = $this->container->make($schemaClass, ['schemas' => $this]);
         } catch (Throwable $ex) {
             throw new RuntimeException("Unable to create schema {$schemaClass}.", 0, $ex);
-        }
-
-        /** If the schema needs to lookup other schemas, we inject the container. */
-        if ($schema instanceof SchemaAwareContract) {
-            $schema->withSchemas($this);
         }
 
         if ($schema instanceof Schema) {
             return $schema;
         }
 
-        throw new RuntimeException("Class {$schema} is not a JSON API schema.");
+        throw new RuntimeException("Class {$schemaClass} is not a JSON API schema.");
     }
 }

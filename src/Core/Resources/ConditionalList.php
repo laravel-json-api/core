@@ -25,7 +25,7 @@ use JsonSerializable;
 use LaravelJsonApi\Contracts\Resources\Skippable;
 use function iterator_to_array;
 
-class ConditionalIterator implements IteratorAggregate, JsonSerializable
+class ConditionalList implements IteratorAggregate, JsonSerializable
 {
 
     /**
@@ -48,17 +48,20 @@ class ConditionalIterator implements IteratorAggregate, JsonSerializable
      */
     public function cursor(): Generator
     {
-        foreach ($this->iterator as $key => $value) {
+        foreach ($this->iterator as $value) {
             if ($value instanceof Skippable && true === $value->skip()) {
                 continue;
             }
 
             if ($value instanceof ConditionalFields) {
-                yield from $value;
+                foreach ($value as $v) {
+                    yield $v;
+                }
+                unset($v);
                 continue;
             }
 
-            yield $key => $value;
+            yield $value;
         }
     }
 
@@ -83,7 +86,7 @@ class ConditionalIterator implements IteratorAggregate, JsonSerializable
      */
     public function jsonSerialize()
     {
-        return $this->all() ?: null;
+        return $this->all();
     }
 
 }

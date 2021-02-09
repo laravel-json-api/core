@@ -51,7 +51,7 @@ interface Container
     public function create(object $model): JsonApiResource;
 
     /**
-     * Create resource objects for the supplied models.
+     * Get a cursor that converts the provided models to resource objects.
      *
      * @param iterable $models
      * @return Generator

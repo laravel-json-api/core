@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-alpha.3] - 2021-02-09
+
+### Added
+
+- **BREAKING** The `Contracts\Schema\Relation` contract now has a `isValidated()` method, to determine if the relation
+  value should be merged when validating update requests. There is now a `Core\Schema\Concerns\RequiredForValidation`
+  trait that can be used on relationship fields to implement the required method.
+- New features for the `Core\Documents\ResourceObject` class:
+    - New `merge()` method for merging two resource objects together. This is useful for update validation, where the
+      values supplied by a client need to be merged over the existing resource field values.
+    - The `putRelation` and `replace` methods now accept an instance of `UrlRoutable` for the `id` value of to-one or
+      to-many relations.
+- The schema container instance is now injected into schema classes via the constructor `$schemas` property. This has
+  been added so that a schema class can be instantiated directly from the service container if the schema container is
+  bound in the service container.
+- New `Core\Resources\ConditionalList` class, for iterating over conditional attributes but yielding them as a
+  zero-indexed array list.
+
+### Changed
+
+- The `Core\Document\ResourceObject::withoutLinks()` method now correctly removes both resource links and relationship
+  links.
+- **BREAKING** As conditional values are now supported in relationships (previously only supported in attributes), the
+  following have been renamed to make it clear that they are not just for use in attributes:
+    - The `Core\Resources\Concerns\ConditionallyLoadsAttributes` trait is now `ConditionallyLoadsFields`.
+    - The `Core\Resources\ConditionalAttr` is now `ConditionalField`.
+    - The `Core\Resources\ConditionalAttrs` is now `ConditionalFields`.
+- **BREAKING** The first argument on the `Contracts\Server\Server` interface (`$parameters`) has been made optional.
+
+### Removed
+
+- **BREAKING** Removed the `mustValidate()` and `isValidated()` methods from the `Core\Resources\Relation` class. These
+  fields are now defined on the schema's relation field instead of the resource's relation.
+- **BREAKING** Made changes to the `Core\Documents\ResourceObject` class:
+    - Removed the deprecated `create()` method, as this was never intended to be brought in from the old package.
+    - Remove the `Arrayable` contract (and therefore the `toArray()` method). This is because `toArray()` was always
+      ambiguous - would it return the field values, or the JSON representation of the resource? Replace `toArray()`
+      with `jsonSerialize()`. The `all()` method continues to return the field values.
+
 ## [1.0.0-alpha.2] - 2021-02-02
 
 ### Added

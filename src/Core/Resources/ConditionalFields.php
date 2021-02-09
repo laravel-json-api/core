@@ -25,7 +25,7 @@ use IteratorAggregate;
 use LaravelJsonApi\Contracts\Resources\Skippable;
 use LogicException;
 
-class ConditionalAttrs implements IteratorAggregate, Skippable
+class ConditionalFields implements IteratorAggregate, Skippable
 {
 
     /**

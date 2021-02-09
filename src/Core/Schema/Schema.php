@@ -19,7 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
+use IteratorAggregate;
 use LaravelJsonApi\Contracts\Schema\Attribute;
+use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Schema\Field;
 use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
@@ -32,10 +34,13 @@ use LogicException;
 use function array_keys;
 use function sprintf;
 
-abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorAggregate
+abstract class Schema implements SchemaContract, IteratorAggregate
 {
 
-    use SchemaAware;
+    /**
+     * @var SchemaContainer
+     */
+    protected SchemaContainer $schemas;
 
     /**
      * The resource type as it appears in URIs.
@@ -156,6 +161,16 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
         $resolver = static::$authorizerResolver ?: new AuthorizerResolver();
 
         return $resolver(static::class);
+    }
+
+    /**
+     * Schema constructor.
+     *
+     * @param SchemaContainer $schemas
+     */
+    public function __construct(SchemaContainer $schemas)
+    {
+        $this->schemas = $schemas;
     }
 
     /**
@@ -311,7 +326,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
     {
         if (0 < $this->maxDepth) {
             return new IncludePathIterator(
-                $this->schemas(),
+                $this->schemas,
                 $this,
                 $this->maxDepth
             );
@@ -369,7 +384,7 @@ abstract class Schema implements SchemaContract, SchemaAwareContract, \IteratorA
 
         return $this->fields = collect($this->fields())->keyBy(function (Field $field) {
             if ($field instanceof SchemaAwareContract) {
-                $field->withSchemas($this->schemas());
+                $field->withSchemas($this->schemas);
             }
 
             return $field->name();

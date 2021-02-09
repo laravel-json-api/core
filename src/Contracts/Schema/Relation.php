@@ -76,4 +76,26 @@ interface Relation extends Field
      * @return Filter[]|iterable
      */
     public function filters(): iterable;
+
+    /**
+     * Is the relation value required when validating an update request?
+     *
+     * When updating resources, the JSON:API specification says:
+     *
+     * "If a request does not include all of the relationships for a resource,
+     * the server MUST interpret the missing relationships as if they were included
+     * with their current values. It MUST NOT interpret them as null or empty values."
+     *
+     * This means we need to merge existing relationship values with those provided
+     * by the client for an update request. However, it would be extremely inefficient
+     * for us to read the value of every relation. For example, a `posts` resource
+     * could have hundreds of `comments`, which are not required for validation.
+     *
+     * Therefore only the values of relations that return `true` for this method
+     * will be extracted and merged for an update request.
+     *
+     * @return bool
+     * @see https://jsonapi.org/format/#crud-updating-resource-relationships
+     */
+    public function isValidated(): bool;
 }

@@ -81,11 +81,6 @@ class Relation implements JsonApiRelation
     private bool $showRelated = true;
 
     /**
-     * @var bool
-     */
-    private bool $validated = false;
-
-    /**
      * @var array|Closure
      */
     private $meta;
@@ -311,26 +306,6 @@ class Relation implements JsonApiRelation
         $this->meta = $meta;
 
         return $this;
-    }
-
-    /**
-     * Mark the relation as required for validation.
-     *
-     * @return $this
-     */
-    public function mustValidate(): self
-    {
-        $this->validated = true;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValidated(): bool
-    {
-        return $this->validated;
     }
 
     /**

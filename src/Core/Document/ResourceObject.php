@@ -19,15 +19,26 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
-use Illuminate\Contracts\Support\Arrayable;
+use ArrayAccess;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use IteratorAggregate;
+use JsonSerializable;
+use LaravelJsonApi\Core\Document\Concerns\Serializable;
+use LogicException;
+use UnexpectedValueException;
+use function json_decode;
+use function strval;
 
-class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable, \ArrayAccess
+class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess, Jsonable
 {
+
+    use Serializable;
 
     /**
      * @var string
@@ -70,13 +81,39 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     private Collection $fieldNames;
 
     /**
-     * @param array $data
+     * @param ResourceObject|Enumerable|array $value
      * @return static
-     * @deprecated use `fromArray`
      */
-    public static function create(array $data): self
+    public static function cast($value): self
     {
-        return self::fromArray($data);
+        if ($value instanceof self) {
+            return $value;
+        }
+
+        if (is_array($value) || $value instanceof Enumerable) {
+            return self::fromArray($value);
+        }
+
+        if (is_string($value)) {
+            return self::fromString($value);
+        }
+
+        throw new InvalidArgumentException('Unexpected resource object.');
+    }
+
+    /**
+     * @param string $json
+     * @return static
+     */
+    public static function fromString(string $json): self
+    {
+        $decoded = json_decode($json, true);
+
+        if (is_array($decoded) && isset($decoded['data']) && is_array($decoded['data'])) {
+            return self::fromArray($decoded['data']);
+        }
+
+        throw new UnexpectedValueException('Expecting JSON to be a JSON:API document with a top-level data member.');
     }
 
     /**
@@ -137,6 +174,14 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     }
 
     /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
+    }
+
+    /**
      * @return void
      */
     public function __clone()
@@ -160,7 +205,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function __set($field, $value)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -177,7 +222,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function __unset($field)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -185,7 +230,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function offsetExists($offset)
     {
-        return $this->fieldValues->offsetExists($offset);
+        return $this->has($offset);
     }
 
     /**
@@ -201,7 +246,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function offsetSet($offset, $value)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -209,7 +254,7 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function offsetUnset($offset)
     {
-        throw new \LogicException('Resource object is immutable.');
+        throw new LogicException('Resource object is immutable.');
     }
 
     /**
@@ -435,7 +480,14 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function withoutLinks(): self
     {
-        return $this->withLinks([]);
+        $copy = clone $this;
+        $copy->links = [];
+        $copy->relationships = collect($copy->relationships)->map(
+            fn(array $relation) => collect($relation)->forget('links')->all()
+        )->all();
+        $copy->normalize();
+
+        return $copy;
     }
 
     /**
@@ -538,6 +590,34 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     }
 
     /**
+     * Return a new resource object with the provided one merged.
+     *
+     * @param mixed $other
+     * @return $this
+     */
+    public function merge($other): self
+    {
+        $other = self::cast($other);
+
+        $copy = clone $this;
+
+        foreach ($other->attributes as $name => $value) {
+            $copy->attributes[$name] = $value;
+        }
+
+        foreach ($other->relationships as $name => $relation) {
+            $copy->relationships[$name] = array_replace_recursive(
+                $this->relationships[$name] ?? [],
+                $relation,
+            );
+        }
+
+        $copy->normalize();
+
+        return $copy;
+    }
+
+    /**
      * Set a field.
      *
      * Sets the provided value as a relation if it is already defined as a relation.
@@ -581,6 +661,18 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     public function putRelation(string $field, ?array $value): self
     {
+        if (is_array($value) && isset($value['id']) && $value['id'] instanceof UrlRoutable) {
+            $value['id'] = strval($value['id']->getRouteKey());
+        } else if (!empty($value) && is_array($value) && !Arr::isAssoc($value)) {
+            $value = collect($value)->map(function (array $data) {
+                if (isset($data['id']) && $data['id'] instanceof UrlRoutable) {
+                    $data['id'] = strval($data['id']->getRouteKey());
+                }
+
+                return $data;
+            })->all();
+        }
+
         $copy = clone $this;
         $copy->relationships[$field] = $copy->relationships[$field] ?? [];
         $copy->relationships[$field]['data'] = $value;
@@ -664,24 +756,18 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
     /**
      * @inheritDoc
      */
-    public function toArray()
+    public function jsonSerialize()
     {
         return collect([
             'type' => $this->type,
             'id' => $this->id,
             'attributes' => $this->attributes,
-            'relationships' => $this->relationships,
+            'relationships' => collect($this->relationships)->filter(
+                fn(array $relation) => Arr::hasAny($relation, ['links', 'data', 'meta'])
+            )->all(),
             'links' => $this->links,
             'meta' => $this->meta,
         ])->filter()->all();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize()
-    {
-        return $this->toArray();
     }
 
     /**
@@ -714,6 +800,9 @@ class ResourceObject implements Arrayable, \IteratorAggregate, \JsonSerializable
      */
     private function normalize(): void
     {
+        ksort($this->attributes);
+        ksort($this->relationships);
+
         $this->fieldValues = $this->fieldValues();
         $this->fieldNames = $this->fieldNames();
     }

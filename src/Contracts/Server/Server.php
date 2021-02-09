@@ -82,9 +82,9 @@ interface Server
     public function authorizable(): bool;
 
     /**
-     * @param $parameters
+     * @param mixed $parameters
      * @param bool|null $secure
      * @return string
      */
-    public function url($parameters, bool $secure = null): string;
+    public function url($parameters = [], bool $secure = null): string;
 }
