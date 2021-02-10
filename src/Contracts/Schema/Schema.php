@@ -27,7 +27,7 @@ interface Schema extends Traversable
 {
 
     /**
-     * Get the JSON API resource type.
+     * Get the JSON:API resource type.
      *
      * @return string
      */

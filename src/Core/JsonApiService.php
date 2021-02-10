@@ -53,7 +53,7 @@ class JsonApiService
             return $this->container->make(Route::class);
         } catch (BindingResolutionException $ex) {
             throw new LogicException(
-                'No bound JSON API route - your application may not be handling an HTTP request.',
+                'No bound JSON:API route - your application may not be handling an HTTP request.',
                 0,
                 $ex
             );
@@ -76,7 +76,7 @@ class JsonApiService
             return $this->container->make(Server::class);
         } catch (BindingResolutionException $ex) {
             throw new LogicException(
-                'No bound JSON API server - your application may not be handling an HTTP request.',
+                'No bound JSON:API server - your application may not be handling an HTTP request.',
                 0,
                 $ex
             );

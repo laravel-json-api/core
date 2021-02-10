@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
 interface Store
 {
     /**
-     * Get a model by JSON API resource type and id.
+     * Get a model by JSON:API resource type and id.
      *
      * @param string $resourceType
      * @param string $resourceId
@@ -46,7 +46,7 @@ interface Store
     public function exists(string $resourceType, string $resourceId): bool;
 
     /**
-     * Query all resources by JSON API resource type.
+     * Query all resources by JSON:API resource type.
      *
      * @param string $resourceType
      * @return QueryAllBuilder
@@ -54,7 +54,7 @@ interface Store
     public function queryAll(string $resourceType): QueryAllBuilder;
 
     /**
-     * Query one resource by JSON API resource type.
+     * Query one resource by JSON:API resource type.
      *
      * @param string $resourceType
      * @param Model|object|string $modelOrResourceId
@@ -129,7 +129,7 @@ interface Store
     public function modifyToMany(string $resourceType, $modelOrResourceId, string $fieldName): ToManyBuilder;
 
     /**
-     * Access a resource repository by its JSON API resource type.
+     * Access a resource repository by its JSON:API resource type.
      *
      * @param string $resourceType
      * @return Repository

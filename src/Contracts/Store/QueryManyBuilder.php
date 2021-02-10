@@ -41,7 +41,7 @@ interface QueryManyBuilder
     public function using(QueryParameters $query): self;
 
     /**
-     * Filter models using JSON API filter parameters.
+     * Filter models using JSON:API filter parameters.
      *
      * @param array|null $filters
      * @return $this
@@ -49,7 +49,7 @@ interface QueryManyBuilder
     public function filter(?array $filters): self;
 
     /**
-     * Sort models using JSON API sort fields.
+     * Sort models using JSON:API sort fields.
      *
      * @param SortFields|SortField|array|string|null $fields
      * @return $this
@@ -57,7 +57,7 @@ interface QueryManyBuilder
     public function sort($fields): self;
 
     /**
-     * Eager load resources using the provided JSON API include paths.
+     * Eager load resources using the provided JSON:API include paths.
      *
      * @param IncludePaths|RelationshipPath|array|string|null $includePaths
      * @return $this
@@ -79,7 +79,7 @@ interface QueryManyBuilder
     public function cursor(): LazyCollection;
 
     /**
-     * Return a page of models using JSON API page parameters.
+     * Return a page of models using JSON:API page parameters.
      *
      * @param array $page
      * @return Page

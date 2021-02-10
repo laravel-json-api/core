@@ -36,7 +36,7 @@ interface QueryOneBuilder
     public function using(QueryParameters $query): self;
 
     /**
-     * Filter the model using JSON API filter parameters.
+     * Filter the model using JSON:API filter parameters.
      *
      * @param array|null $filters
      * @return $this
@@ -44,7 +44,7 @@ interface QueryOneBuilder
     public function filter(?array $filters): self;
 
     /**
-     * Eager load resources using the provided JSON API include paths.
+     * Eager load resources using the provided JSON:API include paths.
      *
      * @param IncludePaths|RelationshipPath|array|string|null $includePaths
      * @return $this

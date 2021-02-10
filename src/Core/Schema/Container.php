@@ -155,6 +155,6 @@ class Container implements ContainerContract
             return $schema;
         }
 
-        throw new RuntimeException("Class {$schemaClass} is not a JSON API schema.");
+        throw new RuntimeException("Class {$schemaClass} is not a JSON:API schema.");
     }
 }

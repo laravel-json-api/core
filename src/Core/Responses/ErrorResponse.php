@@ -152,7 +152,7 @@ class ErrorResponse implements SerializableContract, Responsable, ErrorProvider,
     }
 
     /**
-     * Set the default top-level JSON API member.
+     * Set the default top-level JSON:API member.
      *
      * @return void
      */

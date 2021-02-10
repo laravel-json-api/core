@@ -43,7 +43,7 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
     private array $stack;
 
     /**
-     * Create a list of JSON API error objects.
+     * Create a list of JSON:API error objects.
      *
      * @param ErrorList|ErrorProvider|Error|Enumerable|array $value
      * @return ErrorList

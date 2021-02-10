@@ -24,11 +24,11 @@ interface JsonApiDocument extends Serializable
 {
 
     /**
-     * Set the top-level JSON API member.
+     * Set the top-level JSON:API member.
      *
-     * Encoders MUST only use the provided JSON API object
+     * Encoders MUST only use the provided JSON:API object
      * if it is non-empty. Otherwise encoders should fall back
-     * to the default JSON API object, which is provided by the
+     * to the default JSON:API object, which is provided by the
      * server that is doing the encoding.
      *
      * @param JsonApi|array|string|null $jsonApi
@@ -37,7 +37,7 @@ interface JsonApiDocument extends Serializable
     public function withJsonApi($jsonApi): self;
 
     /**
-     * Forget the top-level JSON API member.
+     * Forget the top-level JSON:API member.
      *
      * @return $this
      */

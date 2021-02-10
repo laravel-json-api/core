@@ -36,7 +36,7 @@ interface ToManyBuilder
     public function using(QueryParameters $query): self;
 
     /**
-     * Eager load resources using the provided JSON API include paths.
+     * Eager load resources using the provided JSON:API include paths.
      *
      * @param IncludePaths|RelationshipPath|array|string|null $includePaths
      * @return $this

@@ -48,7 +48,7 @@ class JsonApi implements Serializable
     }
 
     /**
-     * Create a JSON API object.
+     * Create a JSON:API object.
      *
      * @param JsonApi|Enumerable|array|string|null $value
      * @return JsonApi
@@ -67,11 +67,11 @@ class JsonApi implements Serializable
             return JsonApi::fromArray($value);
         }
 
-        throw new LogicException('Unexpected JSON API member value.');
+        throw new LogicException('Unexpected JSON:API member value.');
     }
 
     /**
-     * Create a JSON API object from an array or enumable.
+     * Create a JSON:API object from an array or enumable.
      *
      * @param array|Enumerable $value
      * @return JsonApi
@@ -96,7 +96,7 @@ class JsonApi implements Serializable
     }
 
     /**
-     * Create a JSON API object, or return null for an empty value.
+     * Create a JSON:API object, or return null for an empty value.
      *
      * @param JsonApi|Enumerable|array|string|null $value
      * @return JsonApi|null

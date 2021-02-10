@@ -56,7 +56,7 @@ trait IsResponsable
     private array $headers = [];
 
     /**
-     * Add the top-level JSON API member to the response.
+     * Add the top-level JSON:API member to the response.
      *
      * @param $jsonApi
      * @return $this

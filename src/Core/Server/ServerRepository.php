@@ -58,7 +58,7 @@ class ServerRepository implements RepositoryContract
     public function server(string $name): ServerContract
     {
         if (empty($name)) {
-            throw new InvalidArgumentException('Expecting a non-empty JSON API server name.');
+            throw new InvalidArgumentException('Expecting a non-empty JSON:API server name.');
         }
 
         $class = $this->config->get("jsonapi.servers.{$name}");

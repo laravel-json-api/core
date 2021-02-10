@@ -53,7 +53,7 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
     }
 
     /**
-     * Construct an exception for a single JSON API error.
+     * Construct an exception for a single JSON:API error.
      *
      * @param Error|Enumerable|array $error
      * @param Throwable|null $previous
@@ -73,7 +73,7 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
      */
     public function __construct($errors, Throwable $previous = null, array $headers = [])
     {
-        parent::__construct('JSON API error', 0, $previous);
+        parent::__construct('JSON:API error', 0, $previous);
         $this->errors = ErrorList::cast($errors);
         $this->withHeaders($headers);
     }

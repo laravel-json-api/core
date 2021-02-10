@@ -40,7 +40,7 @@ interface Server
     public function name(): string;
 
     /**
-     * Get the server's JSON API object.
+     * Get the server's JSON:API object.
      *
      * @return JsonApi
      */

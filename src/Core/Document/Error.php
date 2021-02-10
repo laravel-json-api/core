@@ -75,7 +75,7 @@ class Error implements Serializable, Responsable
     }
 
     /**
-     * Create a JSON API error object.
+     * Create a JSON:API error object.
      *
      * @param Error|Enumerable|array $value
      * @return Error
