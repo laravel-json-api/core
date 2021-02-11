@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-interface ToOneBuilder
+interface ToOneBuilder extends Builder
 {
 
     /**
