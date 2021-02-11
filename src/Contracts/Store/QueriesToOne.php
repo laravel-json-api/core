@@ -19,15 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-
 interface QueriesToOne
 {
 
     /**
      * Query a to-one relation.
      *
-     * @param Model|object|string $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @param string $fieldName
      * @return QueryOneBuilder
      */

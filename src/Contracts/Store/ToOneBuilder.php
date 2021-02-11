@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\RelationshipPath;
@@ -47,7 +46,7 @@ interface ToOneBuilder
      * Replace the value of the relationship.
      *
      * @param array|null $identifier
-     * @return Model|object|null
+     * @return object|null
      *      the new related value.
      */
     public function associate(?array $identifier): ?object;

@@ -19,15 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-
 interface UpdatesResources
 {
 
     /**
      * Update an existing resource.
      *
-     * @param Model|mixed|string $modelOrResourceId
+     * @param mixed|string $modelOrResourceId
      * @return ResourceBuilder
      */
     public function update($modelOrResourceId): ResourceBuilder;

@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\RelationshipPath;
@@ -54,7 +53,7 @@ interface QueryOneBuilder
     /**
      * Execute the query and get the first result.
      *
-     * @return Model|object|null
+     * @return object|null
      */
     public function first(): ?object;
 }

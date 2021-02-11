@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\LazyCollection;
 use LaravelJsonApi\Contracts\Pagination\Page;
 
@@ -29,7 +28,7 @@ interface QueryAllBuilder extends QueryManyBuilder
     /**
      * Execute the query and get the first result.
      *
-     * @return Model|object|null
+     * @return object|null
      */
     public function first(): ?object;
 
@@ -41,7 +40,7 @@ interface QueryAllBuilder extends QueryManyBuilder
      *
      * Otherwise, this method MUST return a cursor of all matching models.
      *
-     * @return LazyCollection|Model|object|null
+     * @return LazyCollection|object|null
      */
     public function firstOrMany();
 
@@ -56,7 +55,7 @@ interface QueryAllBuilder extends QueryManyBuilder
      * a page of matching models.
      *
      * @param array|null $page
-     * @return Model|object|Page|LazyCollection|iterable|null
+     * @return object|Page|LazyCollection|iterable|null
      */
     public function firstOrPaginate(?array $page);
 }

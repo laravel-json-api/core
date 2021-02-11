@@ -17,8 +17,6 @@
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-
 interface Store
 {
     /**
@@ -26,7 +24,7 @@ interface Store
      *
      * @param string $resourceType
      * @param string $resourceId
-     * @return Model|object|null
+     * @return object|null
      */
     public function find(string $resourceType, string $resourceId): ?object;
 
@@ -57,7 +55,7 @@ interface Store
      * Query one resource by JSON:API resource type.
      *
      * @param string $resourceType
-     * @param Model|object|string $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @return QueryOneBuilder
      */
     public function queryOne(string $resourceType, $modelOrResourceId): QueryOneBuilder;
@@ -66,7 +64,7 @@ interface Store
      * Query a to-one relationship.
      *
      * @param string $resourceType
-     * @param $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @param string $fieldName
      * @return QueryOneBuilder
      */
@@ -76,7 +74,7 @@ interface Store
      * Query a to-many relationship.
      *
      * @param string $resourceType
-     * @param $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @param string $fieldName
      * @return QueryManyBuilder
      */
@@ -94,7 +92,7 @@ interface Store
      * Update an existing resource.
      *
      * @param string $resourceType
-     * @param Model|object|string $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @return ResourceBuilder
      */
     public function update(string $resourceType, $modelOrResourceId): ResourceBuilder;
@@ -103,7 +101,7 @@ interface Store
      * Delete an existing resource.
      *
      * @param string $resourceType
-     * @param Model|object|string $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @return void
      */
     public function delete(string $resourceType, $modelOrResourceId): void;
@@ -112,7 +110,7 @@ interface Store
      * Modify a to-one relation.
      *
      * @param string $resourceType
-     * @param Model|object|string $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @param string $fieldName
      * @return ToOneBuilder
      */
@@ -122,7 +120,7 @@ interface Store
      * Modify a to-many relation.
      *
      * @param string $resourceType
-     * @param Model|object|string $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @param string $fieldName
      * @return ToManyBuilder
      */

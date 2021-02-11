@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\RelationshipPath;
@@ -47,7 +46,7 @@ interface ResourceBuilder
      * Store the resource using the supplied validated data.
      *
      * @param array $validatedData
-     * @return Model|object
+     * @return object
      *      the created or updated resource.
      */
     public function store(array $validatedData): object;

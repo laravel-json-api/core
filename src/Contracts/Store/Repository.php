@@ -19,8 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-
 interface Repository
 {
 
@@ -28,7 +26,7 @@ interface Repository
      * Get the model for the supplied resource id.
      *
      * @param string $resourceId
-     * @return Model|object|null
+     * @return object|null
      */
     public function find(string $resourceId): ?object;
 
@@ -36,7 +34,7 @@ interface Repository
      * Get the models for the supplied resource ids.
      *
      * @param string[] $resourceIds
-     * @return Model[]|object[]|iterable
+     * @return iterable
      */
     public function findMany(array $resourceIds): iterable;
 
@@ -44,7 +42,7 @@ interface Repository
      * Find the supplied model or throw a runtime exception if it does not exist.
      *
      * @param string $resourceId
-     * @return Model|object
+     * @return object
      */
     public function findOrFail(string $resourceId): object;
 

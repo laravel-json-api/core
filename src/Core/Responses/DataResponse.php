@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Facades\JsonApi;
@@ -34,7 +33,7 @@ class DataResponse implements Responsable
     use Concerns\IsResponsable;
 
     /**
-     * @var Page|Model|iterable|null
+     * @var Page|object|iterable|null
      */
     private $value;
 
@@ -46,7 +45,7 @@ class DataResponse implements Responsable
     /**
      * Fluent constructor.
      *
-     * @param Page|Model|iterable|null $value
+     * @param Page|object|iterable|null $value
      * @return DataResponse
      */
     public static function make($value): self
@@ -57,7 +56,7 @@ class DataResponse implements Responsable
     /**
      * DataResponse constructor.
      *
-     * @param Page|Model|iterable|null $value
+     * @param Page|object|iterable|null $value
      */
     public function __construct($value)
     {
