@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file. This projec
 
 - The builder interfaces in the `Contracts\Store` namespace now have a `withRequest` method. This allows passing the
   request into the builder process as context for the action.
+- **BREAKING** The `Contracts\Routing\Route` contract now has an `authorizer` method, for getting the authorizer
+  instance for the route.
 
 ### Changed
 

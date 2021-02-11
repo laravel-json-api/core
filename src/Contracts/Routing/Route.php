@@ -17,6 +17,7 @@
 
 namespace LaravelJsonApi\Contracts\Routing;
 
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -72,6 +73,13 @@ interface Route
      * @return Schema
      */
     public function schema(): Schema;
+
+    /**
+     * Get the authorizer for the current route.
+     *
+     * @return Authorizer
+     */
+    public function authorizer(): Authorizer;
 
     /**
      * Does the URL have a relation?
