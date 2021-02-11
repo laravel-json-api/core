@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Enumerable;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Support\Arr;
@@ -75,6 +76,10 @@ class QueryParameters implements QueryParametersContract, Arrayable
                 $value->page(),
                 $value->filter()
             );
+        }
+
+        if ($value instanceof Request) {
+            return self::fromArray($value->query());
         }
 
         if (is_array($value) || $value instanceof Enumerable) {

@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- The builder interfaces in the `Contracts\Store` namespace now have a `withRequest` method. This allows passing the
+  request into the builder process as context for the action.
+
+### Changed
+
+- **BREAKING** The `using` method has been renamed to `withQuery` on the following interfaces in the `Contracts\Store`
+  namespace:
+    - `QueryManyBuilder`
+    - `QueryOneBuilder`
+    - `ResourceBuilder`
+    - `ToManyBuilder`
+    - `ToOneBuilder`
+
 ## [1.0.0-alpha.3] - 2021-02-09
 
 ### Added
