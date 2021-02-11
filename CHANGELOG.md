@@ -21,6 +21,8 @@ All notable changes to this project will be documented in this file. This projec
     - `ResourceBuilder`
     - `ToManyBuilder`
     - `ToOneBuilder`
+- **BREAKING** The `Contracts\Resources\Serializer\Hideable` contract has been updated to type-hint the request class in
+  its method signatures.
 
 ## [1.0.0-alpha.3] - 2021-02-09
 

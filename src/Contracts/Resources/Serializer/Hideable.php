@@ -30,7 +30,7 @@ interface Hideable
      * @param Request|null $request
      * @return bool
      */
-    public function isHidden($request): bool;
+    public function isHidden(?Request $request): bool;
 
     /**
      * Is the field not hidden?
@@ -38,5 +38,5 @@ interface Hideable
      * @param Request|null $request
      * @return bool
      */
-    public function isNotHidden($request): bool;
+    public function isNotHidden(?Request $request): bool;
 }
