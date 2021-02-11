@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- **BREAKING** The `Contracts\Auth\Authorizer` contract now requires the model class to be passed as the second argument
+  on the `index` and `store` methods. Also, all methods have been updated to type-hint the Illuminate request object.
 - **BREAKING** The `using` method has been renamed to `withQuery` on the following interfaces in the `Contracts\Store`
   namespace:
     - `QueryManyBuilder`
