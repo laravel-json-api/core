@@ -62,7 +62,7 @@ class ConditionalField implements JsonSerializable, Skippable
     }
 
     /**
-     * Should the attribute be skipped when encoding?
+     * Should the field be skipped when encoding?
      *
      * @return bool
      */
@@ -72,15 +72,25 @@ class ConditionalField implements JsonSerializable, Skippable
     }
 
     /**
-     * @inheritDoc
+     * Get the field value.
+     *
+     * @return mixed
      */
-    public function jsonSerialize()
+    public function get()
     {
         if (false === $this->skip()) {
             return ($this)();
         }
 
         throw new LogicException('Conditional attribute must not be serialized.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return $this->get();
     }
 
 }

@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file. This projec
   request into the builder process as context for the action.
 - **BREAKING** The `Contracts\Routing\Route` contract now has an `authorizer` method, for getting the authorizer
   instance for the route.
+- New `get` method on the `ConditionalField` class for retrieving the value of the field.
 
 ### Changed
 
