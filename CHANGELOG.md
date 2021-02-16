@@ -27,6 +27,10 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING** The `Contracts\Resources\Serializer\Hideable` contract has been updated to type-hint the request class in
   its method signatures.
 
+### Fixed
+
+- Fixed parsing the `fields` query parameter to the `Core\Query\FieldSets` and `Core\Query\FieldSet` classes.
+
 ## [1.0.0-alpha.3] - 2021-02-09
 
 ### Added

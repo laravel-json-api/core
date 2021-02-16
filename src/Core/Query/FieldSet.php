@@ -20,9 +20,15 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Query;
 
 use Countable;
+use Illuminate\Support\Enumerable;
 use InvalidArgumentException;
 use IteratorAggregate;
+use UnexpectedValueException;
 use function count;
+use function explode;
+use function is_array;
+use function is_null;
+use function is_string;
 
 class FieldSet implements IteratorAggregate, Countable
 {
@@ -38,6 +44,54 @@ class FieldSet implements IteratorAggregate, Countable
     private array $fields;
 
     /**
+     * Create a new field set.
+     *
+     * @param string $resourceType
+     * @param Enumerable|array|string|null $fields
+     * @return static
+     */
+    public static function cast(string $resourceType, $fields): self
+    {
+        if (is_string($fields)) {
+            return self::fromString($resourceType, $fields);
+        }
+
+        if (is_array($fields) || $fields instanceof Enumerable || is_null($fields)) {
+            return self::fromArray($resourceType, $fields ?? []);
+        }
+
+        throw new UnexpectedValueException('Unexpected include paths value.');
+    }
+
+    /**
+     * Create a field set from a string.
+     *
+     * @param string $resourceType
+     * @param string $fields
+     * @return static
+     */
+    public static function fromString(string $resourceType, string $fields): self
+    {
+        return new self($resourceType, ...explode(',', $fields));
+    }
+
+    /**
+     * Create a field set from an array.
+     *
+     * @param string $resourceType
+     * @param Enumerable|array $fields
+     * @return static
+     */
+    public static function fromArray(string $resourceType, $fields): self
+    {
+        if ($fields instanceof Enumerable) {
+            $fields = $fields->all();
+        }
+
+        return new self($resourceType, ...$fields);
+    }
+
+    /**
      * FieldSet constructor.
      *
      * @param string $resourceType
@@ -51,6 +105,22 @@ class FieldSet implements IteratorAggregate, Countable
 
         $this->resourceType = $resourceType;
         $this->fields = $fields;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
+    }
+
+    /**
+     * @return string
+     */
+    public function toString(): string
+    {
+        return implode(',', $this->fields);
     }
 
     /**
