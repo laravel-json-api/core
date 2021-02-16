@@ -24,6 +24,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use UnexpectedValueException;
+use function array_map;
 use function collect;
 use function count;
 use function is_array;
@@ -151,6 +152,25 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     public function isNotEmpty(): bool
     {
         return !$this->isEmpty();
+    }
+
+    /**
+     * @return array
+     */
+    public function fields(): array
+    {
+        return array_map(
+            static fn (FieldSet $value) => $value->fields(),
+            $this->stack,
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->stack;
     }
 
     /**

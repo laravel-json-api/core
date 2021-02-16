@@ -72,7 +72,10 @@ class FieldSet implements IteratorAggregate, Countable
      */
     public static function fromString(string $resourceType, string $fields): self
     {
-        return new self($resourceType, ...explode(',', $fields));
+        return new self(
+            $resourceType,
+            !empty($fields) ? explode(',', $fields) : [],
+        );
     }
 
     /**
@@ -88,23 +91,32 @@ class FieldSet implements IteratorAggregate, Countable
             $fields = $fields->all();
         }
 
-        return new self($resourceType, ...$fields);
+        return new self($resourceType, $fields);
     }
 
     /**
      * FieldSet constructor.
      *
      * @param string $resourceType
-     * @param string ...$fields
+     * @param string[] $fields
      */
-    public function __construct(string $resourceType, string ...$fields)
+    public function __construct(string $resourceType, array $fields)
     {
         if (empty($resourceType)) {
             throw new InvalidArgumentException('Expecting a non-empty resoruce type.');
         }
 
         $this->resourceType = $resourceType;
-        $this->fields = $fields;
+        $this->fields = [];
+
+        foreach ($fields as $field) {
+            if (is_string($field) && !empty($field)) {
+                $this->fields[] = $field;
+                continue;
+            }
+
+            throw new InvalidArgumentException('Expecting fields to contain only non-empty strings.');
+        }
     }
 
     /**
