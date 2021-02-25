@@ -37,9 +37,9 @@ class DataResponse implements Responsable
     private $value;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $created = false;
+    private ?bool $created = null;
 
     /**
      * Fluent constructor.
@@ -63,11 +63,25 @@ class DataResponse implements Responsable
     }
 
     /**
+     * Mark the resource as created.
+     *
      * @return $this
      */
     public function didCreate(): self
     {
         $this->created = true;
+
+        return $this;
+    }
+
+    /**
+     * Mark the resource as not created.
+     *
+     * @return $this
+     */
+    public function didntCreate(): self
+    {
+        $this->created = false;
 
         return $this;
     }
@@ -120,8 +134,9 @@ class DataResponse implements Responsable
             ->resolve($this->value);
 
         if ($parsed instanceof JsonApiResource) {
-            $response = $parsed->prepareResponse($request);
-            return $this->created ? $response->didCreate() : $response;
+            return $parsed
+                ->prepareResponse($request)
+                ->withCreated($this->created);
         }
 
         return (new ResourceCollection($parsed))->prepareResponse($request);

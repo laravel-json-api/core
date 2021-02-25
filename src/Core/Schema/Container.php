@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Schema;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Server\Server;
 use LogicException;
 use RuntimeException;
 use Throwable;
@@ -37,6 +38,11 @@ class Container implements ContainerContract
      * @var IlluminateContainer
      */
     private IlluminateContainer $container;
+
+    /**
+     * @var Server
+     */
+    private Server $server;
 
     /**
      * @var array
@@ -57,11 +63,13 @@ class Container implements ContainerContract
      * Container constructor.
      *
      * @param IlluminateContainer $container
+     * @param Server $server
      * @param iterable $schemas
      */
-    public function __construct(IlluminateContainer $container, iterable $schemas)
+    public function __construct(IlluminateContainer $container, Server $server, iterable $schemas)
     {
         $this->container = $container;
+        $this->server = $server;
         $this->types = [];
         $this->models = [];
         $this->schemas = [];
@@ -146,7 +154,10 @@ class Container implements ContainerContract
     private function make(string $schemaClass): Schema
     {
         try {
-            $schema = $this->container->make($schemaClass, ['schemas' => $this]);
+            $schema = $this->container->make($schemaClass, [
+                'schemas' => $this,
+                'server' => $this->server,
+            ]);
         } catch (Throwable $ex) {
             throw new RuntimeException("Unable to create schema {$schemaClass}.", 0, $ex);
         }

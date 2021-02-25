@@ -69,6 +69,15 @@ interface Schema extends Traversable
     public function uriType(): string;
 
     /**
+     * Get a URL for the resource.
+     *
+     * @param mixed $extra
+     * @param bool|null $secure
+     * @return string
+     */
+    public function url($extra = [], bool $secure = null): string;
+
+    /**
      * Get the "id" field.
      *
      * @return ID

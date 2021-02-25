@@ -21,14 +21,15 @@ namespace LaravelJsonApi\Core\Schema;
 
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Schema\Attribute;
-use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Schema\Field;
 use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use LaravelJsonApi\Core\Resources\ResourceResolver;
+use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use function array_keys;
@@ -38,9 +39,9 @@ abstract class Schema implements SchemaContract, IteratorAggregate
 {
 
     /**
-     * @var SchemaContainer
+     * @var Server
      */
-    protected SchemaContainer $schemas;
+    protected Server $server;
 
     /**
      * The resource type as it appears in URIs.
@@ -166,11 +167,11 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * Schema constructor.
      *
-     * @param SchemaContainer $schemas
+     * @param Server $server
      */
-    public function __construct(SchemaContainer $schemas)
+    public function __construct(Server $server)
     {
-        $this->schemas = $schemas;
+        $this->server = $server;
     }
 
     /**
@@ -191,6 +192,18 @@ abstract class Schema implements SchemaContract, IteratorAggregate
         }
 
         return $this->uriType = Str::dasherize($this->type());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function url($extra = [], bool $secure = null): string
+    {
+        $extra = Arr::wrap($extra);
+
+        array_unshift($extra, $this->uriType());
+
+        return $this->server->url($extra, $secure);
     }
 
     /**
@@ -326,7 +339,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     {
         if (0 < $this->maxDepth) {
             return new IncludePathIterator(
-                $this->schemas,
+                $this->server->schemas(),
                 $this,
                 $this->maxDepth
             );
@@ -384,7 +397,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
 
         return $this->fields = collect($this->fields())->keyBy(function (Field $field) {
             if ($field instanceof SchemaAwareContract) {
-                $field->withSchemas($this->schemas);
+                $field->withSchemas($this->server->schemas());
             }
 
             return $field->name();

@@ -49,11 +49,14 @@ class ServerRepositoryTest extends TestCase
             ->with($serverClass, ['container' => $container, 'name' => $serverName])
             ->willReturn($expectedServer);
 
-        $serverRepository = new ServerRepository($container, $config);
+        $repository = new ServerRepository($container, $config);
 
-        $server = $serverRepository->server($serverName);
+        $server = $repository->server($serverName);
 
         $this->assertInstanceOf($serverClass, $server);
         $this->assertSame($expectedServer, $server);
+
+        /** We expect the server to only be constructed once. */
+        $this->assertSame($expectedServer, $repository->server($serverName));
     }
 }

@@ -7,10 +7,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
-- The builder interfaces in the `Contracts\Store` namespace now have a `withRequest` method. This allows passing the
-  request into the builder process as context for the action.
+- **BREAKING** The builder interfaces in the `Contracts\Store` namespace now have a `withRequest` method. This allows
+  passing the request into the builder process as context for the action.
 - **BREAKING** The `Contracts\Routing\Route` contract now has an `authorizer` method, for getting the authorizer
   instance for the route.
+- **BREAKING** The `Contracts\Schema\Schema` contract now has a `url` method, for generating a URL for the resource that
+  the schema defines.
 - New `get` method on the `ConditionalField` class for retrieving the value of the field.
 - Response classes now have a `withServer` method, for explicitly setting the JSON:API server to use when generating the
   response. This is useful when returning responses from routes that do not have the JSON:API middleware applied to
@@ -18,6 +20,8 @@ All notable changes to this project will be documented in this file. This projec
 - New `MetaResponse` class for returning a JSON:API response with a document containing a top-level `meta` value.
 - [#3](https://github.com/laravel-json-api/core/pull/3) Server classes are now resolved via the service container,
   allowing the developer to use constructor dependency injection if desired.
+- The `DataResponse` class now has a `didntCreate` method for ensure the resource response does not have a `201 Created`
+  status.
 
 ### Changed
 
@@ -32,6 +36,15 @@ All notable changes to this project will be documented in this file. This projec
     - `ToOneBuilder`
 - **BREAKING** The `Contracts\Resources\Serializer\Hideable` contract has been updated to type-hint the request class in
   its method signatures.
+- **BREAKING** The `Core\Schema\SchemaAware` trait has been moved to the `Core\Schema\Concerns` namespace, for
+  consistency with other traits.
+- **BREAKING** The `Core\Schema\Container` class now expects the server instance to be passed as its second constructor
+  argument, with the list of schemas now its third constructor argument.
+- **BREAKING** The constructor argument for the abstract `Core\Schema\Schema` class has been changed to the server
+  instance that the schema belongs to. This change was made so that schemas can generate URLs using the server instance,
+  while also injecting the server's schema container into fields if needed.
+- The server repository now caches servers it has created, and should now be registered in the service container as a
+  singleton.
 
 ### Fixed
 

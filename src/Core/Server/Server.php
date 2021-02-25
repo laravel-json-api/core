@@ -120,7 +120,9 @@ abstract class Server implements ServerContract
         }
 
         return $this->schemas = new SchemaContainer(
-            $this->container, $this->allSchemas()
+            $this->container,
+            $this,
+            $this->allSchemas(),
         );
     }
 
@@ -168,9 +170,20 @@ abstract class Server implements ServerContract
     /**
      * @inheritDoc
      */
-    public function url($parameters = [], bool $secure = null): string
+    public function url($extra = [], bool $secure = null): string
     {
-        return url($this->baseUri(), $parameters, $secure);
+        /**
+         * @TODO
+         *
+         * Annoyingly the Laravel URL helper does not append the parameters
+         * if the first argument is already a valid URL, i.e. has a schema
+         * and host. Whereas we want to *always* append the parameters, even
+         * if `baseUri()` returns a fully valid URL. So we need to manually
+         * append the parameters to the base URI *before* passing through
+         * to the URL helper. (We want to use the URL helper as it'll
+         * add the schema and host if base URI is not already a valid URL.)
+         */
+        return url($this->baseUri(), $extra, $secure);
     }
 
     /**
