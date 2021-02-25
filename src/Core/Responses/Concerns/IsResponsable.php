@@ -216,4 +216,22 @@ trait IsResponsable
 
         return null;
     }
+
+    /**
+     * Set the default top-level JSON:API member.
+     *
+     * @return void
+     */
+    protected function defaultJsonApi(): void
+    {
+        if ($this->jsonApi()->isEmpty()) {
+            $jsonApi = new JsonApi('1.0');
+
+            if ($server = $this->serverIfExists()) {
+                $jsonApi = $server->jsonApi();
+            }
+
+            $this->withJsonApi($jsonApi);
+        }
+    }
 }

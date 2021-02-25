@@ -21,93 +21,76 @@ namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Response;
-use IteratorAggregate;
-use LaravelJsonApi\Contracts\ErrorProvider;
+use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable as SerializableContract;
 use LaravelJsonApi\Core\Document\Concerns\Serializable;
-use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Core\Document\JsonApi;
-use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
+use LaravelJsonApi\Core\Json\Hash;
+use LogicException;
 
-class ErrorResponse implements SerializableContract, Responsable, ErrorProvider, IteratorAggregate
+class MetaResponse implements SerializableContract, Responsable
 {
 
-    use IsResponsable;
+    use Concerns\IsResponsable;
     use Serializable;
 
     /**
-     * @var ErrorList
+     * @var int
      */
-    private ErrorList $errors;
+    private int $status = Response::HTTP_OK;
 
     /**
-     * @var int|null
-     */
-    private ?int $status = null;
-
-    /**
-     * Create an error response for a single error.
-     *
-     * @param  mixed $error
-     * @return ErrorResponse
-     */
-    public static function error($error): self
-    {
-        return new self(Error::cast($error));
-    }
-
-    /**
-     * Fluently construct an error response.
-     *
-     * @param ErrorList|ErrorProvider|Error|Error[] $errors
+     * @param mixed $meta
      * @return static
      */
-    public static function make($errors): self
+    public static function make($meta): self
     {
-        return new self($errors);
+        return new self($meta);
     }
 
     /**
-     * ErrorResponse constructor.
+     * MetaResponse constructor.
      *
-     * @param ErrorList|ErrorProvider|Error|Error[] $errors
+     * @param $meta
      */
-    public function __construct($errors)
+    public function __construct($meta)
     {
-        $this->errors = ErrorList::cast($errors);
+        $this->withMeta($meta);
     }
 
     /**
-     * Set the response status.
+     * Add top-level meta to the response.
      *
-     * This overrides the default status, which is derived from
-     * the error list.
+     * @param mixed $meta
+     * @return $this
+     */
+    public function withMeta($meta): self
+    {
+        $meta = Hash::cast($meta);
+
+        if ($meta->isEmpty()) {
+            throw new LogicException('Meta cannot be empty for a meta response.');
+        }
+
+        $this->meta = $meta;
+
+        return $this;
+    }
+
+    /**
+     * Set the HTTP status for the response.
      *
      * @param int $status
      * @return $this
      */
     public function withStatus(int $status): self
     {
+        if (200 > $status || 299 < $status) {
+            throw new InvalidArgumentException('Expecting a success status.');
+        }
+
         $this->status = $status;
 
         return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toErrors(): ErrorList
-    {
-        return $this->errors;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getIterator()
-    {
-        yield from $this->errors;
     }
 
     /**
@@ -119,7 +102,7 @@ class ErrorResponse implements SerializableContract, Responsable, ErrorProvider,
 
         return new Response(
             $this->toJson($this->encodeOptions),
-            $this->status ?: $this->errors->status(),
+            $this->status,
             $this->headers()
         );
     }
@@ -131,9 +114,8 @@ class ErrorResponse implements SerializableContract, Responsable, ErrorProvider,
     {
         return array_filter([
             'jsonapi' => $this->jsonApi()->toArray() ?: null,
-            'meta' => $this->meta()->toArray() ?: null,
+            'meta' => $this->meta->toArray(),
             'links' => $this->links()->toArray() ?: null,
-            'errors' => $this->errors,
         ]);
     }
 
@@ -144,10 +126,8 @@ class ErrorResponse implements SerializableContract, Responsable, ErrorProvider,
     {
         return array_filter([
             'jsonapi' => $this->jsonApi()->jsonSerialize(),
-            'meta' => $this->meta()->jsonSerialize(),
+            'meta' => $this->meta->jsonSerialize(),
             'links' => $this->links()->jsonSerialize(),
-            'errors' => $this->errors,
         ]);
     }
-
 }

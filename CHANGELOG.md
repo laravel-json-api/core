@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file. This projec
 - Response classes now have a `withServer` method, for explicitly setting the JSON:API server to use when generating the
   response. This is useful when returning responses from routes that do not have the JSON:API middleware applied to
   them.
+- New `MetaResponse` class for returning a JSON:API response with a document containing a top-level `meta` value.
 
 ### Changed
 
