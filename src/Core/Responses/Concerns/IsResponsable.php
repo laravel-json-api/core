@@ -26,9 +26,12 @@ use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
+use LaravelJsonApi\Core\Server\Concerns\ServerAware;
 
 trait IsResponsable
 {
+
+    use ServerAware;
 
     /**
      * @var JsonApi|null
@@ -63,7 +66,7 @@ trait IsResponsable
      */
     public function withJsonApi($jsonApi): self
     {
-        $this->jsonApi = JsonApi::cast($jsonApi);
+        $this->jsonApi = JsonApi::nullable($jsonApi);
 
         return $this;
     }

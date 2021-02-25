@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Core\Responses;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 class ResourceResponse implements Responsable
@@ -74,7 +73,9 @@ class ResourceResponse implements Responsable
             $links->push($this->resource->selfLink());
         }
 
-        $document = JsonApi::server()->encoder()
+        $encoder = $this->server()->encoder();
+
+        $document = $encoder
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))

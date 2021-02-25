@@ -17,54 +17,31 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Core\Responses\Concerns;
 
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Document\Links;
-use LaravelJsonApi\Core\Json\Hash;
-use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
 
-class ResourceCollectionResponse implements Responsable
+trait EncodesIdentifiers
 {
 
-    use Concerns\IsResponsable;
+    use IsResponsable;
 
     /**
-     * @var ResourceCollection
+     * @var JsonApiResource
      */
-    private ResourceCollection $resources;
+    private JsonApiResource $resource;
 
     /**
-     * ResourceCollectionResponse constructor.
-     *
-     * @param ResourceCollection $resources
+     * @var string
      */
-    public function __construct(ResourceCollection $resources)
-    {
-        $this->resources = $resources;
-    }
+    private string $fieldName;
 
     /**
-     * @return Links
+     * @var JsonApiResource|iterable|null
      */
-    public function links(): Links
-    {
-        return $this->resources->links()->merge(
-            $this->links ?: new Links()
-        );
-    }
-
-    /**
-     * @return Hash
-     */
-    public function meta(): Hash
-    {
-        return (new Hash($this->resources->meta()))->merge(
-            $this->meta ?: []
-        );
-    }
+    private $related;
 
     /**
      * @param Request $request
@@ -78,10 +55,10 @@ class ResourceCollectionResponse implements Responsable
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
-            ->withResources($this->resources)
+            ->withIdentifiers($this->resource, $this->fieldName, $this->related)
             ->withJsonApi($this->jsonApi())
-            ->withMeta($this->meta())
-            ->withLinks($this->links())
+            ->withMeta($this->meta)
+            ->withLinks($this->links)
             ->toJson($this->encodeOptions);
 
         return new Response(
@@ -90,5 +67,4 @@ class ResourceCollectionResponse implements Responsable
             $this->headers()
         );
     }
-
 }

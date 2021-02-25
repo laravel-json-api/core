@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING** The `Contracts\Routing\Route` contract now has an `authorizer` method, for getting the authorizer
   instance for the route.
 - New `get` method on the `ConditionalField` class for retrieving the value of the field.
+- Response classes now have a `withServer` method, for explicitly setting the JSON:API server to use when generating the
+  response. This is useful when returning responses from routes that do not have the JSON:API middleware applied to
+  them.
 
 ### Changed
 

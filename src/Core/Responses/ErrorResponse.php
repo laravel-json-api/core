@@ -28,7 +28,6 @@ use LaravelJsonApi\Core\Document\Concerns\Serializable;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\JsonApi;
-use LaravelJsonApi\Core\Facades\JsonApi as JsonApiFacade;
 use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
 class ErrorResponse implements SerializableContract, Responsable, ErrorProvider, IteratorAggregate
@@ -161,7 +160,7 @@ class ErrorResponse implements SerializableContract, Responsable, ErrorProvider,
         if ($this->jsonApi()->isEmpty()) {
             $jsonApi = new JsonApi('1.0');
 
-            if ($server = JsonApiFacade::serverIfExists()) {
+            if ($server = $this->serverIfExists()) {
                 $jsonApi = $server->jsonApi();
             }
 
