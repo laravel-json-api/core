@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file. This projec
   response. This is useful when returning responses from routes that do not have the JSON:API middleware applied to
   them.
 - New `MetaResponse` class for returning a JSON:API response with a document containing a top-level `meta` value.
+- [#3](https://github.com/laravel-json-api/core/pull/3) Server classes are now resolved via the service container,
+  allowing the developer to use constructor dependency injection if desired.
 
 ### Changed
 

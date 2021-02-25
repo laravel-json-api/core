@@ -1,4 +1,19 @@
 <?php
+/*
+ * Copyright 2021 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 declare(strict_types=1);
 
@@ -7,30 +22,32 @@ namespace LaravelJsonApi\Core\Tests\Unit\Server;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use LaravelJsonApi\Core\Server\ServerRepository;
-use LaravelJsonApi\Core\Tests\Unit\Server\Fixture\Server;
 use PHPUnit\Framework\TestCase;
 
-final class ServerRepositoryTest extends TestCase
+class ServerRepositoryTest extends TestCase
 {
+
     public function testItCreatesAServer(): void
     {
         $serverName = 'v1';
-        $serverClass = Server::class;
+        $serverClass = TestServer::class;
 
         $container = $this->createMock(IlluminateContainer::class);
         $config = $this->createMock(ConfigRepository::class);
 
-        $config->expects($this->once())->method('get')->with("jsonapi.servers.{$serverName}")->willReturn($serverClass);
+        $config
+            ->expects($this->once())
+            ->method('get')
+            ->with("jsonapi.servers.{$serverName}")
+            ->willReturn($serverClass);
 
-        $expectedServer = new Server($container, $serverName);
+        $expectedServer = new TestServer($container, $serverName);
 
-        $container->expects($this->once())->method('make')->with(
-            $serverClass,
-            [
-                'container' => $container,
-                'name' => $serverName,
-            ]
-        )->willReturn($expectedServer);
+        $container
+            ->expects($this->once())
+            ->method('make')
+            ->with($serverClass, ['container' => $container, 'name' => $serverName])
+            ->willReturn($expectedServer);
 
         $serverRepository = new ServerRepository($container, $config);
 
