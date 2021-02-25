@@ -29,10 +29,10 @@ use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
-use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\ResourceResponse;
+use LaravelJsonApi\Core\Server\Concerns\ServerAware;
 use LogicException;
 use function sprintf;
 
@@ -41,6 +41,7 @@ class JsonApiResource implements ArrayAccess, Responsable
 
     use ConditionallyLoadsFields;
     use DelegatesToResource;
+    use ServerAware;
 
     /**
      * The model that the resource represents.
@@ -94,7 +95,7 @@ class JsonApiResource implements ArrayAccess, Responsable
             return $this->selfUri;
         }
 
-        return $this->selfUri = JsonApi::server()->url([
+        return $this->selfUri = $this->server()->url([
             $this->schema->uriType(),
             $this->id(),
         ]);
@@ -256,7 +257,10 @@ class JsonApiResource implements ArrayAccess, Responsable
      */
     public function prepareResponse($request): ResourceResponse
     {
-        return new ResourceResponse($this);
+        $response = new ResourceResponse($this);
+        $response->withServer($this->server);
+
+        return $response;
     }
 
     /**
