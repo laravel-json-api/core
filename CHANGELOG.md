@@ -43,6 +43,9 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING** The constructor argument for the abstract `Core\Schema\Schema` class has been changed to the server
   instance that the schema belongs to. This change was made so that schemas can generate URLs using the server instance,
   while also injecting the server's schema container into fields if needed.
+- **BREAKING** Added the `allInverse()` method to the `Contracts\Schema\Relation` contract. This returns a list of the
+  allowed resource types for the relationship. Typically this will just be one resource type; polymorphic relations will
+  return multiple.
 - The server repository now caches servers it has created, and should now be registered in the service container as a
   singleton.
 
