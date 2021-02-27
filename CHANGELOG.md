@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## Unreleased
+## [1.0.0-alpha.4] - 2021-02-27
 
 ### Added
 
@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file. This projec
   instance for the route.
 - **BREAKING** The `Contracts\Schema\Schema` contract now has a `url` method, for generating a URL for the resource that
   the schema defines.
+- **BREAKING** Added the `allInverse()` method to the `Contracts\Schema\Relation` contract. This returns a list of the
+  allowed resource types for the relationship. Typically this will just be one resource type; polymorphic relations will
+  return multiple.
 - New `get` method on the `ConditionalField` class for retrieving the value of the field.
 - Response classes now have a `withServer` method, for explicitly setting the JSON:API server to use when generating the
   response. This is useful when returning responses from routes that do not have the JSON:API middleware applied to
@@ -43,9 +46,6 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING** The constructor argument for the abstract `Core\Schema\Schema` class has been changed to the server
   instance that the schema belongs to. This change was made so that schemas can generate URLs using the server instance,
   while also injecting the server's schema container into fields if needed.
-- **BREAKING** Added the `allInverse()` method to the `Contracts\Schema\Relation` contract. This returns a list of the
-  allowed resource types for the relationship. Typically this will just be one resource type; polymorphic relations will
-  return multiple.
 - The server repository now caches servers it has created, and should now be registered in the service container as a
   singleton.
 
