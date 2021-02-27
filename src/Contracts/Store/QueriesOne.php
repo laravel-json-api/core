@@ -19,15 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-
 interface QueriesOne
 {
 
     /**
      * Query a single resource.
      *
-     * @param Model|object|string $modelOrResourceId
+     * @param object|string $modelOrResourceId
      * @return QueryOneBuilder
      */
     public function queryOne($modelOrResourceId): QueryOneBuilder;

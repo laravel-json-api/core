@@ -20,10 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
 use function is_null;
@@ -34,19 +32,19 @@ class DataResponse implements Responsable
     use Concerns\IsResponsable;
 
     /**
-     * @var Page|Model|iterable|null
+     * @var Page|object|iterable|null
      */
     private $value;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $created = false;
+    private ?bool $created = null;
 
     /**
      * Fluent constructor.
      *
-     * @param Page|Model|iterable|null $value
+     * @param Page|object|iterable|null $value
      * @return DataResponse
      */
     public static function make($value): self
@@ -57,7 +55,7 @@ class DataResponse implements Responsable
     /**
      * DataResponse constructor.
      *
-     * @param Page|Model|iterable|null $value
+     * @param Page|object|iterable|null $value
      */
     public function __construct($value)
     {
@@ -65,11 +63,25 @@ class DataResponse implements Responsable
     }
 
     /**
+     * Mark the resource as created.
+     *
      * @return $this
      */
     public function didCreate(): self
     {
         $this->created = true;
+
+        return $this;
+    }
+
+    /**
+     * Mark the resource as not created.
+     *
+     * @return $this
+     */
+    public function didntCreate(): self
+    {
+        $this->created = false;
 
         return $this;
     }
@@ -82,6 +94,7 @@ class DataResponse implements Responsable
     {
         return $this
             ->prepareDataResponse($request)
+            ->withServer($this->server)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->meta)
             ->withLinks($this->links)
@@ -115,13 +128,15 @@ class DataResponse implements Responsable
             return new ResourceResponse(null);
         }
 
-        $parsed = JsonApi::server()
+        $parsed = $this
+            ->server()
             ->resources()
             ->resolve($this->value);
 
         if ($parsed instanceof JsonApiResource) {
-            $response = $parsed->prepareResponse($request);
-            return $this->created ? $response->didCreate() : $response;
+            return $parsed
+                ->prepareResponse($request)
+                ->withCreated($this->created);
         }
 
         return (new ResourceCollection($parsed))->prepareResponse($request);

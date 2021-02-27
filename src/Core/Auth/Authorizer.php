@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Auth;
 
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\JsonApiService;
@@ -54,12 +55,12 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function index($request): bool
+    public function index(Request $request, string $modelClass): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
                 'viewAny',
-                $this->schema()->model()
+                $modelClass
             );
         }
 
@@ -69,12 +70,12 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function store($request): bool
+    public function store(Request $request, string $modelClass): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
                 'create',
-                $this->schema()->model()
+                $modelClass
             );
         }
 
@@ -84,7 +85,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function show($request, object $model): bool
+    public function show(Request $request, object $model): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -99,7 +100,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function update($request, object $model): bool
+    public function update(Request $request, object $model): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -114,7 +115,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function destroy($request, object $model): bool
+    public function destroy(Request $request, object $model): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -129,7 +130,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function showRelationship($request, object $model, string $fieldName): bool
+    public function showRelationship(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -144,7 +145,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function updateRelationship($request, object $model, string $fieldName): bool
+    public function updateRelationship(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -159,7 +160,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function attachRelationship($request, object $model, string $fieldName): bool
+    public function attachRelationship(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -174,7 +175,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function detachRelationship($request, object $model, string $fieldName): bool
+    public function detachRelationship(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -189,11 +190,11 @@ final class Authorizer implements AuthorizerContract
     /**
      * Create a lazy relation object.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $fieldName
      * @return LazyRelation
      */
-    private function createRelation($request, string $fieldName): LazyRelation
+    private function createRelation(Request $request, string $fieldName): LazyRelation
     {
         return new LazyRelation(
             $this->service->server(),

@@ -24,6 +24,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use UnexpectedValueException;
+use function array_map;
 use function collect;
 use function count;
 use function is_array;
@@ -71,8 +72,8 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
             throw new \InvalidArgumentException('Expecting an array or enumerable object.');
         }
 
-        return new self(...collect($value)->map(function (array $fields, string $type) {
-            return new FieldSet($type, ...$fields);
+        return new self(...collect($value)->map(function ($fields, string $resourceType) {
+            return FieldSet::cast($resourceType, $fields);
         })->values());
     }
 
@@ -127,6 +128,17 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     }
 
     /**
+     * Get a field set by resource type.
+     *
+     * @param string $resourceType
+     * @return FieldSet|null
+     */
+    public function get(string $resourceType): ?FieldSet
+    {
+        return $this->stack[$resourceType] ?? null;
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty(): bool
@@ -143,13 +155,32 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     }
 
     /**
+     * @return array
+     */
+    public function fields(): array
+    {
+        return array_map(
+            static fn (FieldSet $value) => $value->fields(),
+            $this->stack,
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->stack;
+    }
+
+    /**
      * @inheritDoc
      */
     public function toArray()
     {
-        return collect($this->stack)->map(function (FieldSet $fieldSet) {
-            return $fieldSet->fields();
-        })->all();
+        return collect($this->stack)
+            ->map(fn(FieldSet $fieldSet) => $fieldSet->toString())
+            ->all();
     }
 
     /**

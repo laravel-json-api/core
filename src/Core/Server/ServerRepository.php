@@ -41,6 +41,11 @@ class ServerRepository implements RepositoryContract
     private ConfigRepository $config;
 
     /**
+     * @var array
+     */
+    private array $cache;
+
+    /**
      * ServerRepository constructor.
      *
      * @param IlluminateContainer $container
@@ -50,6 +55,7 @@ class ServerRepository implements RepositoryContract
     {
         $this->container = $container;
         $this->config = $config;
+        $this->cache = [];
     }
 
     /**
@@ -58,7 +64,11 @@ class ServerRepository implements RepositoryContract
     public function server(string $name): ServerContract
     {
         if (empty($name)) {
-            throw new InvalidArgumentException('Expecting a non-empty JSON API server name.');
+            throw new InvalidArgumentException('Expecting a non-empty JSON:API server name.');
+        }
+
+        if (isset($this->cache[$name])) {
+            return $this->cache[$name];
         }
 
         $class = $this->config->get("jsonapi.servers.{$name}");
@@ -68,7 +78,10 @@ class ServerRepository implements RepositoryContract
         }
 
         try {
-            $server = new $class($this->container, $name);
+            $server = $this->container->make($class, [
+                'container' => $this->container,
+                'name' => $name,
+            ]);
         } catch (Throwable $ex) {
             throw new RuntimeException(
                 "Unable to construct server {$name} using class {$class}.",
@@ -78,7 +91,7 @@ class ServerRepository implements RepositoryContract
         }
 
         if ($server instanceof ServerContract) {
-            return $server;
+            return $this->cache[$name] = $server;
         }
 
         throw new RuntimeException("Class for server {$name} is not a server instance.");

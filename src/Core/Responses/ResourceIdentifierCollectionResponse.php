@@ -20,35 +20,12 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Responses;
 
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 class ResourceIdentifierCollectionResponse implements Responsable
 {
 
-    use Concerns\IsResponsable;
-
-    /**
-     * @var JsonApiResource
-     */
-    private JsonApiResource $resource;
-
-    /**
-     * @var string
-     */
-    private string $fieldName;
-
-    /**
-     * @var iterable
-     */
-    private iterable $related;
-
-    /**
-     * @var bool
-     */
-    private bool $created = false;
+    use Concerns\EncodesIdentifiers;
 
     /**
      * ResourceIdentifierResponse constructor.
@@ -62,29 +39,6 @@ class ResourceIdentifierCollectionResponse implements Responsable
         $this->resource = $resource;
         $this->fieldName = $fieldName;
         $this->related = $related;
-    }
-
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    public function toResponse($request)
-    {
-        $document = JsonApi::server()->encoder()
-            ->withRequest($request)
-            ->withIncludePaths($this->includePaths($request))
-            ->withFieldSets($this->fieldSets($request))
-            ->withIdentifiers($this->resource, $this->fieldName, $this->related)
-            ->withJsonApi($this->jsonApi())
-            ->withMeta($this->meta)
-            ->withLinks($this->links)
-            ->toJson($this->encodeOptions);
-
-        return new Response(
-            $document,
-            Response::HTTP_OK,
-            $this->headers()
-        );
     }
 
 }

@@ -19,35 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Query\IncludePaths;
-use LaravelJsonApi\Core\Query\RelationshipPath;
-
-interface ToOneBuilder
+interface ToOneBuilder extends Builder
 {
-
-    /**
-     * Apply the provided query parameters.
-     *
-     * @param QueryParameters $query
-     * @return $this
-     */
-    public function using(QueryParameters $query): self;
-
-    /**
-     * Eager load resources using the provided JSON API include paths.
-     *
-     * @param IncludePaths|RelationshipPath|array|string|null $includePaths
-     * @return $this
-     */
-    public function with($includePaths): self;
 
     /**
      * Replace the value of the relationship.
      *
      * @param array|null $identifier
-     * @return Model|object|null
+     * @return object|null
      *      the new related value.
      */
     public function associate(?array $identifier): ?object;

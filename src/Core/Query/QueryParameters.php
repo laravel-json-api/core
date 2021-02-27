@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Enumerable;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Support\Arr;
@@ -58,7 +59,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * Cast a value to query parameters.
      *
-     * @param QueryParametersContract|Enumerable|array|null $value
+     * @param QueryParametersContract|Enumerable|Request|array|null $value
      * @return QueryParameters
      */
     public static function cast($value): self
@@ -75,6 +76,10 @@ class QueryParameters implements QueryParametersContract, Arrayable
                 $value->page(),
                 $value->filter()
             );
+        }
+
+        if ($value instanceof Request) {
+            return self::fromArray($value->query());
         }
 
         if (is_array($value) || $value instanceof Enumerable) {
@@ -190,12 +195,12 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @param IncludePaths|array|string $paths
+     * @param IncludePaths|array|string|null $paths
      * @return $this
      */
     public function setIncludePaths($paths): self
     {
-        $this->includePaths = IncludePaths::cast($paths);
+        $this->includePaths = IncludePaths::nullable($paths);
 
         return $this;
     }
@@ -221,12 +226,12 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * Set the sparse field sets.
      *
-     * @param FieldSets|array $fieldSets
+     * @param FieldSets|array|null $fieldSets
      * @return $this
      */
     public function setSparseFieldSets($fieldSets): self
     {
-        $this->fieldSets = FieldSets::cast($fieldSets);
+        $this->fieldSets = FieldSets::nullable($fieldSets);
 
         return $this;
     }
@@ -252,11 +257,8 @@ class QueryParameters implements QueryParametersContract, Arrayable
      */
     public function setFieldSet(string $type, array $fields): self
     {
-        if (!$this->fieldSets) {
-            $this->fieldSets = new FieldSets();
-        }
-
-        $this->fieldSets->push(new FieldSet($type, ...$fields));
+        $this->fieldSets = FieldSets::cast($this->fieldSets)
+            ->push(new FieldSet($type, ...$fields));
 
         return $this;
     }
@@ -285,12 +287,12 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @param SortFields|array|string $fields
+     * @param SortFields|array|string|null $fields
      * @return $this
      */
     public function setSortFields($fields): self
     {
-        $this->sort = SortFields::cast($fields);
+        $this->sort = SortFields::nullable($fields);
 
         return $this;
     }
@@ -316,12 +318,12 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * Set pagination.
      *
-     * @param Arrayable|array $pagination
+     * @param Arrayable|array|null $pagination
      * @return $this
      */
     public function setPagination($pagination): self
     {
-        $this->pagination = collect($pagination)->toArray();
+        $this->pagination = is_null($pagination) ? null : collect($pagination)->toArray();
 
         return $this;
     }
@@ -349,12 +351,12 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * Set filters.
      *
-     * @param Arrayable|array $filters
+     * @param Arrayable|array|null $filters
      * @return $this
      */
     public function setFilters($filters): self
     {
-        $this->filters = collect($filters)->toArray();
+        $this->filters = is_null($filters) ? null : collect($filters)->toArray();
 
         return $this;
     }

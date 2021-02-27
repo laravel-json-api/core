@@ -26,9 +26,12 @@ use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
+use LaravelJsonApi\Core\Server\Concerns\ServerAware;
 
 trait IsResponsable
 {
+
+    use ServerAware;
 
     /**
      * @var JsonApi|null
@@ -56,14 +59,14 @@ trait IsResponsable
     private array $headers = [];
 
     /**
-     * Add the top-level JSON API member to the response.
+     * Add the top-level JSON:API member to the response.
      *
      * @param $jsonApi
      * @return $this
      */
     public function withJsonApi($jsonApi): self
     {
-        $this->jsonApi = JsonApi::cast($jsonApi);
+        $this->jsonApi = JsonApi::nullable($jsonApi);
 
         return $this;
     }
@@ -212,5 +215,23 @@ trait IsResponsable
         }
 
         return null;
+    }
+
+    /**
+     * Set the default top-level JSON:API member.
+     *
+     * @return void
+     */
+    protected function defaultJsonApi(): void
+    {
+        if ($this->jsonApi()->isEmpty()) {
+            $jsonApi = new JsonApi('1.0');
+
+            if ($server = $this->serverIfExists()) {
+                $jsonApi = $server->jsonApi();
+            }
+
+            $this->withJsonApi($jsonApi);
+        }
     }
 }

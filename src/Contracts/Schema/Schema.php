@@ -27,7 +27,7 @@ interface Schema extends Traversable
 {
 
     /**
-     * Get the JSON API resource type.
+     * Get the JSON:API resource type.
      *
      * @return string
      */
@@ -67,6 +67,15 @@ interface Schema extends Traversable
      * @return string
      */
     public function uriType(): string;
+
+    /**
+     * Get a URL for the resource.
+     *
+     * @param mixed $extra
+     * @param bool|null $secure
+     * @return string
+     */
+    public function url($extra = [], bool $secure = null): string;
 
     /**
      * Get the "id" field.

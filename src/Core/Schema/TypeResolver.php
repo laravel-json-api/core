@@ -43,7 +43,7 @@ final class TypeResolver
     }
 
     /**
-     * Resolve the JSON API resource type from the fully-qualified schema class.
+     * Resolve the JSON:API resource type from the fully-qualified schema class.
      *
      * @param string $schemaClass
      * @return string

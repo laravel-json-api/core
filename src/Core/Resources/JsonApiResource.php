@@ -29,7 +29,6 @@ use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
-use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\ResourceResponse;
@@ -94,10 +93,9 @@ class JsonApiResource implements ArrayAccess, Responsable
             return $this->selfUri;
         }
 
-        return $this->selfUri = JsonApi::server()->url([
-            $this->schema->uriType(),
+        return $this->selfUri = $this->schema->url(
             $this->id(),
-        ]);
+        );
     }
 
     /**

@@ -61,6 +61,23 @@ interface Relation extends Field
     public function inverse(): string;
 
     /**
+     * Get a list of the inverse resource types.
+     *
+     * For a standard relation, this method will return the singular
+     * resource type (from the `inverse()` method), wrapped in an array.
+     * For a polymorphic relation, it will be a list of the expected
+     * inverse resource types, i.e. identical to
+     * `PolymorphicRelation::inverseTypes()`.
+     *
+     * This is effectively a helper method to ensure calling code can
+     * get a list of inverse types without worrying about whether the
+     * relation is polymorphic or not.
+     *
+     * @return string[]
+     */
+    public function allInverse(): array;
+
+    /**
      * Is the relation allowed as an include path?
      *
      * @return bool

@@ -40,7 +40,7 @@ interface Server
     public function name(): string;
 
     /**
-     * Get the server's JSON API object.
+     * Get the server's JSON:API object.
      *
      * @return JsonApi
      */
@@ -82,9 +82,11 @@ interface Server
     public function authorizable(): bool;
 
     /**
-     * @param mixed $parameters
+     * Get a URL for the server.
+     *
+     * @param mixed|array $extra
      * @param bool|null $secure
      * @return string
      */
-    public function url($parameters = [], bool $secure = null): string;
+    public function url($extra = [], bool $secure = null): string;
 }

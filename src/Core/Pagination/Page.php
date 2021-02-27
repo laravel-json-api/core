@@ -60,7 +60,7 @@ class Page extends AbstractPage
             return new self($page);
         }
 
-        throw new InvalidArgumentException('Expecting a JSON API page or a Laravel paginator.');
+        throw new InvalidArgumentException('Expecting a JSON:API page or a Laravel paginator.');
     }
 
     /**

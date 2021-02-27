@@ -17,17 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Store;
+namespace LaravelJsonApi\Core\Tests\Unit\Server;
 
-interface ModifiesToOne
+use LaravelJsonApi\Core\Server\Server as ServerContract;
+
+class TestServer extends ServerContract
 {
 
     /**
-     * Modify a to-one relationship.
-     *
-     * @param object|string $modelOrResourceId
-     * @param string $fieldName
-     * @return ToOneBuilder
+     * @inheritDoc
      */
-    public function modifyToOne($modelOrResourceId, string $fieldName): ToOneBuilder;
+    public function serving(): void
+    {
+        // no-op
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function allSchemas(): array
+    {
+        return [];
+    }
 }

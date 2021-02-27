@@ -151,6 +151,14 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     }
 
     /**
+     * @return SortField[]
+     */
+    public function all(): array
+    {
+        return $this->stack;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getIterator()

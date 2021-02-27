@@ -17,7 +17,7 @@
 
 namespace LaravelJsonApi\Contracts\Routing;
 
-use Illuminate\Database\Eloquent\Model;
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -35,7 +35,7 @@ interface Route
     /**
      * Get the resource id or the model (if bindings have been substituted).
      *
-     * @return Model|mixed|string|null
+     * @return object|string|null
      */
     public function modelOrResourceId();
 
@@ -56,7 +56,7 @@ interface Route
     /**
      * Get the resource model.
      *
-     * @return Model|object
+     * @return object
      */
     public function model(): object;
 
@@ -73,6 +73,13 @@ interface Route
      * @return Schema
      */
     public function schema(): Schema;
+
+    /**
+     * Get the authorizer for the current route.
+     *
+     * @return Authorizer
+     */
+    public function authorizer(): Authorizer;
 
     /**
      * Does the URL have a relation?

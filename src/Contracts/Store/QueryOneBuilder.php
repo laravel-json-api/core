@@ -19,24 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Query\IncludePaths;
-use LaravelJsonApi\Core\Query\RelationshipPath;
-
-interface QueryOneBuilder
+interface QueryOneBuilder extends Builder
 {
 
     /**
-     * Apply the provided query parameters.
-     *
-     * @param QueryParameters $query
-     * @return $this
-     */
-    public function using(QueryParameters $query): self;
-
-    /**
-     * Filter the model using JSON API filter parameters.
+     * Filter the model using JSON:API filter parameters.
      *
      * @param array|null $filters
      * @return $this
@@ -44,17 +31,9 @@ interface QueryOneBuilder
     public function filter(?array $filters): self;
 
     /**
-     * Eager load resources using the provided JSON API include paths.
-     *
-     * @param IncludePaths|RelationshipPath|array|string|null $includePaths
-     * @return $this
-     */
-    public function with($includePaths): self;
-
-    /**
      * Execute the query and get the first result.
      *
-     * @return Model|object|null
+     * @return object|null
      */
     public function first(): ?object;
 }

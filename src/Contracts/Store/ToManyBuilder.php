@@ -19,35 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Query\IncludePaths;
-use LaravelJsonApi\Core\Query\RelationshipPath;
-
-interface ToManyBuilder
+interface ToManyBuilder extends Builder
 {
-
-    /**
-     * Apply the provided query parameters.
-     *
-     * @param QueryParameters $query
-     * @return $this
-     */
-    public function using(QueryParameters $query): self;
-
-    /**
-     * Eager load resources using the provided JSON API include paths.
-     *
-     * @param IncludePaths|RelationshipPath|array|string|null $includePaths
-     * @return $this
-     */
-    public function with($includePaths): self;
 
     /**
      * Completely replace every member of the relationship with the specified members.
      *
      * @param array $identifiers
-     * @return EloquentCollection|iterable
+     * @return iterable
      *      the related models that were used to replace the relationship.
      */
     public function sync(array $identifiers): iterable;
@@ -56,7 +35,7 @@ interface ToManyBuilder
      * Add the specified members to the relationship unless they are already present.
      *
      * @param array $identifiers
-     * @return EloquentCollection|iterable
+     * @return iterable
      *      the related models that were added to the relationship.
      */
     public function attach(array $identifiers): iterable;
@@ -65,7 +44,7 @@ interface ToManyBuilder
      * Delete the specified members from the relationship.
      *
      * @param array $identifiers
-     * @return EloquentCollection|iterable
+     * @return iterable
      *      the related models that were removed from the relationship.
      */
     public function detach(array $identifiers): iterable;

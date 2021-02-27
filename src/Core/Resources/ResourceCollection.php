@@ -156,7 +156,7 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
      */
     protected function preparePaginationResponse($request): ResourceCollectionResponse
     {
-        /** Ensure the resources are a JSON API page. */
+        /** Ensure the resources are a JSON:API page. */
         $this->resources = Page::cast($this->resources);
 
         if ($this->preserveAllQueryParameters) {

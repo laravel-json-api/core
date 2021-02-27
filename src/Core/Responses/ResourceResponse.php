@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Core\Responses;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Facades\JsonApi;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 class ResourceResponse implements Responsable
@@ -36,9 +35,9 @@ class ResourceResponse implements Responsable
     private ?JsonApiResource $resource;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private bool $created = false;
+    private ?bool $created = null;
 
     /**
      * ResourceResponse constructor.
@@ -57,7 +56,34 @@ class ResourceResponse implements Responsable
      */
     public function didCreate(): self
     {
-        $this->created = true;
+        return $this->withCreated(true);
+    }
+
+    /**
+     * Mark the resource as not created.
+     *
+     * @return $this
+     */
+    public function didntCreate(): self
+    {
+        return $this->withCreated(false);
+    }
+
+    /**
+     * Set the created status of the resource.
+     *
+     * If a boolean provided, that will be used to determine whether the resource
+     * was created.
+     *
+     * If null is provided, the status will be determined by calling the
+     * `JsonApiResource::wasCreated()` method.
+     *
+     * @param bool|null $created
+     * @return $this
+     */
+    public function withCreated(?bool $created): self
+    {
+        $this->created = $created;
 
         return $this;
     }
@@ -74,7 +100,9 @@ class ResourceResponse implements Responsable
             $links->push($this->resource->selfLink());
         }
 
-        $document = JsonApi::server()->encoder()
+        $encoder = $this->server()->encoder();
+
+        $document = $encoder
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
@@ -124,8 +152,8 @@ class ResourceResponse implements Responsable
      */
     protected function resourceWasCreated(): bool
     {
-        if (true === $this->created) {
-            return true;
+        if (is_bool($this->created)) {
+            return $this->created;
         }
 
         if ($this->resource) {

@@ -19,35 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Database\Eloquent\Model;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Query\IncludePaths;
-use LaravelJsonApi\Core\Query\RelationshipPath;
-
-interface ResourceBuilder
+interface ResourceBuilder extends Builder
 {
-
-    /**
-     * Apply the provided query parameters.
-     *
-     * @param QueryParameters $query
-     * @return $this
-     */
-    public function using(QueryParameters $query): self;
-
-    /**
-     * Eager load resources using the provided JSON API include paths.
-     *
-     * @param IncludePaths|RelationshipPath|array|string|null $includePaths
-     * @return $this
-     */
-    public function with($includePaths): self;
 
     /**
      * Store the resource using the supplied validated data.
      *
      * @param array $validatedData
-     * @return Model|object
+     * @return object
      *      the created or updated resource.
      */
     public function store(array $validatedData): object;

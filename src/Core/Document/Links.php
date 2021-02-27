@@ -40,7 +40,7 @@ class Links implements Serializable, IteratorAggregate, Countable
     private array $stack;
 
     /**
-     * Create a JSON API links object.
+     * Create a JSON:API links object.
      *
      * @param Links|Link|iterable|null $value
      * @return Links

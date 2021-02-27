@@ -27,35 +27,35 @@ interface QueryParameters
 {
 
     /**
-     * Get the JSON API include paths.
+     * Get the JSON:API include paths.
      *
      * @return IncludePaths|null
      */
     public function includePaths(): ?IncludePaths;
 
     /**
-     * Get the JSON API sparse field sets.
+     * Get the JSON:API sparse field sets.
      *
      * @return FieldSets|null
      */
     public function sparseFieldSets(): ?FieldSets;
 
     /**
-     * Get the JSON API sort fields.
+     * Get the JSON:API sort fields.
      *
      * @return SortFields|null
      */
     public function sortFields(): ?SortFields;
 
     /**
-     * Get the JSON API page parameters.
+     * Get the JSON:API page parameters.
      *
      * @return array|null
      */
     public function page(): ?array;
 
     /**
-     * Get the JSON API filter parameters.
+     * Get the JSON:API filter parameters.
      *
      * @return array|null
      */
