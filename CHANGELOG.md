@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- If closures are used for data and/or meta on the  `Resources\Relation` class, the closures will now receive the model
+  as their first and only argument.
+- The default value of the `Resources\Relation` class is now returned by a protected `value` method, allowing child
+  classes to modify the default behaviour if needed.
+
 ## [1.0.0-alpha.4] - 2021-02-27
 
 ### Added

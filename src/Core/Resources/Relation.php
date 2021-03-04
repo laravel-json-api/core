@@ -140,7 +140,7 @@ class Relation implements JsonApiRelation
     public function meta(): ?array
     {
         if ($this->meta instanceof Closure) {
-            $this->meta = ($this->meta)();
+            $this->meta = ($this->meta)($this->resource);
         }
 
         return $this->meta;
@@ -152,11 +152,11 @@ class Relation implements JsonApiRelation
     public function data()
     {
         if (false === $this->hasData) {
-            return $this->resource->{$this->keyName};
+            return $this->value();
         }
 
         if ($this->data instanceof Closure) {
-            return ($this->data)();
+            return ($this->data)($this->resource);
         }
 
         return $this->data;
@@ -306,6 +306,16 @@ class Relation implements JsonApiRelation
         $this->meta = $meta;
 
         return $this;
+    }
+
+    /**
+     * Get the value of the relationship.
+     *
+     * @return mixed
+     */
+    protected function value()
+    {
+        return $this->resource->{$this->keyName};
     }
 
     /**
