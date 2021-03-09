@@ -65,13 +65,6 @@ abstract class Server implements ServerContract
     private ?ResourceContainerContract $resources = null;
 
     /**
-     * Bootstrap the server when it is handling an HTTP request.
-     *
-     * @return void
-     */
-    abstract public function serving(): void;
-
-    /**
      * Get the server's list of schemas.
      *
      * @return array
