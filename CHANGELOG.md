@@ -14,6 +14,20 @@ All notable changes to this project will be documented in this file. This projec
 - New `Creatable` interface, which the `JsonApiResource` class delegates to when determining whether a resource was
   created within the current HTTP request.
 
+### Changed
+
+- The `$container` property on the `Server` class is now `protected` and can be used by child classes if needed.
+
+### Removed
+
+- **Reverted [#3](https://github.com/laravel-json-api/core/pull/3)** Server classes can no longer use constructor
+  dependency injection. This is because server classes are created in a number of different contexts - e.g. HTTP
+  requests, Artisan generators, etc - so injecting dependencies via the constructor will likely result in developers
+  injecting dependencies that are only required in certain contexts in which the server is being used. See
+  [laravel #44](https://github.com/laravel-json-api/laravel/issues/44) for discussion on this topic.
+- The `Server\Server` contract no longer has a `serving()` method on it. This has been removed from the contract so that
+  developers can type-hint dependencies in their `serving` method.
+
 ## [1.0.0-alpha.4] - 2021-02-27
 
 ### Added

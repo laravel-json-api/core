@@ -47,7 +47,7 @@ abstract class Server implements ServerContract
     /**
      * @var IlluminateContainer
      */
-    private IlluminateContainer $container;
+    protected IlluminateContainer $container;
 
     /**
      * @var string

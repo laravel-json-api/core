@@ -25,12 +25,6 @@ use LaravelJsonApi\Core\Document\JsonApi;
 
 interface Server
 {
-    /**
-     * Bootstrap the server when it is handling an HTTP request.
-     *
-     * @return void
-     */
-    public function serving(): void;
 
     /**
      * Get the server's name.
