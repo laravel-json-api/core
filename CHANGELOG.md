@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file. This projec
   as their first and only argument.
 - The default value of the `Resources\Relation` class is now returned by a protected `value` method, allowing child
   classes to modify the default behaviour if needed.
+- New `Creatable` interface, which the `JsonApiResource` class delegates to when determining whether a resource was
+  created within the current HTTP request.
 
 ## [1.0.0-alpha.4] - 2021-02-27
 

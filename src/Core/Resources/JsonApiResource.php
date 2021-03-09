@@ -21,6 +21,7 @@ use ArrayAccess;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Resources\Creatable;
 use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
 use LaravelJsonApi\Contracts\Resources\Serializer\Attribute as SerializableAttribute;
 use LaravelJsonApi\Contracts\Resources\Serializer\Relation as SerializableRelation;
@@ -184,8 +185,12 @@ class JsonApiResource implements ArrayAccess, Responsable
      */
     public function wasCreated(): bool
     {
+        if ($this->resource instanceof Creatable) {
+            return $this->resource->wasCreated();
+        }
+
         if (property_exists($this->resource, 'wasRecentlyCreated')) {
-            return $this->resource->wasRecentlyCreated;
+            return (bool) $this->resource->wasRecentlyCreated;
         }
 
         return false;
