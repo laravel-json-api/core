@@ -27,10 +27,10 @@ use PHPUnit\Framework\TestCase;
 class ServerRepositoryTest extends TestCase
 {
 
-    public function testItCreatesAServer(): void
+    public function test(): void
     {
-        $serverName = 'v1';
-        $serverClass = TestServer::class;
+        $name = 'v1';
+        $klass = TestServer::class;
 
         $container = $this->createMock(IlluminateContainer::class);
         $config = $this->createMock(ConfigRepository::class);
@@ -38,25 +38,19 @@ class ServerRepositoryTest extends TestCase
         $config
             ->expects($this->once())
             ->method('get')
-            ->with("jsonapi.servers.{$serverName}")
-            ->willReturn($serverClass);
+            ->with("jsonapi.servers.{$name}")
+            ->willReturn($klass);
 
-        $expectedServer = new TestServer($container, $serverName);
-
-        $container
-            ->expects($this->once())
-            ->method('make')
-            ->with($serverClass, ['container' => $container, 'name' => $serverName])
-            ->willReturn($expectedServer);
+        $expected = new TestServer($container, $name);
 
         $repository = new ServerRepository($container, $config);
 
-        $server = $repository->server($serverName);
+        $actual = $repository->server($name);
 
-        $this->assertInstanceOf($serverClass, $server);
-        $this->assertSame($expectedServer, $server);
+        $this->assertInstanceOf($klass, $actual);
+        $this->assertEquals($expected, $actual);
 
         /** We expect the server to only be constructed once. */
-        $this->assertSame($expectedServer, $repository->server($serverName));
+        $this->assertSame($actual, $repository->server($name));
     }
 }
