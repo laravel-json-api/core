@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changed
 
 - The `$container` property on the `Server` class is now `protected` and can be used by child classes if needed.
+- The `$resource` property on the `Resources\Relation` class is now `protected`.
 
 ### Removed
 

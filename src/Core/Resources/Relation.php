@@ -33,7 +33,7 @@ class Relation implements JsonApiRelation
     /**
      * @var object
      */
-    private object $resource;
+    protected object $resource;
 
     /**
      * @var string
