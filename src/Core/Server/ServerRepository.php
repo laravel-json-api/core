@@ -78,10 +78,7 @@ class ServerRepository implements RepositoryContract
         }
 
         try {
-            $server = $this->container->make($class, [
-                'container' => $this->container,
-                'name' => $name,
-            ]);
+            $server = new $class($this->container, $name);
         } catch (Throwable $ex) {
             throw new RuntimeException(
                 "Unable to construct server {$name} using class {$class}.",

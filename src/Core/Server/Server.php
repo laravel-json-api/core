@@ -47,7 +47,7 @@ abstract class Server implements ServerContract
     /**
      * @var IlluminateContainer
      */
-    private IlluminateContainer $container;
+    protected IlluminateContainer $container;
 
     /**
      * @var string
@@ -63,13 +63,6 @@ abstract class Server implements ServerContract
      * @var ResourceContainerContract|null
      */
     private ?ResourceContainerContract $resources = null;
-
-    /**
-     * Bootstrap the server when it is handling an HTTP request.
-     *
-     * @return void
-     */
-    abstract public function serving(): void;
 
     /**
      * Get the server's list of schemas.

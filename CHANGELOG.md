@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-alpha.5] - 2021-03-12
+
+### Added
+
+- If closures are used for data and/or meta on the  `Resources\Relation` class, the closures will now receive the model
+  as their first and only argument.
+- The default value of the `Resources\Relation` class is now returned by a protected `value` method, allowing child
+  classes to modify the default behaviour if needed.
+- New `Creatable` interface, which the `JsonApiResource` class delegates to when determining whether a resource was
+  created within the current HTTP request.
+
+### Changed
+
+- The `$container` property on the `Server` class is now `protected` and can be used by child classes if needed.
+- The `$resource` property on the `Resources\Relation` class is now `protected`.
+
+### Removed
+
+- **Reverted [#3](https://github.com/laravel-json-api/core/pull/3)** Server classes can no longer use constructor
+  dependency injection. This is because server classes are created in a number of different contexts - e.g. HTTP
+  requests, Artisan generators, etc - so injecting dependencies via the constructor will likely result in developers
+  injecting dependencies that are only required in certain contexts in which the server is being used. See
+  [laravel #44](https://github.com/laravel-json-api/laravel/issues/44) for discussion on this topic.
+- The `Server\Server` contract no longer has a `serving()` method on it. This has been removed from the contract so that
+  developers can type-hint dependencies in their `serving` method.
+
 ## [1.0.0-alpha.4] - 2021-02-27
 
 ### Added
