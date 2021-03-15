@@ -81,9 +81,9 @@ class Relation implements JsonApiRelation
     private bool $showRelated = true;
 
     /**
-     * @var array|Closure
+     * @var array|Closure|null
      */
-    private $meta;
+    private $meta = null;
 
     /**
      * Relation constructor.
