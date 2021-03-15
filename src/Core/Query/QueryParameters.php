@@ -57,6 +57,11 @@ class QueryParameters implements QueryParametersContract, Arrayable
     private ?array $filters;
 
     /**
+     * @var array
+     */
+    private array $unrecognised;
+
+    /**
      * Cast a value to query parameters.
      *
      * @param QueryParametersContract|Enumerable|Request|array|null $value
@@ -75,6 +80,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
                 $value->sortFields(),
                 $value->page(),
                 $value->filter(),
+                $value->unrecognisedParameters(),
             );
         }
 
@@ -107,12 +113,21 @@ class QueryParameters implements QueryParametersContract, Arrayable
             throw new \InvalidArgumentException('Expecting an array or enumerable value.');
         }
 
+        $unrecognised = collect($value)->forget([
+            'include',
+            'fields',
+            'sort',
+            'page',
+            'filter',
+        ])->all();
+
         return new self(
             array_key_exists('include', $value) ? IncludePaths::cast($value['include']) : null,
             array_key_exists('fields', $value) ? FieldSets::cast($value['fields']) : null,
             array_key_exists('sort', $value) ? SortFields::cast($value['sort']) : null,
             array_key_exists('page', $value) ? $value['page'] : null,
-            array_key_exists('filter', $value) ? $value['filter'] : null
+            array_key_exists('filter', $value) ? $value['filter'] : null,
+            $unrecognised,
         );
     }
 
@@ -137,19 +152,22 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param SortFields|null $sortFields
      * @param array|null $page
      * @param array|null $filters
+     * @param array|null $unrecognised
      */
     public function __construct(
         IncludePaths $includePaths = null,
         FieldSets $fieldSets = null,
         SortFields $sortFields = null,
         array $page = null,
-        array $filters = null
+        array $filters = null,
+        array $unrecognised = null
     ) {
         $this->includePaths = $includePaths;
         $this->fieldSets = $fieldSets;
         $this->sort = $sortFields;
         $this->pagination = $page;
         $this->filters = $filters;
+        $this->unrecognised = $unrecognised ?? [];
     }
 
     /**
@@ -356,11 +374,44 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
+     * @inheritDoc
+     */
+    public function unrecognisedParameters(): array
+    {
+        return $this->unrecognised;
+    }
+
+    /**
+     * Set unrecognised parameters.
+     *
+     * @param array|null $values
+     * @return $this
+     */
+    public function setUnrecognisedParameters(?array $values): self
+    {
+        $this->unrecognised = $values ?? [];
+
+        return $this;
+    }
+
+    /**
+     * Remove unrecognised parameters.
+     *
+     * @return $this
+     */
+    public function withoutUnrecognisedParameters(): self
+    {
+        $this->unrecognised = [];
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function toQuery(): array
     {
-        $query = [];
+        $query = $this->unrecognisedParameters();
 
         if ($this->fieldSets && $this->includePaths->isNotEmpty()) {
             $query['fields'] = $this->fieldSets->toArray();
@@ -382,6 +433,8 @@ class QueryParameters implements QueryParametersContract, Arrayable
             $query['sort'] = $this->sort->toString();
         }
 
+        ksort($query);
+
         return $query;
     }
 
@@ -390,7 +443,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      */
     public function toArray()
     {
-        $query = [];
+        $query = $this->unrecognisedParameters();
 
         if ($this->fieldSets && $this->fieldSets->isNotEmpty()) {
             $query['fields'] = $this->fieldSets->toArray();
@@ -411,6 +464,8 @@ class QueryParameters implements QueryParametersContract, Arrayable
         if ($this->sort && $this->sort->isNotEmpty()) {
             $query['sort'] = $this->sort->toArray();
         }
+
+        ksort($query);
 
         return $query;
     }

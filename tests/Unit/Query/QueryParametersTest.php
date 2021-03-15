@@ -48,11 +48,13 @@ class QueryParametersTest extends TestCase
     public function test(): QueryParameters
     {
         $parameters = QueryParameters::cast($value = [
+            'bazbat' => 'foobar',
             'fields' => [
                 'comments' => 'user,content',
                 'posts' => 'author,createdAt,synopsis,title',
             ],
             'filter' => ['foo' => 'bar', 'baz' => 'bat'],
+            'foobar' => 'bazbat',
             'include' => 'author,comments.user',
             'page' => ['number' => '1', 'size' => '25'],
             'sort' => '-createdAt,id',
@@ -63,6 +65,10 @@ class QueryParametersTest extends TestCase
         $this->assertEquals(IncludePaths::fromString($value['include']), $parameters->includePaths());
         $this->assertEquals($value['page'], $parameters->page());
         $this->assertEquals(SortFields::fromString($value['sort']), $parameters->sortFields());
+        $this->assertEquals([
+            'foobar' => 'bazbat',
+            'bazbat' => 'foobar',
+        ], $parameters->unrecognisedParameters());
 
         $arr = $value;
         $arr['include'] = ['author', 'comments.user'];
@@ -117,6 +123,7 @@ class QueryParametersTest extends TestCase
         $mock->method('includePaths')->willReturn($expected->includePaths());
         $mock->method('page')->willReturn($expected->page());
         $mock->method('sortFields')->willReturn($expected->sortFields());
+        $mock->method('unrecognisedParameters')->willReturn($expected->unrecognisedParameters());
 
         $this->assertEquals($expected, QueryParameters::cast($mock));
     }
@@ -270,6 +277,29 @@ class QueryParametersTest extends TestCase
 
         $this->assertSame($parameters, $parameters->withoutFilters());
         $this->assertNull($parameters->filter());
+    }
+
+    public function testSetUnrecognisedParameters(): void
+    {
+        $parameters = QueryParameters::fromArray([
+            'foo' => 'bar',
+            'baz' => 'bat',
+        ]);
+
+        $this->assertSame($parameters, $parameters->setUnrecognisedParameters(['foobar' => 'bazbat']));
+        $this->assertSame(['foobar' => 'bazbat'], $parameters->unrecognisedParameters());
+        $this->assertSame([], $parameters->setUnrecognisedParameters(null)->unrecognisedParameters());
+    }
+
+    public function testWithoutUnrecognisedParameters(): void
+    {
+        $parameters = QueryParameters::fromArray([
+            'foo' => 'bar',
+            'baz' => 'bat',
+        ]);
+
+        $this->assertSame($parameters, $parameters->withoutUnrecognisedParameters());
+        $this->assertSame([], $parameters->unrecognisedParameters());
     }
 
     /**

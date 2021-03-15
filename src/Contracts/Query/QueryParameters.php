@@ -61,4 +61,11 @@ interface QueryParameters
      */
     public function filter(): ?array;
 
+    /**
+     * Get query parameters that are not defined in the JSON:API specification.
+     *
+     * @return array
+     */
+    public function unrecognisedParameters(): array;
+
 }

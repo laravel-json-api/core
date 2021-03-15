@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
+- **BREAKING** The `Contracts\Query\QueryParameters` interface now has an `unrecognisedParameters` method. This returns
+  any query parameters that are not defined by the JSON:API specification, which allows implementations to add support
+  for additional query parameters as needed.
 - The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
   object.
 - The `SortField` class now has static `ascending` and `descending` methods, to easily create a sort field with the
