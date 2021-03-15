@@ -196,6 +196,32 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     }
 
     /**
+     * Run a filter over each relationship path.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function filter(callable $callback): self
+    {
+        return new self(
+            ...$this->collect()->filter($callback)
+        );
+    }
+
+    /**
+     * Create new include paths of all relationship paths that do not pass a given truth test.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function reject(callable $callback): self
+    {
+        return new self(
+            ...$this->collect()->reject($callback)
+        );
+    }
+
+    /**
      * @return array
      */
     public function toArray()

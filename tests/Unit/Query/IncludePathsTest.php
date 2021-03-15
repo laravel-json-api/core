@@ -135,4 +135,27 @@ class IncludePathsTest extends TestCase
 
         $this->assertEquals(['image'], $paths->skip(2)->toArray());
     }
+
+    public function testFilter(): void
+    {
+        $paths = IncludePaths::fromString('author.profile,comments,tags');
+
+        $actual = $paths->filter(fn(RelationshipPath $path) => 1 === count($path));
+
+        $this->assertNotSame($paths, $actual);
+        $this->assertSame('author.profile,comments,tags', $paths->toString());
+        $this->assertSame('comments,tags', $actual->toString());
+    }
+
+    public function testReject(): void
+    {
+        $paths = IncludePaths::fromString('author.profile,comments,tags');
+
+        $actual = $paths->reject(fn(RelationshipPath $path) => 1 === count($path));
+
+        $this->assertNotSame($paths, $actual);
+        $this->assertSame('author.profile,comments,tags', $paths->toString());
+        $this->assertSame('author.profile', $actual->toString());
+    }
+
 }
