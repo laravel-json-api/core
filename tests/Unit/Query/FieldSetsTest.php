@@ -39,6 +39,7 @@ class FieldSetsTest extends TestCase
 
         $this->assertEquals($values, $fields->toArray());
         $this->assertEquals($fields, FieldSets::nullable($values));
+        $this->assertCount(2, $fields);
 
         return $fields;
     }
@@ -109,7 +110,7 @@ class FieldSetsTest extends TestCase
      * @param FieldSets $fields
      * @depends testCastWithArray
      */
-    public function testAll(FieldSets $fields): void
+    public function testAllAndCollect(FieldSets $fields): void
     {
         $expected = [
             'posts' => new FieldSet('posts', ['slug', 'synopsis', 'title']),
@@ -117,6 +118,7 @@ class FieldSetsTest extends TestCase
         ];
 
         $this->assertEquals($expected, $fields->all());
+        $this->assertEquals(collect($expected), $fields->collect());
     }
 
     /**
@@ -131,5 +133,19 @@ class FieldSetsTest extends TestCase
         ];
 
         $this->assertEquals($expected, $fields->fields());
+    }
+
+    public function testForget(): void
+    {
+        $fields = FieldSets::fromArray([
+            'posts' => 'slug,synopsis,title',
+            'users' => 'firstName,lastName',
+        ]);
+
+        $this->assertSame($fields, $fields->forget('foo', 'users', 'bar'));
+
+        $this->assertSame([
+            'posts' => 'slug,synopsis,title',
+        ], $fields->toArray());
     }
 }

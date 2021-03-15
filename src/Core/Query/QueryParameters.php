@@ -74,7 +74,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
                 $value->sparseFieldSets(),
                 $value->sortFields(),
                 $value->page(),
-                $value->filter()
+                $value->filter(),
             );
         }
 
@@ -84,6 +84,10 @@ class QueryParameters implements QueryParametersContract, Arrayable
 
         if (is_array($value) || $value instanceof Enumerable) {
             return self::fromArray($value);
+        }
+
+        if (is_null($value)) {
+            return new self();
         }
 
         throw new UnexpectedValueException('Expecting a valid query parameters value.');
@@ -104,9 +108,9 @@ class QueryParameters implements QueryParametersContract, Arrayable
         }
 
         return new self(
-            array_key_exists('include', $value) ? IncludePaths::fromArray($value['include']) : null,
-            array_key_exists('fields', $value) ? FieldSets::fromArray($value['fields']) : null,
-            array_key_exists('sort', $value) ? SortFields::fromArray($value['sort']) : null,
+            array_key_exists('include', $value) ? IncludePaths::cast($value['include']) : null,
+            array_key_exists('fields', $value) ? FieldSets::cast($value['fields']) : null,
+            array_key_exists('sort', $value) ? SortFields::cast($value['sort']) : null,
             array_key_exists('page', $value) ? $value['page'] : null,
             array_key_exists('filter', $value) ? $value['filter'] : null
         );
@@ -161,29 +165,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      */
     public function toString(): string
     {
-        $query = [];
-
-        if ($this->includePaths && $this->includePaths->isNotEmpty()) {
-            $query['include'] = $this->includePaths->toString();
-        }
-
-        if ($this->fieldSets && $this->includePaths->isNotEmpty()) {
-            $query['fields'] = $this->fieldSets->toArray();
-        }
-
-        if ($this->sort && $this->sort->isNotEmpty()) {
-            $query['sort'] = $this->sort->toString();
-        }
-
-        if (is_array($this->pagination) && !empty($this->pagination)) {
-            $query['page'] = $this->pagination;
-        }
-
-        if (is_array($this->filters) && !empty($this->filters)) {
-            $query['filter'] = $this->filters;
-        }
-
-        return Arr::query($query);
+        return Arr::query($this->toQuery());
     }
 
     /**
@@ -258,7 +240,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     public function setFieldSet(string $type, array $fields): self
     {
         $this->fieldSets = FieldSets::cast($this->fieldSets)
-            ->push(new FieldSet($type, ...$fields));
+            ->push(new FieldSet($type, $fields));
 
         return $this;
     }
@@ -374,33 +356,62 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @inheritDoc
+     * @return array
      */
-    public function toArray()
+    public function toQuery(): array
     {
         $query = [];
 
-        if ($this->includePaths && $this->includePaths->isNotEmpty()) {
-            $query['include'] = $this->includePaths->toArray();
-        }
-
-        if ($this->fieldSets && $this->fieldSets->isNotEmpty()) {
+        if ($this->fieldSets && $this->includePaths->isNotEmpty()) {
             $query['fields'] = $this->fieldSets->toArray();
-        }
-
-        if ($this->sort && $this->sort->isNotEmpty()) {
-            $query['sort'] = $this->sort->toArray();
-        }
-
-        if (is_array($this->pagination) && !empty($this->pagination)) {
-            $query['page'] = $this->pagination;
         }
 
         if (is_array($this->filters) && !empty($this->filters)) {
             $query['filter'] = $this->filters;
         }
 
+        if ($this->includePaths && $this->includePaths->isNotEmpty()) {
+            $query['include'] = $this->includePaths->toString();
+        }
+
+        if (is_array($this->pagination) && !empty($this->pagination)) {
+            $query['page'] = $this->pagination;
+        }
+
+        if ($this->sort && $this->sort->isNotEmpty()) {
+            $query['sort'] = $this->sort->toString();
+        }
+
         return $query;
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function toArray()
+    {
+        $query = [];
+
+        if ($this->fieldSets && $this->fieldSets->isNotEmpty()) {
+            $query['fields'] = $this->fieldSets->toArray();
+        }
+
+        if (is_array($this->filters) && !empty($this->filters)) {
+            $query['filter'] = $this->filters;
+        }
+
+        if ($this->includePaths && $this->includePaths->isNotEmpty()) {
+            $query['include'] = $this->includePaths->toArray();
+        }
+
+        if (is_array($this->pagination) && !empty($this->pagination)) {
+            $query['page'] = $this->pagination;
+        }
+
+        if ($this->sort && $this->sort->isNotEmpty()) {
+            $query['sort'] = $this->sort->toArray();
+        }
+
+        return $query;
+    }
 }

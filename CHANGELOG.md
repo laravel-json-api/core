@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
+  object.
+- The `SortField` class now has static `ascending` and `descending` methods, to easily create a sort field with the
+  specified direction.
+- The `QueryParameters` class now has a `toQuery()` method, that casts the value back to a HTTP query parameter array.
+  This is different from `QueryParameters::toArray()`, as the `include` and `sort` parameters are strings in a HTTP
+  query array.
+
+### Fixed
+
+- The `QueryParameters::setFieldSet()` method now correctly passes the fields lists as an array to the field set
+  constructor.
+
 ## [1.0.0-alpha.5] - 2021-03-12
 
 ### Added

@@ -68,6 +68,28 @@ class SortField
     }
 
     /**
+     * Create a new ascending sort field.
+     *
+     * @param string $name
+     * @return static
+     */
+    public static function ascending(string $name): self
+    {
+        return new self($name);
+    }
+
+    /**
+     * Create a new descending sort field.
+     *
+     * @param string $name
+     * @return static
+     */
+    public static function descending(string $name): self
+    {
+        return new self($name, false);
+    }
+
+    /**
      * SortField constructor.
      *
      * @param string $name
