@@ -65,7 +65,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * Cast a value to query parameters.
      *
      * @param QueryParametersContract|Enumerable|Request|array|null $value
-     * @return QueryParameters
+     * @return static
      */
     public static function cast($value): self
     {
@@ -74,7 +74,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
         }
 
         if ($value instanceof QueryParametersContract) {
-            return new self(
+            return new static(
                 $value->includePaths(),
                 $value->sparseFieldSets(),
                 $value->sortFields(),
@@ -85,15 +85,15 @@ class QueryParameters implements QueryParametersContract, Arrayable
         }
 
         if ($value instanceof Request) {
-            return self::fromArray($value->query());
+            return static::fromArray($value->query());
         }
 
         if (is_array($value) || $value instanceof Enumerable) {
-            return self::fromArray($value);
+            return static::fromArray($value);
         }
 
         if (is_null($value)) {
-            return new self();
+            return new static();
         }
 
         throw new UnexpectedValueException('Expecting a valid query parameters value.');
@@ -121,7 +121,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
             'filter',
         ])->all();
 
-        return new self(
+        return new static(
             array_key_exists('include', $value) ? IncludePaths::cast($value['include']) : null,
             array_key_exists('fields', $value) ? FieldSets::cast($value['fields']) : null,
             array_key_exists('sort', $value) ? SortFields::cast($value['sort']) : null,
@@ -133,7 +133,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
 
     /**
      * @param QueryParametersContract|Enumerable|array|null $value
-     * @return QueryParameters|null
+     * @return static|null
      */
     public static function nullable($value): ?self
     {
@@ -141,7 +141,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
             return null;
         }
 
-        return self::cast($value);
+        return static::cast($value);
     }
 
     /**
