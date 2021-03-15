@@ -69,7 +69,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      */
     public static function cast($value): self
     {
-        if ($value instanceof self) {
+        if ($value instanceof static) {
             return $value;
         }
 
