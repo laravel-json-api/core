@@ -32,7 +32,7 @@ use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
-use LaravelJsonApi\Core\Responses\ResourceResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
 use LogicException;
 use function sprintf;
 

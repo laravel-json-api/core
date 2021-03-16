@@ -17,16 +17,20 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses\Concerns;
+namespace LaravelJsonApi\Core\Responses\Internal;
 
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Responses\Concerns;
 
-trait EncodesIdentifiers
+class ResourceIdentifierCollectionResponse implements Responsable
 {
 
-    use IsResponsable;
+    use Concerns\HasRelationshipMeta;
+    use Concerns\IsResponsable;
 
     /**
      * @var JsonApiResource
@@ -39,9 +43,23 @@ trait EncodesIdentifiers
     private string $fieldName;
 
     /**
-     * @var JsonApiResource|iterable|null
+     * @var iterable
      */
-    private $related;
+    private iterable $related;
+
+    /**
+     * ResourceIdentifierResponse constructor.
+     *
+     * @param JsonApiResource $resource
+     * @param string $fieldName
+     * @param iterable $related
+     */
+    public function __construct(JsonApiResource $resource, string $fieldName, iterable $related)
+    {
+        $this->resource = $resource;
+        $this->fieldName = $fieldName;
+        $this->related = $related;
+    }
 
     /**
      * @param Request $request
@@ -55,9 +73,9 @@ trait EncodesIdentifiers
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
-            ->withIdentifiers($this->resource, $this->fieldName, $this->related)
+            ->withToMany($this->resource, $this->fieldName, $this->related)
             ->withJsonApi($this->jsonApi())
-            ->withMeta($this->meta)
+            ->withMeta($this->allMeta())
             ->withLinks($this->links)
             ->toJson($this->encodeOptions);
 
@@ -66,5 +84,28 @@ trait EncodesIdentifiers
             Response::HTTP_OK,
             $this->headers()
         );
+    }
+
+    /**
+     * @return Hash|null
+     */
+    private function allMeta(): ?Hash
+    {
+        return Hash::cast($this->metaForRelationship())
+            ->merge($this->meta());
+    }
+
+    /**
+     * @return array|null
+     */
+    private function metaForRelationship(): ?array
+    {
+        if ($this->hasRelationMeta) {
+            return $this->resource
+                ->relationship($this->fieldName)
+                ->meta();
+        }
+
+        return null;
     }
 }

@@ -24,6 +24,27 @@ All notable changes to this project will be documented in this file. This projec
   only parameters valid for the supplied schema.
 - The `Document\ResourceObject` class has a new `withRelationshipMeta` method for adding meta for a specified
   relationship.
+- Added new response classes for returning related resources for a relationship - e.g. the `/api/posts/1/comments`
+  endpoint. Previously the `DataResponse` class was used for this endpoint, but the new classes allow for relationship
+  meta to be merged into the top-level meta member of the response for the endpoint.
+
+### Changed
+
+- **BREAKING** The `Contracts\Encoder\Encoder` interface now has two methods for encoding resource identifiers:
+  `withToOne` and `withToMany`. These replace the `withIdentifiers` method, which has been removed.
+- Moved the following classes from the `Core\Responses` namespace to the `Core\Responses\Internal` namespace. This is
+  considered non-breaking because the classes are not part of the public API (responses that can be used for the public
+  API are still in the `Core\Responses` namespace):
+    - `PaginatedResourceResponse`
+    - `ResourceCollectionResponse`
+    - `ResourceIdentifierCollectionResponse`
+    - `ResourceIdentifierResponse`
+    - `ResourceResponse`
+
+### Removed
+
+- Deleted the `Core\Responses\Concerns\EncodesIdentifiers` trait. This is considered non-breaking as the trait was only
+  intended for internal use.
 
 ### Fixed
 

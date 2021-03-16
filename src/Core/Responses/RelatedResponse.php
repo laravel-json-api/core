@@ -23,14 +23,14 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Core\Responses\Internal\PaginatedIdentifierResponse;
+use LaravelJsonApi\Core\Responses\Internal\PaginatedRelatedResourceResponse;
+use LaravelJsonApi\Core\Responses\Internal\RelatedResourceCollectionResponse;
+use LaravelJsonApi\Core\Responses\Internal\RelatedResourceResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
-use LaravelJsonApi\Core\Responses\Internal\ResourceIdentifierCollectionResponse;
-use LaravelJsonApi\Core\Responses\Internal\ResourceIdentifierResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
 use function is_null;
 
-class RelationshipResponse implements Responsable
+class RelatedResponse implements Responsable
 {
 
     use Concerns\HasRelationshipMeta;
@@ -109,7 +109,7 @@ class RelationshipResponse implements Responsable
      * Convert the data member to a response class.
      *
      * @param $request
-     * @return ResourceIdentifierResponse|ResourceIdentifierCollectionResponse|PaginatedIdentifierResponse
+     * @return RelatedResourceResponse|RelatedResourceCollectionResponse|PaginatedRelatedResourceResponse
      */
     private function prepareDataResponse($request)
     {
@@ -117,7 +117,7 @@ class RelationshipResponse implements Responsable
         $resource = $resolver->resolve($this->resource);
 
         if (is_null($this->related)) {
-            return new ResourceIdentifierResponse(
+            return new RelatedResourceResponse(
                 $resource,
                 $this->fieldName,
                 null
@@ -125,7 +125,7 @@ class RelationshipResponse implements Responsable
         }
 
         if ($this->related instanceof Page) {
-            return new PaginatedIdentifierResponse(
+            return new PaginatedRelatedResourceResponse(
                 $resource,
                 $this->fieldName,
                 $this->related,
@@ -135,14 +135,14 @@ class RelationshipResponse implements Responsable
         $parsed = $resolver->resolve($this->related);
 
         if ($parsed instanceof JsonApiResource) {
-            return new ResourceIdentifierResponse(
+            return new RelatedResourceResponse(
                 $resource,
                 $this->fieldName,
                 $parsed,
             );
         }
 
-        return new ResourceIdentifierCollectionResponse(
+        return new RelatedResourceCollectionResponse(
             $resource,
             $this->fieldName,
             $parsed,

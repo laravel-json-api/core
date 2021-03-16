@@ -24,6 +24,9 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
 use function is_null;
 
 class DataResponse implements Responsable

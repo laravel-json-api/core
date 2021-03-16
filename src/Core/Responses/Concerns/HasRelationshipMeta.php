@@ -17,28 +17,39 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Core\Responses\Concerns;
 
-use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
-
-class ResourceIdentifierResponse implements Responsable
+trait HasRelationshipMeta
 {
 
-    use Concerns\EncodesIdentifiers;
+    /**
+     * @var bool
+     */
+    private bool $hasRelationMeta = true;
 
     /**
-     * ResourceIdentifierResponse constructor.
+     * Set whether relationship meta should appear in the top-level meta member.
      *
-     * @param JsonApiResource $resource
-     * @param string $fieldName
-     * @param JsonApiResource|null $related
+     * @param bool $bool
+     * @return $this
      */
-    public function __construct(JsonApiResource $resource, string $fieldName, ?JsonApiResource $related)
+    public function withRelationshipMeta(bool $bool = true): self
     {
-        $this->resource = $resource;
-        $this->fieldName = $fieldName;
-        $this->related = $related;
+        $this->hasRelationMeta = $bool;
+
+        return $this;
+    }
+
+    /**
+     * Do not add relationship meta to the top-level meta member.
+     *
+     * @return $this
+     */
+    public function withoutRelationshipMeta(): self
+    {
+        $this->hasRelationMeta = false;
+
+        return $this;
     }
 
 }
