@@ -113,8 +113,8 @@ class RelatedResponse implements Responsable
      */
     private function prepareDataResponse($request)
     {
-        $resolver = $this->server()->resources();
-        $resource = $resolver->resolve($this->resource);
+        $resources = $this->server()->resources();
+        $resource = $resources->create($this->resource);
 
         if (is_null($this->related)) {
             return new RelatedResourceResponse(
@@ -132,20 +132,18 @@ class RelatedResponse implements Responsable
             );
         }
 
-        $parsed = $resolver->resolve($this->related);
-
-        if ($parsed instanceof JsonApiResource) {
+        if (is_object($this->related) && $resources->exists($this->related)) {
             return new RelatedResourceResponse(
                 $resource,
                 $this->fieldName,
-                $parsed,
+                $this->related,
             );
         }
 
         return new RelatedResourceCollectionResponse(
             $resource,
             $this->fieldName,
-            $parsed,
+            $this->related,
         );
     }
 

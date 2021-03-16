@@ -113,14 +113,14 @@ class RelationshipResponse implements Responsable
      */
     private function prepareDataResponse($request)
     {
-        $resolver = $this->server()->resources();
-        $resource = $resolver->resolve($this->resource);
+        $resources = $this->server()->resources();
+        $resource = $resources->create($this->resource);
 
         if (is_null($this->related)) {
             return new ResourceIdentifierResponse(
                 $resource,
                 $this->fieldName,
-                null
+                null,
             );
         }
 
@@ -132,20 +132,18 @@ class RelationshipResponse implements Responsable
             );
         }
 
-        $parsed = $resolver->resolve($this->related);
-
-        if ($parsed instanceof JsonApiResource) {
+        if (is_object($this->related) && $resources->exists($this->related)) {
             return new ResourceIdentifierResponse(
                 $resource,
                 $this->fieldName,
-                $parsed,
+                $this->related,
             );
         }
 
         return new ResourceIdentifierCollectionResponse(
             $resource,
             $this->fieldName,
-            $parsed,
+            $this->related,
         );
     }
 
