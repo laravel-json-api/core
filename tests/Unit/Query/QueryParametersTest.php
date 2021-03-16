@@ -23,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Query\FieldSets;
+use LaravelJsonApi\Core\Query\FilterParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\SortFields;
@@ -61,7 +62,7 @@ class QueryParametersTest extends TestCase
         ]);
 
         $this->assertEquals(FieldSets::fromArray($value['fields']), $parameters->sparseFieldSets());
-        $this->assertEquals($value['filter'], $parameters->filter());
+        $this->assertEquals(FilterParameters::fromArray($value['filter']), $parameters->filter());
         $this->assertEquals(IncludePaths::fromString($value['include']), $parameters->includePaths());
         $this->assertEquals($value['page'], $parameters->page());
         $this->assertEquals(SortFields::fromString($value['sort']), $parameters->sortFields());
@@ -270,7 +271,7 @@ class QueryParametersTest extends TestCase
         ]);
 
         $this->assertSame($parameters, $parameters->setFilters(['baz' => 'bat']));
-        $this->assertSame(['baz' => 'bat'], $parameters->filter());
+        $this->assertEquals(FilterParameters::fromArray(['baz' => 'bat']), $parameters->filter());
         $this->assertNull($parameters->setFilters(null)->filter());
     }
 

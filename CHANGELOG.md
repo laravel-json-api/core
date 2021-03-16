@@ -7,9 +7,11 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
-- **BREAKING** The `Contracts\Query\QueryParameters` interface now has an `unrecognisedParameters` method. This returns
-  any query parameters that are not defined by the JSON:API specification, which allows implementations to add support
-  for additional query parameters as needed.
+- **BREAKING** Made the followign changes to the `Contracts\Query\QueryParameters` interface:
+    - New `unrecognisedParameters` method. This returns any query parameters that are not defined by the JSON:API
+      specification, which allows implementations to add support for additional query parameters as needed.
+    - The `filters` method now returns a `FilterParameters` object or null. Previously it returned an array or null.
+- New `FilterParameters` class for handling a collection of filter parameters received from a client.
 - The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
   object.
 - The `IncludePaths` and `SortFields` classes now have `filter`, `reject` and `forSchema` methods.
@@ -18,6 +20,8 @@ All notable changes to this project will be documented in this file. This projec
 - The `QueryParameters` class now has a `toQuery()` method, that casts the value back to a HTTP query parameter array.
   This is different from `QueryParameters::toArray()`, as the `include` and `sort` parameters are strings in a HTTP
   query array.
+- The `QueryParameters` class now has a `forSchema()` method, that returns a new query parameters instance that contains
+  only parameters valid for the supplied schema.
 
 ### Fixed
 

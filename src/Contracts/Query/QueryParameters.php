@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Query;
 
 use LaravelJsonApi\Core\Query\FieldSets;
+use LaravelJsonApi\Core\Query\FilterParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\SortFields;
 
@@ -57,9 +58,9 @@ interface QueryParameters
     /**
      * Get the JSON:API filter parameters.
      *
-     * @return array|null
+     * @return FilterParameters|null
      */
-    public function filter(): ?array;
+    public function filter(): ?FilterParameters;
 
     /**
      * Get query parameters that are not defined in the JSON:API specification.
