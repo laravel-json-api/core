@@ -102,6 +102,8 @@ class FilterParameters implements \IteratorAggregate, \Countable, Arrayable
      */
     public function __construct(FilterParameter ...$parameters)
     {
+        $this->stack = [];
+
         foreach ($parameters as $parameter) {
             $this->stack[$parameter->key()] = $parameter;
         }
