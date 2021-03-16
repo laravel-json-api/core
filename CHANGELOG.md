@@ -22,6 +22,8 @@ All notable changes to this project will be documented in this file. This projec
   query array.
 - The `QueryParameters` class now has a `forSchema()` method, that returns a new query parameters instance that contains
   only parameters valid for the supplied schema.
+- The `Document\ResourceObject` class has a new `withRelationshipMeta` method for adding meta for a specified
+  relationship.
 
 ### Fixed
 

@@ -485,7 +485,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * Get a new query parameter object with valid values for the provided schema.
      *
      * @param Schema $schema
-     * @return $this
+     * @return static
      */
     public function forSchema(Schema $schema): self
     {
