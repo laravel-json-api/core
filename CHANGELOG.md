@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file. This projec
   for additional query parameters as needed.
 - The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
   object.
-- The `IncludePaths` class now has `filter` and `reject` methods.
+- The `IncludePaths` and `SortFields` classes now have `filter` and `reject` methods.
 - The `SortField` class now has static `ascending` and `descending` methods, to easily create a sort field with the
   specified direction.
 - The `QueryParameters` class now has a `toQuery()` method, that casts the value back to a HTTP query parameter array.

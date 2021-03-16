@@ -62,6 +62,16 @@ class QueryParameters implements QueryParametersContract, Arrayable
     private array $unrecognised;
 
     /**
+     * Fluent constructor.
+     *
+     * @return static
+     */
+    public static function make(): self
+    {
+        return new static();
+    }
+
+    /**
      * Cast a value to query parameters.
      *
      * @param QueryParametersContract|Enumerable|Request|array|null $value

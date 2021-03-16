@@ -168,6 +168,30 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     }
 
     /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function filter(callable $callback): self
+    {
+        $copy = new self();
+        $copy->stack = collect($this->stack)->filter($callback)->all();
+
+        return $copy;
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function reject(callable $callback): self
+    {
+        $copy = new self();
+        $copy->stack = collect($this->stack)->reject($callback)->all();
+
+        return $copy;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getIterator()

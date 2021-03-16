@@ -146,6 +146,11 @@ class QueryParametersTest extends TestCase
         $this->assertEquals($expected, QueryParameters::nullable($expected->toQuery()));
     }
 
+    public function testMake(): void
+    {
+        $this->assertEquals(new QueryParameters(), QueryParameters::make());
+    }
+
     public function testSetIncludePaths(): void
     {
         $parameters = QueryParameters::fromArray(['include' => 'author,comments']);
