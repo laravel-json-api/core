@@ -19,6 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Query;
 
+use LaravelJsonApi\Contracts\Schema\Relation;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Query\RelationshipPath;
 use PHPUnit\Framework\TestCase;
 
@@ -53,6 +55,41 @@ class RelationshipPathTest extends TestCase
         $this->assertSame(['image'], $actual->names());
         $this->assertSame(['user', 'image'], $path->skip(1)->names());
         $this->assertNull($path->skip(3));
+    }
+
+    public function testExistsOnSchema(): void
+    {
+        $schema = $this->createMock(Schema::class);
+        $schema->method('isRelationship')->with('comments')->willReturn(true);
+        $schema->method('relationship')->with('comments')->willReturn($relation = $this->createMock(Relation::class));
+        $relation->method('isIncludePath')->willReturn(true);
+
+        $path = new RelationshipPath('comments', 'user');
+
+        $this->assertTrue($path->existsOnSchema($schema));
+    }
+
+    public function testExistsOnSchemaNotIncludePath(): void
+    {
+        $schema = $this->createMock(Schema::class);
+        $schema->method('isRelationship')->with('comments')->willReturn(true);
+        $schema->method('relationship')->with('comments')->willReturn($relation = $this->createMock(Relation::class));
+        $relation->method('isIncludePath')->willReturn(false);
+
+        $path = new RelationshipPath('comments', 'user');
+
+        $this->assertFalse($path->existsOnSchema($schema));
+    }
+
+    public function testExistsOnSchemaInvalid(): void
+    {
+        $schema = $this->createMock(Schema::class);
+        $schema->method('isRelationship')->with('comments')->willReturn(false);
+        $schema->expects($this->never())->method('relationship');
+
+        $path = new RelationshipPath('comments', 'user');
+
+        $this->assertFalse($path->existsOnSchema($schema));
     }
 
     public function testEmpty(): void

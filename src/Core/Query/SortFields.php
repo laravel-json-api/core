@@ -24,6 +24,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use UnexpectedValueException;
 use function array_map;
 use function collect;
@@ -189,6 +190,17 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
         $copy->stack = collect($this->stack)->reject($callback)->all();
 
         return $copy;
+    }
+
+    /**
+     * @param Schema $schema
+     * @return $this
+     */
+    public function forSchema(Schema $schema): self
+    {
+        return $this->filter(
+            static fn(SortField $field) => $field->existsOnSchema($schema)
+        );
     }
 
     /**
