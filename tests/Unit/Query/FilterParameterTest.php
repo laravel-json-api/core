@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Query;
 
-use LaravelJsonApi\Contracts\Schema\Filter;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Query\FilterParameter;
 use PHPUnit\Framework\TestCase;
@@ -38,15 +37,9 @@ class FilterParameterTest extends TestCase
     public function testExistsOnSchema(): void
     {
         $schema = $this->createMock(Schema::class);
-        $schema->method('filters')->willReturn([
-            $a = $this->createMock(Filter::class),
-            $b = $this->createMock(Filter::class),
-            $c = $this->createMock(Filter::class),
-        ]);
-
-        $a->method('key')->willReturn('foo');
-        $b->method('key')->willReturn('bar');
-        $c->method('key')->willReturn('baz');
+        $schema->method('isFilter')->willReturnCallback(
+            fn($value) => \in_array($value, ['foo', 'bar', 'baz'], true)
+        );
 
         $this->assertTrue((new FilterParameter('baz', 'bat'))->existsOnSchema($schema));
         $this->assertFalse((new FilterParameter('foobar', 'bazbat'))->existsOnSchema($schema));

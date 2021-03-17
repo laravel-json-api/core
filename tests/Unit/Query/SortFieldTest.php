@@ -53,7 +53,9 @@ class SortFieldTest extends TestCase
     public function testExistsOnSchema(): void
     {
         $schema = $this->createMock(Schema::class);
-        $schema->method('sortable')->willReturn(['title', 'updatedAt', 'createdAt']);
+        $schema->method('isSortable')->willReturnCallback(
+            fn($value) => \in_array($value, ['title', 'updatedAt', 'createdAt'], true)
+        );
 
         $this->assertTrue(SortField::cast('-updatedAt')->existsOnSchema($schema));
         $this->assertFalse(SortField::cast('id')->existsOnSchema($schema));

@@ -74,13 +74,6 @@ class FilterParameter
      */
     public function existsOnSchema(Schema $schema): bool
     {
-        /** @var Filter $filter */
-        foreach ($schema->filters() as $filter) {
-            if ($this->key() === $filter->key()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $schema->isFilter($this->key());
     }
 }

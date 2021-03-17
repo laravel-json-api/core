@@ -164,6 +164,14 @@ interface Schema extends Traversable
     public function isRelationship(string $name): bool;
 
     /**
+     * Is the provided name a filter parameter?
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function isFilter(string $name): bool;
+
+    /**
      * Get the filters for the resource.
      *
      * @return Filter[]|iterable
@@ -185,11 +193,27 @@ interface Schema extends Traversable
      public function includePaths(): iterable;
 
     /**
+     * Is the provided field name a sparse field?
+     *
+     * @param string $fieldName
+     * @return bool
+     */
+     public function isSparseField(string $fieldName): bool;
+
+    /**
      * Get the sparse fields that are supported by this resource.
      *
      * @return string[]|iterable
      */
      public function sparseFields(): iterable;
+
+    /**
+     * Is the provided name a sort parameter?
+     *
+     * @param string $name
+     * @return bool
+     */
+     public function isSortable(string $name): bool;
 
     /**
      * Get the parameters that can be used to sort this resource.
