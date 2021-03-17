@@ -17,28 +17,23 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Contracts\Implementations\Countable;
 
-use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
-
-class ResourceIdentifierResponse implements Responsable
+interface CountableSchema
 {
 
-    use Concerns\EncodesIdentifiers;
+    /**
+     * Is the provided field name a countable field?
+     *
+     * @param string $fieldName
+     * @return bool
+     */
+    public function isCountable(string $fieldName): bool;
 
     /**
-     * ResourceIdentifierResponse constructor.
+     * Get the countable field names.
      *
-     * @param JsonApiResource $resource
-     * @param string $fieldName
-     * @param JsonApiResource|null $related
+     * @return iterable
      */
-    public function __construct(JsonApiResource $resource, string $fieldName, ?JsonApiResource $related)
-    {
-        $this->resource = $resource;
-        $this->fieldName = $fieldName;
-        $this->related = $related;
-    }
-
+    public function countable(): iterable;
 }

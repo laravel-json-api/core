@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Query;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use UnexpectedValueException;
 use function is_string;
 
@@ -157,5 +158,16 @@ class SortField
     public function getDirection(): string
     {
         return $this->isAscending() ? 'asc' : 'desc';
+    }
+
+    /**
+     * Does the sort field exist on the provided schema?
+     *
+     * @param Schema $schema
+     * @return bool
+     */
+    public function existsOnSchema(Schema $schema): bool
+    {
+        return $schema->isSortable($this->name());
     }
 }

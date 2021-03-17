@@ -23,6 +23,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Enumerable;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Support\Arr;
 use UnexpectedValueException;
 use function array_key_exists;
@@ -52,9 +53,9 @@ class QueryParameters implements QueryParametersContract, Arrayable
     private ?array $pagination;
 
     /**
-     * @var array|null
+     * @var FilterParameters|null
      */
-    private ?array $filters;
+    private ?FilterParameters $filters;
 
     /**
      * @var array
@@ -62,19 +63,29 @@ class QueryParameters implements QueryParametersContract, Arrayable
     private array $unrecognised;
 
     /**
+     * Fluent constructor.
+     *
+     * @return static
+     */
+    public static function make(): self
+    {
+        return new static();
+    }
+
+    /**
      * Cast a value to query parameters.
      *
      * @param QueryParametersContract|Enumerable|Request|array|null $value
-     * @return QueryParameters
+     * @return static
      */
     public static function cast($value): self
     {
-        if ($value instanceof self) {
+        if ($value instanceof static) {
             return $value;
         }
 
         if ($value instanceof QueryParametersContract) {
-            return new self(
+            return new static(
                 $value->includePaths(),
                 $value->sparseFieldSets(),
                 $value->sortFields(),
@@ -85,15 +96,15 @@ class QueryParameters implements QueryParametersContract, Arrayable
         }
 
         if ($value instanceof Request) {
-            return self::fromArray($value->query());
+            return static::fromArray($value->query());
         }
 
         if (is_array($value) || $value instanceof Enumerable) {
-            return self::fromArray($value);
+            return static::fromArray($value);
         }
 
         if (is_null($value)) {
-            return new self();
+            return new static();
         }
 
         throw new UnexpectedValueException('Expecting a valid query parameters value.');
@@ -121,19 +132,19 @@ class QueryParameters implements QueryParametersContract, Arrayable
             'filter',
         ])->all();
 
-        return new self(
+        return new static(
             array_key_exists('include', $value) ? IncludePaths::cast($value['include']) : null,
             array_key_exists('fields', $value) ? FieldSets::cast($value['fields']) : null,
             array_key_exists('sort', $value) ? SortFields::cast($value['sort']) : null,
             array_key_exists('page', $value) ? $value['page'] : null,
-            array_key_exists('filter', $value) ? $value['filter'] : null,
+            array_key_exists('filter', $value) ? FilterParameters::cast($value['filter']) : null,
             $unrecognised,
         );
     }
 
     /**
      * @param QueryParametersContract|Enumerable|array|null $value
-     * @return QueryParameters|null
+     * @return static|null
      */
     public static function nullable($value): ?self
     {
@@ -141,7 +152,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
             return null;
         }
 
-        return self::cast($value);
+        return static::cast($value);
     }
 
     /**
@@ -151,7 +162,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param FieldSets|null $fieldSets
      * @param SortFields|null $sortFields
      * @param array|null $page
-     * @param array|null $filters
+     * @param FilterParameters|null $filters
      * @param array|null $unrecognised
      */
     public function __construct(
@@ -159,7 +170,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
         FieldSets $fieldSets = null,
         SortFields $sortFields = null,
         array $page = null,
-        array $filters = null,
+        FilterParameters $filters = null,
         array $unrecognised = null
     ) {
         $this->includePaths = $includePaths;
@@ -187,7 +198,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @return IncludePaths|null
+     * @inheritDoc
      */
     public function includePaths(): ?IncludePaths
     {
@@ -216,7 +227,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @return FieldSets|null
+     * @inheritDoc
      */
     public function sparseFieldSets(): ?FieldSets
     {
@@ -279,7 +290,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @return SortFields|null
+     * @inheritDoc
      */
     public function sortFields(): ?SortFields
     {
@@ -308,7 +319,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @return array|null
+     * @inheritDoc
      */
     public function page(): ?array
     {
@@ -341,9 +352,9 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @return array|null
+     * @inheritDoc
      */
-    public function filter(): ?array
+    public function filter(): ?FilterParameters
     {
         return $this->filters;
     }
@@ -351,12 +362,12 @@ class QueryParameters implements QueryParametersContract, Arrayable
     /**
      * Set filters.
      *
-     * @param Arrayable|array|null $filters
+     * @param mixed|null $filters
      * @return $this
      */
     public function setFilters($filters): self
     {
-        $this->filters = is_null($filters) ? null : collect($filters)->toArray();
+        $this->filters = FilterParameters::nullable($filters);
 
         return $this;
     }
@@ -417,8 +428,8 @@ class QueryParameters implements QueryParametersContract, Arrayable
             $query['fields'] = $this->fieldSets->toArray();
         }
 
-        if (is_array($this->filters) && !empty($this->filters)) {
-            $query['filter'] = $this->filters;
+        if ($this->filters && $this->filters->isNotEmpty()) {
+            $query['filter'] = $this->filters->toArray();
         }
 
         if ($this->includePaths && $this->includePaths->isNotEmpty()) {
@@ -449,8 +460,8 @@ class QueryParameters implements QueryParametersContract, Arrayable
             $query['fields'] = $this->fieldSets->toArray();
         }
 
-        if (is_array($this->filters) && !empty($this->filters)) {
-            $query['filter'] = $this->filters;
+        if ($this->filters && $this->filters->isNotEmpty()) {
+            $query['filter'] = $this->filters->toArray();
         }
 
         if ($this->includePaths && $this->includePaths->isNotEmpty()) {
@@ -468,5 +479,34 @@ class QueryParameters implements QueryParametersContract, Arrayable
         ksort($query);
 
         return $query;
+    }
+
+    /**
+     * Get a new query parameter object with valid values for the provided schema.
+     *
+     * @param Schema $schema
+     * @return static
+     */
+    public function forSchema(Schema $schema): self
+    {
+        $includePaths = IncludePaths::cast($this->includePaths)->forSchema($schema);
+        $sortFields = SortFields::cast($this->sort)->forSchema($schema);
+        $filters = FilterParameters::cast($this->filters)->forSchema($schema);
+        $pagination = null;
+
+        if ($this->pagination && $paginator = $schema->pagination()) {
+            $pagination = collect($this->pagination)
+                ->only($paginator->keys())
+                ->all();
+        }
+
+        return new static(
+            $includePaths->isNotEmpty() ? $includePaths : null,
+            $this->fieldSets,
+            $sortFields->isNotEmpty() ? $sortFields : null,
+            !empty($pagination) ? $pagination : null,
+            $filters->isNotEmpty() ? $filters : null,
+            $this->unrecognised,
+        );
     }
 }

@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Schema;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Schema\Attribute;
 use LaravelJsonApi\Contracts\Schema\Field;
+use LaravelJsonApi\Contracts\Schema\Filter;
 use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
@@ -351,6 +352,35 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
+    public function isFilter(string $name): bool
+    {
+        /** @var Filter $filter */
+        foreach ($this->filters() as $filter) {
+            if ($filter->key() === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isSparseField(string $fieldName): bool
+    {
+        foreach ($this->sparseFields() as $sparseField) {
+            if ($sparseField === $fieldName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function sparseFields(): iterable
     {
         /** @var Field $field */
@@ -364,10 +394,26 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
+    public function isSortable(string $name): bool
+    {
+        foreach ($this->sortable() as $sortable) {
+            if ($sortable === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function sortable(): iterable
     {
-        if ($this->id()->isSortable()) {
-            yield $this->id()->name();
+        $id = $this->id();
+
+        if ($id->isSortable()) {
+            yield $id->name();
         }
 
         /** @var Attribute $attr */

@@ -17,34 +17,28 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Query;
+namespace LaravelJsonApi\Core\Query\Custom;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Implementations\Countable\CountableSchema;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use UnexpectedValueException;
-use function array_map;
-use function collect;
-use function count;
-use function explode;
-use function implode;
 use function is_array;
+use function is_null;
 use function is_string;
 
-class SortFields implements IteratorAggregate, Countable, Arrayable
+class CountablePaths implements IteratorAggregate, Countable, Arrayable
 {
 
     /**
-     * @var SortField[]
-     */
-    private array $stack;
-
-    /**
-     * @param SortFields|SortField|Enumerable|array|string|null $value
-     * @return SortFields
+     * Create a new countable paths value object.
+     *
+     * @param mixed $value
+     * @return static
      */
     public static function cast($value): self
     {
@@ -52,72 +46,73 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
             return $value;
         }
 
-        if ($value instanceof SortField) {
-            return new self($value);
+        if (is_string($value)) {
+            return self::fromString($value);
         }
 
         if (is_array($value) || $value instanceof Enumerable) {
             return self::fromArray($value);
         }
 
-        if (is_string($value)) {
-            return self::fromString($value);
-        }
-
         if (is_null($value)) {
             return new self();
         }
 
-        throw new UnexpectedValueException('Unexpected sort fields value.');
+        throw new UnexpectedValueException('Unable to cast provided value to countable paths.');
     }
 
     /**
-     * @param array|Enumerable $values
-     * @return SortFields
+     * @param $paths
+     * @return static
      */
-    public static function fromArray($values): self
+    public static function fromArray($paths): self
     {
-        if (!is_array($values) && !$values instanceof Enumerable) {
-            throw new \InvalidArgumentException('Expecting an array or enumerable object.');
+        if ($paths instanceof Enumerable) {
+            $paths = $paths->all();
         }
 
-        return new self(...collect($values)
-            ->map(fn($field) => SortField::cast($field))
-        );
+        if (is_array($paths)) {
+            return new self(...$paths);
+        }
+
+        throw new UnexpectedValueException('Expecting an array or enumerable.');
     }
 
     /**
-     * @param string $value
-     * @return SortFields
+     * @param string $paths
+     * @return static
      */
-    public static function fromString(string $value): self
+    public static function fromString(string $paths): self
     {
-        return new self(...collect(explode(',', $value))
-            ->map(fn($field) => SortField::fromString($field))
-        );
+        return new self(...explode(',', $paths));
     }
 
     /**
-     * @param SortFields|SortField|array|string|null $value
-     * @return SortFields|null
+     * @param mixed|null $value
+     * @return static|null
      */
     public static function nullable($value): ?self
     {
-        if (is_null($value)) {
-            return null;
+        if (!is_null($value)) {
+            return self::cast($value);
         }
 
-        return self::cast($value);
+        return null;
     }
 
     /**
-     * SortFields constructor.
-     *
-     * @param SortField ...$fields
+     * @var string[]
      */
-    public function __construct(SortField ...$fields)
+    private array $paths;
+
+    /**
+     * CountablePaths constructor.
+     *
+     * @param string ...$paths
+     */
+    public function __construct(string ...$paths)
     {
-        $this->stack = $fields;
+        $this->paths = $paths;
     }
 
     /**
@@ -133,7 +128,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public function toString(): string
     {
-        return implode(',', $this->stack);
+        return implode(',', $this->paths);
     }
 
     /**
@@ -141,7 +136,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public function isEmpty(): bool
     {
-        return empty($this->stack);
+        return empty($this->paths);
     }
 
     /**
@@ -153,11 +148,11 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     }
 
     /**
-     * @return SortField[]
+     * @return string[]
      */
     public function all(): array
     {
-        return $this->stack;
+        return $this->paths;
     }
 
     /**
@@ -165,7 +160,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public function collect(): Collection
     {
-        return collect($this->stack);
+        return Collection::make($this->paths);
     }
 
     /**
@@ -174,10 +169,9 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public function filter(callable $callback): self
     {
-        $copy = new self();
-        $copy->stack = collect($this->stack)->filter($callback)->all();
-
-        return $copy;
+        return new self(
+            ...collect($this->paths)->filter($callback)
+        );
     }
 
     /**
@@ -186,10 +180,9 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public function reject(callable $callback): self
     {
-        $copy = new self();
-        $copy->stack = collect($this->stack)->reject($callback)->all();
-
-        return $copy;
+        return new self(
+            ...collect($this->paths)->reject($callback)
+        );
     }
 
     /**
@@ -199,16 +192,8 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     public function forSchema(Schema $schema): self
     {
         return $this->filter(
-            static fn(SortField $field) => $field->existsOnSchema($schema)
+            fn($name) => $this->isCountablePath($schema, $name)
         );
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getIterator()
-    {
-        yield from $this->stack;
     }
 
     /**
@@ -216,7 +201,15 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public function count()
     {
-        return count($this->stack);
+        return count($this->paths);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIterator()
+    {
+        yield from $this->paths;
     }
 
     /**
@@ -224,9 +217,23 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public function toArray()
     {
-        return array_map(function (SortField $field) {
-            return $field->toString();
-        }, $this->stack);
+        return $this->paths;
+    }
+
+    /**
+     * Is the path a valid countable path?
+     *
+     * @param Schema $schema
+     * @param string $path
+     * @return bool
+     */
+    private function isCountablePath(Schema $schema, string $path): bool
+    {
+        if ($schema instanceof CountableSchema) {
+            return $schema->isCountable($path);
+        }
+
+        return false;
     }
 
 }

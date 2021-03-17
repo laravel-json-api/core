@@ -22,8 +22,10 @@ namespace LaravelJsonApi\Core\Responses;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
 use function is_null;
 
 class DataResponse implements Responsable
@@ -128,18 +130,16 @@ class DataResponse implements Responsable
             return new ResourceResponse(null);
         }
 
-        $parsed = $this
-            ->server()
-            ->resources()
-            ->resolve($this->value);
+        $resources = $this->server()->resources();
 
-        if ($parsed instanceof JsonApiResource) {
-            return $parsed
+        if (is_object($this->value) && $resources->exists($this->value)) {
+            return $resources
+                ->create($this->value)
                 ->prepareResponse($request)
                 ->withCreated($this->created);
         }
 
-        return (new ResourceCollection($parsed))->prepareResponse($request);
+        return (new ResourceCollection($this->value))->prepareResponse($request);
     }
 
 }

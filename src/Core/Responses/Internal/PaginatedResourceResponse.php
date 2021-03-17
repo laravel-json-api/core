@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Core\Responses\Internal;
 
 use Illuminate\Contracts\Pagination\Paginator;
 use InvalidArgumentException;
@@ -62,7 +62,7 @@ class PaginatedResourceResponse extends ResourceCollectionResponse
      */
     public function meta(): Hash
     {
-        return (new Hash($this->page->meta()))->merge(
+        return Hash::cast($this->page->meta())->merge(
             parent::meta()
         );
     }

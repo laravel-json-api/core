@@ -187,9 +187,10 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
      */
     public function toArray()
     {
-        return collect($this->stack)
-            ->map(fn(FieldSet $fieldSet) => $fieldSet->toString())
-            ->all();
+        return array_map(
+            static fn(FieldSet $fieldSet) => $fieldSet->toString(),
+            $this->stack,
+        );
     }
 
     /**

@@ -101,4 +101,26 @@ class SortFieldsTest extends TestCase
         $this->assertEquals(new SortFields(), SortFields::nullable([]));
         $this->assertEquals($expected, SortFields::nullable($expected->toArray()));
     }
+
+    public function testFilter(): void
+    {
+        $fields = SortFields::fromString('-updatedAt,-createdAt,id');
+
+        $actual = $fields->filter(fn(SortField $field) => $field->isDescending());
+
+        $this->assertNotSame($fields, $actual);
+        $this->assertSame('-updatedAt,-createdAt,id', $fields->toString());
+        $this->assertSame('-updatedAt,-createdAt', $actual->toString());
+    }
+
+    public function testReject(): void
+    {
+        $fields = SortFields::fromString('-updatedAt,-createdAt,id');
+
+        $actual = $fields->reject(fn(SortField $field) => $field->isAscending());
+
+        $this->assertNotSame($fields, $actual);
+        $this->assertSame('-updatedAt,-createdAt,id', $fields->toString());
+        $this->assertSame('-updatedAt,-createdAt', $actual->toString());
+    }
 }

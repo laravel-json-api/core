@@ -24,6 +24,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use UnexpectedValueException;
 use function collect;
 use function count;
@@ -218,6 +219,19 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     {
         return new self(
             ...$this->collect()->reject($callback)
+        );
+    }
+
+    /**
+     * Get the include paths that are valid for the provided schema.
+     *
+     * @param Schema $schema
+     * @return $this
+     */
+    public function forSchema(Schema $schema): self
+    {
+        return $this->filter(
+            static fn(RelationshipPath $path) => $path->existsOnSchema($schema)
         );
     }
 

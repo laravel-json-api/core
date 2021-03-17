@@ -442,13 +442,37 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Return a new instance with the provided relationship meta.
+     *
+     * @param string $relation
+     * @param array $meta
+     * @return $this
+     */
+    public function withRelationshipMeta(string $relation, array $meta): self
+    {
+        $copy = clone $this;
+        $copy->relationships[$relation] = $copy->relationships[$relation] ?? [];
+        $copy->relationships[$relation]['meta'] = $meta;
+        $copy->normalize();
+
+        return $copy;
+    }
+
+    /**
      * Return a new instance without meta.
      *
      * @return ResourceObject
      */
     public function withoutMeta(): self
     {
-        return $this->withMeta([]);
+        $copy = clone $this;
+        $copy->meta = [];
+        $copy->relationships = collect($copy->relationships)->map(
+            fn(array $relation) => collect($relation)->forget('meta')->all()
+        )->all();
+        $copy->normalize();
+
+        return $copy;
     }
 
     /**

@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Query;
 
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Query\SortField;
 use PHPUnit\Framework\TestCase;
 
@@ -47,5 +48,16 @@ class SortFieldTest extends TestCase
         $this->assertFalse($field->isAscending());
         $this->assertTrue($field->isDescending());
         $this->assertEquals($field, SortField::descending('title'));
+    }
+
+    public function testExistsOnSchema(): void
+    {
+        $schema = $this->createMock(Schema::class);
+        $schema->method('isSortable')->willReturnCallback(
+            fn($value) => \in_array($value, ['title', 'updatedAt', 'createdAt'], true)
+        );
+
+        $this->assertTrue(SortField::cast('-updatedAt')->existsOnSchema($schema));
+        $this->assertFalse(SortField::cast('id')->existsOnSchema($schema));
     }
 }
