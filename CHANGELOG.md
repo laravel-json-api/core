@@ -30,6 +30,8 @@ All notable changes to this project will be documented in this file. This projec
 - Added new response classes for returning related resources for a relationship - e.g. the `/api/posts/1/comments`
   endpoint. Previously the `DataResponse` class was used for this endpoint, but the new classes allow for relationship
   meta to be merged into the top-level meta member of the response for the endpoint.
+- The core package now supports the *countable* implementation-semantic. This adds a custom query parameter that allows
+  a client to specify which relationships should have a count added to their relationship meta.
 
 ### Changed
 
