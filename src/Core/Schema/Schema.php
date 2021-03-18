@@ -124,6 +124,18 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function model(): string
+    {
+        if (isset(static::$model)) {
+            return static::$model;
+        }
+
+        throw new LogicException('The model class name must be set.');
+    }
+
+    /**
      * Specify the callback to use to guess the resource class from the schema class.
      *
      * @param callable $resolver
