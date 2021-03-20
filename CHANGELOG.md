@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file. This projec
       specification, which allows implementations to add support for additional query parameters as needed.
     - The `filters` method now returns a `FilterParameters` object or null. Previously it returned an array or null.
 - **BREAKING** The `$baseUri` argument on the `Contracts\Resources\Serializer\Relation` interface is now nullable.
+- New `Contracts\Schema\IdEncoder` interface to encode model IDs to JSON:API resource IDs.
 - New `FilterParameters` class for handling a collection of filter parameters received from a client.
 - The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
   object.
