@@ -66,6 +66,13 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     protected int $maxDepth = 1;
 
     /**
+     * Whether resources of this type have a self link.
+     *
+     * @var bool
+     */
+    protected bool $selfLink = true;
+
+    /**
      * @var array|null
      */
     private ?array $fields = null;
@@ -217,6 +224,14 @@ abstract class Schema implements SchemaContract, IteratorAggregate
         array_unshift($extra, $this->uriType());
 
         return $this->server->url($extra, $secure);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasSelfLink(): bool
+    {
+        return $this->selfLink;
     }
 
     /**

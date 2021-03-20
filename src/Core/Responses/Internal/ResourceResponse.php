@@ -97,8 +97,8 @@ class ResourceResponse implements Responsable
     {
         $links = $this->links();
 
-        if ($this->resource) {
-            $links->push($this->resource->selfLink());
+        if ($this->resource && $self = $this->resource->selfLink()) {
+            $links->push($self);
         }
 
         $encoder = $this->server()->encoder();

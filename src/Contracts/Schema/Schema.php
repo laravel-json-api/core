@@ -78,6 +78,24 @@ interface Schema extends Traversable
     public function url($extra = [], bool $secure = null): string;
 
     /**
+     * Do resources of this type have a `self` link?
+     *
+     * The `self` link of a resource identifies a specific resource.
+     * Servers MUST respond to a `GET` request to the specified URL with a response that
+     * includes the resource as the primary data.
+     *
+     * Typically schemas will return `true` for this method; however there are some
+     * instances where a resource may not be retrievable by its id. For example, a resource
+     * that can only be obtained from an index (fetch-many) query and has a random UUID
+     * that it cannot then be retrieved by. In this scenario, `false` must be returned
+     * by this method. In doing so, the resource will also not be able to have relationship
+     * links.
+     *
+     * @return bool
+     */
+    public function hasSelfLink(): bool;
+
+    /**
      * Get the "id" field.
      *
      * @return ID

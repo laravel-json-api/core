@@ -7,9 +7,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
-- **BREAKING** The `Contracts\Schema\Schema` interface now has `isFilter()`, `isSparseField` and `isSortable()` methods.
-  These methods have been added to the abstract schema class provided by this package, so this is unlikely to have a
-  significant impact on implementing packages.
+- **BREAKING** Added the following methods to the `Contracts\Schema\Schema` interface: `isFilter()`,
+  `isSparseField`, `isSortable()` and `hasSelfLink()`. These methods have been added to the abstract schema class
+  provided by this package, so this is unlikely to have a significant impact on implementing packages.
 - **BREAKING** Made the following changes to the `Contracts\Query\QueryParameters` interface:
     - New `unrecognisedParameters` method. This returns any query parameters that are not defined by the JSON:API
       specification, which allows implementations to add support for additional query parameters as needed.

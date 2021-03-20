@@ -26,6 +26,7 @@ use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
+use function sprintf;
 
 class Relation implements JsonApiRelation
 {
@@ -36,9 +37,9 @@ class Relation implements JsonApiRelation
     protected object $resource;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $baseUri;
+    private ?string $baseUri;
 
     /**
      * @var string
@@ -89,14 +90,14 @@ class Relation implements JsonApiRelation
      * Relation constructor.
      *
      * @param object $resource
-     * @param string $baseUri
+     * @param string|null $baseUri
      * @param string $fieldName
      * @param string|null $keyName
      * @param string|null $uriName
      */
     public function __construct(
         object $resource,
-        string $baseUri,
+        ?string $baseUri,
         string $fieldName,
         string $keyName = null,
         string $uriName = null
@@ -123,12 +124,12 @@ class Relation implements JsonApiRelation
     {
         $links = new Links();
 
-        if ($this->showSelf) {
-            $links->push(new Link('self', $this->selfUrl()));
+        if ($this->showSelf && $self = $this->selfUrl()) {
+            $links->push(new Link('self', $self));
         }
 
-        if ($this->showRelated) {
-            $links->push(new Link('related', $this->relatedUrl()));
+        if ($this->showRelated && $related = $this->relatedUrl()) {
+            $links->push(new Link('related', $related));
         }
 
         return $links;
@@ -171,27 +172,35 @@ class Relation implements JsonApiRelation
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function selfUrl(): string
+    public function selfUrl(): ?string
     {
-        return \sprintf(
-            '%s/relationships/%s',
-            $this->baseUri,
-            $this->uriFieldName()
-        );
+        if ($this->baseUri) {
+            return sprintf(
+                '%s/relationships/%s',
+                $this->baseUri,
+                $this->uriFieldName()
+            );
+        }
+
+        return null;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function relatedUrl(): string
+    public function relatedUrl(): ?string
     {
-        return \sprintf(
-            '%s/%s',
-            $this->baseUri,
-            $this->uriFieldName()
-        );
+        if ($this->baseUri) {
+            return sprintf(
+                '%s/%s',
+                $this->baseUri,
+                $this->uriFieldName()
+            );
+        }
+
+        return null;
     }
 
     /**
