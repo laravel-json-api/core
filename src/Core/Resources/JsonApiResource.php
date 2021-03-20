@@ -32,8 +32,8 @@ use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
+use LaravelJsonApi\Core\Schema\IdEncoder;
 use LogicException;
-use function is_string;
 use function sprintf;
 
 class JsonApiResource implements ArrayAccess, Responsable
@@ -62,6 +62,15 @@ class JsonApiResource implements ArrayAccess, Responsable
     protected string $type = '';
 
     /**
+     * The resource id.
+     *
+     * @var string|null
+     */
+    protected ?string $id = null;
+
+    /**
+     * The resource's self URL.
+     *
      * @var string|null
      */
     protected ?string $selfUri = null;
@@ -142,15 +151,12 @@ class JsonApiResource implements ArrayAccess, Responsable
      */
     public function id(): string
     {
-        if ($key = $this->schema->idKeyName()) {
-            return (string) $this->resource->{$key};
+        if ($this->id) {
+            return $this->id;
         }
 
-        if ($this->resource instanceof UrlRoutable) {
-            return (string) $this->resource->getRouteKey();
-        }
-
-        throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
+        return $this->id = IdEncoder::cast($this->schema->id())
+            ->encode($this->modelKey());
     }
 
     /**
@@ -322,6 +328,24 @@ class JsonApiResource implements ArrayAccess, Responsable
             $keyName,
             $field ? $field->uriName() : null,
         );
+    }
+
+    /**
+     * Get the model key.
+     *
+     * @return string|int
+     */
+    private function modelKey()
+    {
+        if ($key = $this->schema->idKeyName()) {
+            return $this->resource->{$key};
+        }
+
+        if ($this->resource instanceof UrlRoutable) {
+            return $this->resource->getRouteKey();
+        }
+
+        throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
     }
 
 }
