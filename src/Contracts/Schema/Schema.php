@@ -106,7 +106,9 @@ interface Schema extends Traversable
      * Get the key name for the resource "id".
      *
      * If this method returns `null`, resource classes should fall-back to a
-     * sensible default. E.g. `UrlRoutable::getRouteKeyName()`.
+     * sensible defaults. E.g. for `UrlRoutable` objects, the implementation can
+     * fallback to `UrlRoutable::getRouteKey()` to retrieve the id value and
+     * and `UrlRoutable::getRouteKeyName()` if it needs the key name.
      *
      * @return string|null
      */
