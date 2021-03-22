@@ -20,23 +20,24 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Schema;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
+use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\IdEncoder as IdEncoderContract;
 
-final class IdEncoder implements IdEncoderContract
+final class IdParser implements IdEncoderContract
 {
 
     /**
-     * @var IdEncoderContract|null
+     * @var ID|null
      */
-    private ?IdEncoderContract $encoder;
+    private ?ID $field;
 
     /**
-     * Safely cast the value to an ID Encoder instance.
+     * Safely cast the value to an ID encoder instance.
      *
      * @param IdEncoderContract|mixed|null $value
      * @return IdEncoderContract
      */
-    public static function cast($value): IdEncoderContract
+    public static function encoder($value): IdEncoderContract
     {
         if ($value instanceof IdEncoderContract) {
             return $value;
@@ -46,26 +47,24 @@ final class IdEncoder implements IdEncoderContract
     }
 
     /**
-     * Safely create a new instance.
+     * Fluent constructor.
      *
-     * @param IdEncoderContract|mixed|null $value
+     * @param ID|null $field
      * @return static
      */
-    public static function make($value = null): self
+    public static function make(ID $field = null): self
     {
-        return new self(
-            ($value instanceof IdEncoderContract) ? $value : null
-        );
+        return new self($field);
     }
 
     /**
-     * IdEncoder constructor.
+     * IdParser constructor.
      *
-     * @param IdEncoderContract|null $encoder
+     * @param ID|null $field
      */
-    public function __construct(?IdEncoderContract $encoder)
+    public function __construct(?ID $field)
     {
-        $this->encoder = $encoder;
+        $this->field = $field;
     }
 
     /**
@@ -73,8 +72,8 @@ final class IdEncoder implements IdEncoderContract
      */
     public function encode($modelKey): string
     {
-        if ($this->encoder) {
-            return $this->encoder->encode($modelKey);
+        if ($this->field instanceof IdEncoderContract) {
+            return $this->field->encode($modelKey);
         }
 
         return (string) $modelKey;
@@ -98,13 +97,14 @@ final class IdEncoder implements IdEncoderContract
     /**
      * Encode many ids.
      *
-     * @param $modelKeys
+     * @param mixed $modelKeys
      * @return array
      */
     public function encodeIds($modelKeys): array
     {
         return collect($modelKeys)
             ->map(fn($modelKey) => $this->encodeId($modelKey))
+            ->values()
             ->all();
     }
 
@@ -113,8 +113,8 @@ final class IdEncoder implements IdEncoderContract
      */
     public function decode(string $resourceId)
     {
-        if ($this->encoder) {
-            return $this->encoder->decode($resourceId);
+        if ($this->field instanceof IdEncoderContract) {
+            return $this->field->decode($resourceId);
         }
 
         return $resourceId;
@@ -123,15 +123,46 @@ final class IdEncoder implements IdEncoderContract
     /**
      * Decode many resource ids.
      *
-     * @param $resourceIds
+     * @param mixed $resourceIds
      * @return array
      */
     public function decodeIds($resourceIds): array
     {
         return collect($resourceIds)
-            ->map(fn($resourceId) => $this->decode($resourceId))
+            ->map(fn($resourceId) => $this->decodeIfMatch($resourceId))
             ->reject(fn($id) => is_null($id))
+            ->values()
             ->all();
+    }
+
+    /**
+     * Match the provided resource id value.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public function match(string $value): bool
+    {
+        if ($this->field) {
+            return $this->field->match($value);
+        }
+
+        return true;
+    }
+
+    /**
+     * Decode the provided value if it matches the ID's pattern.
+     *
+     * @param string $value
+     * @return string|int|null
+     */
+    public function decodeIfMatch(string $value)
+    {
+        if ($this->match($value)) {
+            return $this->decode($value);
+        }
+
+        return null;
     }
 
 }

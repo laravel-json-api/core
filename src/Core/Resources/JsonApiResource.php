@@ -32,7 +32,7 @@ use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
 use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
-use LaravelJsonApi\Core\Schema\IdEncoder;
+use LaravelJsonApi\Core\Schema\IdParser;
 use LogicException;
 use function sprintf;
 
@@ -155,7 +155,7 @@ class JsonApiResource implements ArrayAccess, Responsable
             return $this->id;
         }
 
-        return $this->id = IdEncoder::cast($this->schema->id())
+        return $this->id = IdParser::encoder($this->schema->id())
             ->encode($this->modelKey());
     }
 
