@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file. This projec
       specification, which allows implementations to add support for additional query parameters as needed.
     - The `filters` method now returns a `FilterParameters` object or null. Previously it returned an array or null.
 - **BREAKING** The `$baseUri` argument on the `Contracts\Resources\Serializer\Relation` interface is now nullable.
+- **BREAKING** The `Contracts\Store\Store` interface now has a `findOrFail` method. This is unlikely to be breaking in
+  most implementation because the `Core\Store\Store` class will be in use and which has been updated.
 - New `Contracts\Schema\IdEncoder` interface to encode model IDs to JSON:API resource IDs.
 - New `FilterParameters` class for handling a collection of filter parameters received from a client.
 - The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
@@ -34,9 +36,21 @@ All notable changes to this project will be documented in this file. This projec
   meta to be merged into the top-level meta member of the response for the endpoint.
 - The core package now supports the *countable* implementation-semantic. This adds a custom query parameter that allows
   a client to specify which relationships should have a count added to their relationship meta.
+- Added a number of pagination traits - `HasPageMeta` and `HasPageNumbers`, so that these can be used in both the
+  Eloquent and non-Eloquent implementations.
 
 ### Changed
 
+- **BREAKING** Made a number of changes to store contracts, so that the contracts are easier to implement in when not
+  working with Eloquent resources:
+    - The `QueryAllBuilder` contract has been removed; support for singular filters is now implemented via the
+      `HasSingularFilters` interface which is intended to be added to classes implementing `QueryManyBuilder`. As part
+      of this change, the `QueriesAll::queryAll()` method now has the `QueryManyBuilder` interface as its return type.
+    - The `QueryManyBuilder` contract no longer has pagination methods on it. If a builder supports pagination, it must
+      add the `HasPagination` interface.
+    - Removed the `cursor` method from the `QueryManyBuilder` contract, as it is not required on the contract
+      (implementing classes can add it if needed). The `get` method now has a return type of `iterable` instead of the
+      Laravel `Collection` class.
 - **BREAKING** The `Contracts\Encoder\Encoder` interface now has two methods for encoding resource identifiers:
   `withToOne` and `withToMany`. These replace the `withIdentifiers` method, which has been removed.
 - Moved the following classes from the `Core\Responses` namespace to the `Core\Responses\Internal` namespace. This is

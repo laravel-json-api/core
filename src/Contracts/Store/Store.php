@@ -29,6 +29,15 @@ interface Store
     public function find(string $resourceType, string $resourceId): ?object;
 
     /**
+     * Find the supplied model or throw a runtime exception if it does not exist.
+     *
+     * @param string $resourceType
+     * @param string $resourceId
+     * @return object
+     */
+    public function findOrFail(string $resourceType, string $resourceId): object;
+
+    /**
      * @param array $identifiers
      * @return iterable
      */
@@ -47,9 +56,9 @@ interface Store
      * Query all resources by JSON:API resource type.
      *
      * @param string $resourceType
-     * @return QueryAllBuilder
+     * @return QueryManyBuilder|HasPagination|HasSingularFilters
      */
-    public function queryAll(string $resourceType): QueryAllBuilder;
+    public function queryAll(string $resourceType): QueryManyBuilder;
 
     /**
      * Query one resource by JSON:API resource type.
@@ -76,7 +85,7 @@ interface Store
      * @param string $resourceType
      * @param object|string $modelOrResourceId
      * @param string $fieldName
-     * @return QueryManyBuilder
+     * @return QueryManyBuilder|HasPagination
      */
     public function queryToMany(string $resourceType, $modelOrResourceId, string $fieldName): QueryManyBuilder;
 

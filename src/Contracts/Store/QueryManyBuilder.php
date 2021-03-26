@@ -19,8 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\LazyCollection;
 use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Query\SortField;
 use LaravelJsonApi\Core\Query\SortFields;
@@ -45,33 +43,13 @@ interface QueryManyBuilder extends Builder
     public function sort($fields): self;
 
     /**
-     * Get the results of the query.
+     * Get all the results of the query.
      *
-     * @return Collection
-     */
-    public function get(): Collection;
-
-    /**
-     * Get a lazy collection for the query.
+     * The method MAY return a page, if it is not possible to retrieve all
+     * resources in a single query.
      *
-     * @return LazyCollection
+     * @return iterable|Page
      */
-    public function cursor(): LazyCollection;
-
-    /**
-     * Return a page of models using JSON:API page parameters.
-     *
-     * @param array $page
-     * @return Page
-     */
-    public function paginate(array $page): Page;
-
-    /**
-     * Execute the query, paginating results only if page parameters are provided.
-     *
-     * @param array|null $page
-     * @return Page|Collection|iterable
-     */
-    public function getOrPaginate(?array $page): iterable;
+    public function get(): iterable;
 
 }

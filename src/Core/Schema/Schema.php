@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Schema;
 
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Pagination\Paginator;
 use LaravelJsonApi\Contracts\Schema\Attribute;
 use LaravelJsonApi\Contracts\Schema\Field;
 use LaravelJsonApi\Contracts\Schema\Filter;
@@ -373,6 +374,22 @@ abstract class Schema implements SchemaContract, IteratorAggregate
             );
         }
 
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function pagination(): ?Paginator
+    {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function filters(): iterable
+    {
         return [];
     }
 

@@ -23,11 +23,11 @@ interface QueriesToMany
 {
 
     /**
-     * Query a to-one relation.
+     * Query a to-many relation.
      *
      * @param object|string $modelOrResourceId
      * @param string $fieldName
-     * @return QueryManyBuilder
+     * @return QueryManyBuilder|HasPagination
      */
     public function queryToMany($modelOrResourceId, string $fieldName): QueryManyBuilder;
 }

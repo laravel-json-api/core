@@ -29,7 +29,6 @@ use LaravelJsonApi\Contracts\Store\QueriesAll;
 use LaravelJsonApi\Contracts\Store\QueriesOne;
 use LaravelJsonApi\Contracts\Store\QueriesToMany;
 use LaravelJsonApi\Contracts\Store\QueriesToOne;
-use LaravelJsonApi\Contracts\Store\QueryAllBuilder;
 use LaravelJsonApi\Contracts\Store\QueryManyBuilder;
 use LaravelJsonApi\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Contracts\Store\Repository;
@@ -84,6 +83,16 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
+    public function findOrFail(string $resourceType, string $resourceId): object
+    {
+        return $this
+            ->resources($resourceType)
+            ->findOrFail($resourceId);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function findMany(array $identifiers): iterable
     {
         return collect($identifiers)->groupBy('type')->map(function(Collection $ids, $type) {
@@ -106,12 +115,12 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function queryAll(string $resourceType): QueryAllBuilder
+    public function queryAll(string $resourceType): QueryManyBuilder
     {
         $repository = $this->resources($resourceType);
 
         if ($repository instanceof QueriesAll) {
-            return $repository->queryAll();
+            return new QueryAllHandler($repository->queryAll());
         }
 
         throw new LogicException("Querying all {$resourceType} resources is not supported.");
@@ -153,7 +162,9 @@ class Store implements StoreContract
         $repository = $this->resources($resourceType);
 
         if ($repository instanceof QueriesToMany) {
-            return $repository->queryToMany($modelOrResourceId, $fieldName);
+            return new QueryManyHandler(
+                $repository->queryToMany($modelOrResourceId, $fieldName)
+            );
         }
 
         throw new LogicException("Querying to-many relationships on a {$resourceType} resource is not supported.");

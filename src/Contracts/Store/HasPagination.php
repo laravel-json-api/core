@@ -19,43 +19,32 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Support\LazyCollection;
 use LaravelJsonApi\Contracts\Pagination\Page;
 
-interface QueryAllBuilder extends QueryManyBuilder
+interface HasPagination
 {
 
     /**
-     * Execute the query and get the first result.
+     * Return a page of models using JSON:API page parameters.
      *
-     * @return object|null
+     * @param array $page
+     * @return Page
      */
-    public function first(): ?object;
-
-    /**
-     * Execute the query and return the result.
-     *
-     * If a singular filter has been applied, this method MUST return
-     * the first matching model, or null.
-     *
-     * Otherwise, this method MUST return a cursor of all matching models.
-     *
-     * @return LazyCollection|object|null
-     */
-    public function firstOrMany();
+    public function paginate(array $page): Page;
 
     /**
      * Execute the query.
      *
      * If the supplied page variable is empty, this method MUST return:
-     * - the first matching model or null if a singular filter has been applied; OR
-     * - a cursor of matching models.
+     *
+     * - a page of matching models, if default pagination is always used; OR
+     * - all the matching models.
      *
      * If the supplied page variable is not empty, this method MUST return
      * a page of matching models.
      *
      * @param array|null $page
-     * @return object|Page|LazyCollection|iterable|null
+     * @return object|Page|iterable|null
      */
-    public function firstOrPaginate(?array $page);
+    public function getOrPaginate(?array $page): iterable;
 }
