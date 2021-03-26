@@ -51,6 +51,14 @@ interface Container
     public function create(object $model): JsonApiResource;
 
     /**
+     * Cast the value to a JSON:API resource.
+     *
+     * @param JsonApiResource|object $modelOrResource
+     * @return JsonApiResource
+     */
+    public function cast(object $modelOrResource): JsonApiResource;
+
+    /**
      * Get a cursor that converts the provided models to resource objects.
      *
      * @param iterable $models

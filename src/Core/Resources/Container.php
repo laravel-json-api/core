@@ -105,6 +105,18 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
+    public function cast(object $modelOrResource): JsonApiResource
+    {
+        if ($modelOrResource instanceof JsonApiResource) {
+            return $modelOrResource;
+        }
+
+        return $this->create($modelOrResource);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function cursor(iterable $models): Generator
     {
         foreach ($models as $record) {

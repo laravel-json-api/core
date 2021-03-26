@@ -114,7 +114,7 @@ class RelatedResponse implements Responsable
     private function prepareDataResponse($request)
     {
         $resources = $this->server()->resources();
-        $resource = $resources->create($this->resource);
+        $resource = $resources->cast($this->resource);
 
         if (is_null($this->related)) {
             return new RelatedResourceResponse(

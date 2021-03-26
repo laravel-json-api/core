@@ -16,7 +16,9 @@ All notable changes to this project will be documented in this file. This projec
     - The `filters` method now returns a `FilterParameters` object or null. Previously it returned an array or null.
 - **BREAKING** The `$baseUri` argument on the `Contracts\Resources\Serializer\Relation` interface is now nullable.
 - **BREAKING** The `Contracts\Store\Store` interface now has a `findOrFail` method. This is unlikely to be breaking in
-  most implementation because the `Core\Store\Store` class will be in use and which has been updated.
+  most implementations because the `Core\Store\Store` class will be in use and has been updated.
+- **BREAKING** Added a `cast` method to the `Contracts\Resources\Container` interface. This is unlikely to be breaking
+  in most implementations because the `Core\Resources\Container` class will be in use and has been updated.
 - New `Contracts\Schema\IdEncoder` interface to encode model IDs to JSON:API resource IDs.
 - New `FilterParameters` class for handling a collection of filter parameters received from a client.
 - The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
