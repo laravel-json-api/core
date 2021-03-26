@@ -83,6 +83,19 @@ class FilterParametersTest extends TestCase
         $this->assertFalse($filters->exists('bazbat'));
     }
 
+    public function testValue(): void
+    {
+        $filters = FilterParameters::fromArray([
+            'foo' => 'bar',
+            'baz' => null,
+        ]);
+
+        $this->assertSame('bar', $filters->value('foo'));
+        $this->assertNull($filters->value('baz', 'blah!'));
+        $this->assertNull($filters->value('foobar'));
+        $this->assertFalse($filters->value('foobar', false));
+    }
+
     public function testFilter(): void
     {
         $filters = FilterParameters::fromArray([

@@ -128,6 +128,22 @@ class FilterParameters implements \IteratorAggregate, \Countable, Arrayable
     }
 
     /**
+     * Get the value of a filter using the filter key.
+     *
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed|null
+     */
+    public function value(string $key, $default = null)
+    {
+        if ($filter = $this->get($key)) {
+            return $filter->value();
+        }
+
+        return $default;
+    }
+
+    /**
      * @return FilterParameter[]
      */
     public function all(): array
