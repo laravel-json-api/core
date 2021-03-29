@@ -76,6 +76,11 @@ All notable changes to this project will be documented in this file. This projec
 
 - The `QueryParameters::setFieldSet()` method now correctly passes the fields lists as an array to the field set
   constructor.
+- Fixed the `Core\Document\ResourceObject::merge()` method handling of merging relationships. Previously this used
+  `array_replace_recursive` to megre the relationship object, but this led to incorrect merging of `data` members,
+  particularly for to-many relationships. This has been altered to `array_replace`, so that the `data`, `links` and
+  `meta` members of the relationship are replaced with the values from the resource object's relationship that is being
+  merged in.
 
 ## [1.0.0-alpha.5] - 2021-03-12
 

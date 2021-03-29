@@ -630,7 +630,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
         }
 
         foreach ($other->relationships as $name => $relation) {
-            $copy->relationships[$name] = array_replace_recursive(
+            $copy->relationships[$name] = array_replace(
                 $this->relationships[$name] ?? [],
                 $relation,
             );

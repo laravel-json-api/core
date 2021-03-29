@@ -691,6 +691,13 @@ class ResourceObjectTest extends TestCase
                         'id' => '2',
                     ],
                 ],
+                'tags' => [
+                    'data' => [
+                        [
+                            'tags' => '999',
+                        ],
+                    ],
+                ],
             ],
         ];
 
@@ -699,6 +706,7 @@ class ResourceObjectTest extends TestCase
         $expected['attributes']['title'] = $merge['attributes']['title'];
         $expected['relationships']['author']['data'] = $merge['relationships']['author']['data'];
         $expected['relationships']['site'] = $merge['relationships']['site'];
+        $expected['relationships']['tags']['data'] = $merge['relationships']['tags']['data'];
 
         ksort($expected['attributes']);
         ksort($expected['relationships']);
