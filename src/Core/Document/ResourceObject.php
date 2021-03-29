@@ -770,6 +770,18 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Dump the resource object.
+     *
+     * @return $this
+     */
+    public function dump(): self
+    {
+        dump($this->jsonSerialize());
+
+        return $this;
+    }
+
+    /**
      * @inheritDoc
      */
     public function getIterator()

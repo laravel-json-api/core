@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file. This projec
   a client to specify which relationships should have a count added to their relationship meta.
 - Added a number of pagination traits - `HasPageMeta` and `HasPageNumbers`, so that these can be used in both the
   Eloquent and non-Eloquent implementations.
+- Added a `dump` method to the `Core\Document\ResourceObject` class.
 
 ### Changed
 
