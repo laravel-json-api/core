@@ -57,9 +57,14 @@ interface Schema extends Traversable
     /**
      * Get a repository for the resource.
      *
-     * @return Repository
+     * Schemas MUST return a repository if the resource type is retrievable
+     * by its resource ID; or if the resource type will be referenced in a JSON:API
+     * document via a resource identifier (i.e. when parsing JSON:API documents, the
+     * resource type and id can be validated via the repository class.)
+     *
+     * @return Repository|null
      */
-    public function repository(): Repository;
+    public function repository(): ?Repository;
 
     /**
      * Get the resource type as it appears in URIs.

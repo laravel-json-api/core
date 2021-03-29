@@ -37,8 +37,9 @@ use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Contracts\Store\ToManyBuilder;
 use LaravelJsonApi\Contracts\Store\ToOneBuilder;
 use LaravelJsonApi\Contracts\Store\UpdatesResources;
-use LaravelJsonApi\Core\Support\Str;
 use LogicException;
+use RuntimeException;
+use function sprintf;
 
 class Store implements StoreContract
 {
@@ -59,25 +60,15 @@ class Store implements StoreContract
     }
 
     /**
-     * @param string $name
-     * @param mixed $arguments
-     * @return Repository
-     */
-    public function __call(string $name, $arguments)
-    {
-        return $this->resources(
-            Str::dasherize($name)
-        );
-    }
-
-    /**
      * @inheritDoc
      */
     public function find(string $resourceType, string $resourceId): ?object
     {
-        return $this
-            ->resources($resourceType)
-            ->find($resourceId);
+        if ($repository = $this->resources($resourceType)) {
+            return $repository->find($resourceId);
+        }
+
+        return null;
     }
 
     /**
@@ -85,9 +76,15 @@ class Store implements StoreContract
      */
     public function findOrFail(string $resourceType, string $resourceId): object
     {
-        return $this
-            ->resources($resourceType)
-            ->findOrFail($resourceId);
+        if ($repository = $this->resources($resourceType)) {
+            return $repository->findOrFail($resourceId);
+        }
+
+        throw new RuntimeException(sprintf(
+            'Resource type %s with id %s does not exist.',
+            $resourceType,
+            $resourceId,
+        ));
     }
 
     /**
@@ -95,11 +92,9 @@ class Store implements StoreContract
      */
     public function findMany(array $identifiers): iterable
     {
-        return collect($identifiers)->groupBy('type')->map(function(Collection $ids, $type) {
-            return collect($this->resources($type)->findMany(
-                $ids->pluck('id')->unique()->all()
-            ));
-        })->flatten();
+        return collect($identifiers)
+            ->groupBy('type')
+            ->flatMap(fn($ids, $type) => $this->findManyByType($type, $ids));
     }
 
     /**
@@ -107,9 +102,11 @@ class Store implements StoreContract
      */
     public function exists(string $resourceType, string $resourceId): bool
     {
-        return $this
-            ->resources($resourceType)
-            ->exists($resourceId);
+        if ($repository = $this->resources($resourceType)) {
+            return $repository->exists($resourceId);
+        }
+
+        return false;
     }
 
     /**
@@ -244,10 +241,28 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function resources(string $resourceType): Repository
+    public function resources(string $resourceType): ?Repository
     {
         return $this->schemas
             ->schemaFor($resourceType)
             ->repository();
+    }
+
+    /**
+     * Find many resources by a resource type.
+     *
+     * @param string $resourceType
+     * @param Collection $ids
+     * @return Collection
+     */
+    private function findManyByType(string $resourceType, Collection $ids): Collection
+    {
+        if ($repository = $this->resources($resourceType)) {
+            return collect($repository->findMany(
+                $ids->pluck('id')->unique()->all()
+            ));
+        }
+
+        return collect();
     }
 }

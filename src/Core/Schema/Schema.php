@@ -29,6 +29,7 @@ use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Contracts\Store\Repository;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LaravelJsonApi\Core\Support\Arr;
@@ -193,6 +194,14 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     public function __construct(Server $server)
     {
         $this->server = $server;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function repository(): ?Repository
+    {
+        return null;
     }
 
     /**

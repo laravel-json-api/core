@@ -139,7 +139,7 @@ interface Store
      * Access a resource repository by its JSON:API resource type.
      *
      * @param string $resourceType
-     * @return Repository
+     * @return Repository|null
      */
-    public function resources(string $resourceType): Repository;
+    public function resources(string $resourceType): ?Repository;
 }

@@ -43,6 +43,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- **BREAKING** The return type of `Contracts\Schema\Schema::repository()` is now nullable.
+- **BREAKING** The return type of `Contracts\Store\Store::resources()` is now nullable.
 - **BREAKING** Made a number of changes to store contracts, so that the contracts are easier to implement in when not
   working with Eloquent resources:
     - The `QueryAllBuilder` contract has been removed; support for singular filters is now implemented via the
