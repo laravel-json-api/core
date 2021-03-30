@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Core\Responses;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedIdentifierResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceIdentifierCollectionResponse;

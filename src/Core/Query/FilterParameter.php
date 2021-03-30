@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Query;
 
 use InvalidArgumentException;
-use LaravelJsonApi\Contracts\Schema\Filter;
 use LaravelJsonApi\Contracts\Schema\Schema;
 
 class FilterParameter
