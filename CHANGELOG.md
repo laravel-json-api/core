@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-beta.1] - 2021-03-30
+
+### Added
+
+- **BREAKING** Added the following methods to the `Contracts\Schema\Schema` interface: `isFilter()`,
+  `isSparseField`, `isSortable()` and `hasSelfLink()`. These methods have been added to the abstract schema class
+  provided by this package, so this is unlikely to have a significant impact on implementing packages.
+- **BREAKING** Made the following changes to the `Contracts\Query\QueryParameters` interface:
+    - New `unrecognisedParameters` method. This returns any query parameters that are not defined by the JSON:API
+      specification, which allows implementations to add support for additional query parameters as needed.
+    - The `filters` method now returns a `FilterParameters` object or null. Previously it returned an array or null.
+- **BREAKING** The `$baseUri` argument on the `Contracts\Resources\Serializer\Relation` interface is now nullable.
+- **BREAKING** The `Contracts\Store\Store` interface now has a `findOrFail` method. This is unlikely to be breaking in
+  most implementations because the `Core\Store\Store` class will be in use and has been updated.
+- **BREAKING** Added a `cast` method to the `Contracts\Resources\Container` interface. This is unlikely to be breaking
+  in most implementations because the `Core\Resources\Container` class will be in use and has been updated.
+- New `Contracts\Schema\IdEncoder` interface to encode model IDs to JSON:API resource IDs.
+- New `FilterParameters` class for handling a collection of filter parameters received from a client.
+- The `FieldSets`, `IncludePaths` and `SortFields` classes all now have a `collect()` method, that returns a collection
+  object.
+- The `IncludePaths` and `SortFields` classes now have `filter`, `reject` and `forSchema` methods.
+- The `SortField` class now has static `ascending` and `descending` methods, to easily create a sort field with the
+  specified direction.
+- The `QueryParameters` class now has a `toQuery()` method, that casts the value back to a HTTP query parameter array.
+  This is different from `QueryParameters::toArray()`, as the `include` and `sort` parameters are strings in a HTTP
+  query array.
+- The `QueryParameters` class now has a `forSchema()` method, that returns a new query parameters instance that contains
+  only parameters valid for the supplied schema.
+- The `Document\ResourceObject` class has a new `withRelationshipMeta` method for adding meta for a specified
+  relationship.
+- Added new response classes for returning related resources for a relationship - e.g. the `/api/posts/1/comments`
+  endpoint. Previously the `DataResponse` class was used for this endpoint, but the new classes allow for relationship
+  meta to be merged into the top-level meta member of the response for the endpoint.
+- The core package now supports the *countable* implementation-semantic. This adds a custom query parameter that allows
+  a client to specify which relationships should have a count added to their relationship meta.
+- Added a number of pagination traits - `HasPageMeta` and `HasPageNumbers`, so that these can be used in both the
+  Eloquent and non-Eloquent implementations.
+- Added a `dump` method to the `Core\Document\ResourceObject` class.
+
+### Changed
+
+- **BREAKING** The return type of `Contracts\Schema\Schema::repository()` is now nullable.
+- **BREAKING** The return type of `Contracts\Store\Store::resources()` is now nullable.
+- **BREAKING** Made a number of changes to store contracts, so that the contracts are easier to implement in when not
+  working with Eloquent resources:
+    - The `QueryAllBuilder` contract has been removed; support for singular filters is now implemented via the
+      `HasSingularFilters` interface which is intended to be added to classes implementing `QueryManyBuilder`. As part
+      of this change, the `QueriesAll::queryAll()` method now has the `QueryManyBuilder` interface as its return type.
+    - The `QueryManyBuilder` contract no longer has pagination methods on it. If a builder supports pagination, it must
+      add the `HasPagination` interface.
+    - Removed the `cursor` method from the `QueryManyBuilder` contract, as it is not required on the contract
+      (implementing classes can add it if needed). The `get` method now has a return type of `iterable` instead of the
+      Laravel `Collection` class.
+- **BREAKING** The `Contracts\Encoder\Encoder` interface now has two methods for encoding resource identifiers:
+  `withToOne` and `withToMany`. These replace the `withIdentifiers` method, which has been removed.
+- Moved the following classes from the `Core\Responses` namespace to the `Core\Responses\Internal` namespace. This is
+  considered non-breaking because the classes are not part of the public API (responses that can be used for the public
+  API are still in the `Core\Responses` namespace):
+    - `PaginatedResourceResponse`
+    - `ResourceCollectionResponse`
+    - `ResourceIdentifierCollectionResponse`
+    - `ResourceIdentifierResponse`
+    - `ResourceResponse`
+
+### Removed
+
+- Deleted the `Core\Responses\Concerns\EncodesIdentifiers` trait. This is considered non-breaking as the trait was only
+  intended for internal use.
+
+### Fixed
+
+- The `QueryParameters::setFieldSet()` method now correctly passes the fields lists as an array to the field set
+  constructor.
+- Fixed the `Core\Document\ResourceObject::merge()` method handling of merging relationships. Previously this used
+  `array_replace_recursive` to megre the relationship object, but this led to incorrect merging of `data` members,
+  particularly for to-many relationships. This has been altered to `array_replace`, so that the `data`, `links` and
+  `meta` members of the relationship are replaced with the values from the resource object's relationship that is being
+  merged in.
+
 ## [1.0.0-alpha.5] - 2021-03-12
 
 ### Added

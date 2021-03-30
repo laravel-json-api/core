@@ -27,12 +27,12 @@ use LaravelJsonApi\Contracts\Resources\Serializer\Attribute as SerializableAttri
 use LaravelJsonApi\Contracts\Resources\Serializer\Relation as SerializableRelation;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Document\Link;
-use LaravelJsonApi\Core\Document\LinkHref;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Document\ResourceIdentifier;
 use LaravelJsonApi\Core\Resources\Concerns\ConditionallyLoadsFields;
 use LaravelJsonApi\Core\Resources\Concerns\DelegatesToResource;
-use LaravelJsonApi\Core\Responses\ResourceResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
+use LaravelJsonApi\Core\Schema\IdParser;
 use LogicException;
 use function sprintf;
 
@@ -62,6 +62,15 @@ class JsonApiResource implements ArrayAccess, Responsable
     protected string $type = '';
 
     /**
+     * The resource id.
+     *
+     * @var string|null
+     */
+    protected ?string $id = null;
+
+    /**
+     * The resource's self URL.
+     *
      * @var string|null
      */
     protected ?string $selfUri = null;
@@ -86,12 +95,16 @@ class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the resource's `self` link URL.
      *
-     * @return string
+     * @return string|null
      */
-    public function selfUrl(): string
+    public function selfUrl(): ?string
     {
         if ($this->selfUri) {
             return $this->selfUri;
+        }
+
+        if (false === $this->schema->hasSelfLink()) {
+            return null;
         }
 
         return $this->selfUri = $this->schema->url(
@@ -102,15 +115,19 @@ class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get the `self` link for the resource.
      *
-     * @return Link
+     * @return Link|null
      */
-    public function selfLink(): Link
+    public function selfLink(): ?Link
     {
-        return new Link(
-            'self',
-            new LinkHref($this->selfUrl()),
-            $this->selfMeta()
-        );
+        if ($url = $this->selfUrl()) {
+            return new Link(
+                'self',
+                $url,
+                $this->selfMeta()
+            );
+        }
+
+        return null;
     }
 
     /**
@@ -134,15 +151,12 @@ class JsonApiResource implements ArrayAccess, Responsable
      */
     public function id(): string
     {
-        if ($key = $this->schema->idKeyName()) {
-            return (string) $this->resource->{$key};
+        if ($this->id) {
+            return $this->id;
         }
 
-        if ($this->resource instanceof UrlRoutable) {
-            return (string) $this->resource->getRouteKey();
-        }
-
-        throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
+        return $this->id = IdParser::encoder($this->schema->id())
+            ->encode($this->modelKey());
     }
 
     /**
@@ -226,7 +240,13 @@ class JsonApiResource implements ArrayAccess, Responsable
      */
     public function links($request): Links
     {
-        return new Links($this->selfLink());
+        $links = new Links();
+
+        if ($self = $this->selfLink()) {
+            $links->push($self);
+        }
+
+        return $links;
     }
 
     /**
@@ -299,13 +319,33 @@ class JsonApiResource implements ArrayAccess, Responsable
      */
     protected function relation(string $fieldName, string $keyName = null): Relation
     {
+        $field = $this->schema->isRelationship($fieldName) ? $this->schema->relationship($fieldName) : null;
+
         return new Relation(
             $this->resource,
             $this->selfUrl(),
             $fieldName,
             $keyName,
-            $this->schema->relationship($fieldName)->uriName()
+            $field ? $field->uriName() : null,
         );
+    }
+
+    /**
+     * Get the model key.
+     *
+     * @return string|int
+     */
+    private function modelKey()
+    {
+        if ($key = $this->schema->idKeyName()) {
+            return $this->resource->{$key};
+        }
+
+        if ($this->resource instanceof UrlRoutable) {
+            return $this->resource->getRouteKey();
+        }
+
+        throw new LogicException('Resource is not URL routable: you must implement the id method yourself.');
     }
 
 }

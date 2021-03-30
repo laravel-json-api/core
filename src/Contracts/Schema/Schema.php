@@ -57,9 +57,14 @@ interface Schema extends Traversable
     /**
      * Get a repository for the resource.
      *
-     * @return Repository
+     * Schemas MUST return a repository if the resource type is retrievable
+     * by its resource ID; or if the resource type will be referenced in a JSON:API
+     * document via a resource identifier (i.e. when parsing JSON:API documents, the
+     * resource type and id can be validated via the repository class.)
+     *
+     * @return Repository|null
      */
-    public function repository(): Repository;
+    public function repository(): ?Repository;
 
     /**
      * Get the resource type as it appears in URIs.
@@ -78,6 +83,24 @@ interface Schema extends Traversable
     public function url($extra = [], bool $secure = null): string;
 
     /**
+     * Do resources of this type have a `self` link?
+     *
+     * The `self` link of a resource identifies a specific resource.
+     * Servers MUST respond to a `GET` request to the specified URL with a response that
+     * includes the resource as the primary data.
+     *
+     * Typically schemas will return `true` for this method; however there are some
+     * instances where a resource may not be retrievable by its id. For example, a resource
+     * that can only be obtained from an index (fetch-many) query and has a random UUID
+     * that it cannot then be retrieved by. In this scenario, `false` must be returned
+     * by this method. In doing so, the resource will also not be able to have relationship
+     * links.
+     *
+     * @return bool
+     */
+    public function hasSelfLink(): bool;
+
+    /**
      * Get the "id" field.
      *
      * @return ID
@@ -88,7 +111,9 @@ interface Schema extends Traversable
      * Get the key name for the resource "id".
      *
      * If this method returns `null`, resource classes should fall-back to a
-     * sensible default. E.g. `UrlRoutable::getRouteKeyName()`.
+     * sensible defaults. E.g. for `UrlRoutable` objects, the implementation can
+     * fallback to `UrlRoutable::getRouteKey()` to retrieve the id value and
+     * and `UrlRoutable::getRouteKeyName()` if it needs the key name.
      *
      * @return string|null
      */
@@ -164,6 +189,14 @@ interface Schema extends Traversable
     public function isRelationship(string $name): bool;
 
     /**
+     * Is the provided name a filter parameter?
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function isFilter(string $name): bool;
+
+    /**
      * Get the filters for the resource.
      *
      * @return Filter[]|iterable
@@ -185,11 +218,27 @@ interface Schema extends Traversable
      public function includePaths(): iterable;
 
     /**
+     * Is the provided field name a sparse field?
+     *
+     * @param string $fieldName
+     * @return bool
+     */
+     public function isSparseField(string $fieldName): bool;
+
+    /**
      * Get the sparse fields that are supported by this resource.
      *
      * @return string[]|iterable
      */
      public function sparseFields(): iterable;
+
+    /**
+     * Is the provided name a sort parameter?
+     *
+     * @param string $name
+     * @return bool
+     */
+     public function isSortable(string $name): bool;
 
     /**
      * Get the parameters that can be used to sort this resource.

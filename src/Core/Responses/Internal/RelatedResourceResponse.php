@@ -17,53 +17,48 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Core\Responses\Internal;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
-use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Responses\Concerns;
 
-class ResourceCollectionResponse implements Responsable
+class RelatedResourceResponse implements Responsable
 {
 
+    use Concerns\HasRelationshipMeta;
     use Concerns\IsResponsable;
 
     /**
-     * @var ResourceCollection
+     * @var JsonApiResource
      */
-    private ResourceCollection $resources;
+    private JsonApiResource $resource;
 
     /**
-     * ResourceCollectionResponse constructor.
+     * @var string
+     */
+    private string $fieldName;
+
+    /**
+     * @var object|null
+     */
+    private ?object $related;
+
+    /**
+     * ResourceIdentifierResponse constructor.
      *
-     * @param ResourceCollection $resources
+     * @param JsonApiResource $resource
+     * @param string $fieldName
+     * @param object|null $related
      */
-    public function __construct(ResourceCollection $resources)
+    public function __construct(JsonApiResource $resource, string $fieldName, ?object $related)
     {
-        $this->resources = $resources;
-    }
-
-    /**
-     * @return Links
-     */
-    public function links(): Links
-    {
-        return $this->resources->links()->merge(
-            $this->links ?: new Links()
-        );
-    }
-
-    /**
-     * @return Hash
-     */
-    public function meta(): Hash
-    {
-        return (new Hash($this->resources->meta()))->merge(
-            $this->meta ?: []
-        );
+        $this->resource = $resource;
+        $this->fieldName = $fieldName;
+        $this->related = $related;
     }
 
     /**
@@ -78,10 +73,10 @@ class ResourceCollectionResponse implements Responsable
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
             ->withFieldSets($this->fieldSets($request))
-            ->withResources($this->resources)
+            ->withResource($this->related)
             ->withJsonApi($this->jsonApi())
-            ->withMeta($this->meta())
-            ->withLinks($this->links())
+            ->withMeta($this->allMeta())
+            ->withLinks($this->links)
             ->toJson($this->encodeOptions);
 
         return new Response(
@@ -89,6 +84,29 @@ class ResourceCollectionResponse implements Responsable
             Response::HTTP_OK,
             $this->headers()
         );
+    }
+
+    /**
+     * @return Hash|null
+     */
+    private function allMeta(): ?Hash
+    {
+        return Hash::cast($this->metaForRelationship())
+            ->merge($this->meta());
+    }
+
+    /**
+     * @return array|null
+     */
+    private function metaForRelationship(): ?array
+    {
+        if ($this->hasRelationMeta) {
+            return $this->resource
+                ->relationship($this->fieldName)
+                ->meta();
+        }
+
+        return null;
     }
 
 }

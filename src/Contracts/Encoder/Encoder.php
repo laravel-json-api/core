@@ -58,12 +58,22 @@ interface Encoder
     public function withResources(iterable $resources): JsonApiDocument;
 
     /**
-     * Create a compound document for a relationship identifier or identifiers.
+     * Create a document for a to-one relationship (identifier or null as the top-level data member.)
      *
-     * @param JsonApiResource $resource
+     * @param JsonApiResource|object $resource
      * @param string $fieldName
-     * @param JsonApiResource|iterable|null $identifiers
+     * @param JsonApiResource|object|null $related
      * @return JsonApiDocument
      */
-    public function withIdentifiers(JsonApiResource $resource, string $fieldName, $identifiers): JsonApiDocument;
+    public function withToOne(object $resource, string $fieldName, ?object $related): JsonApiDocument;
+
+    /**
+     * Create a document for a to-many relationship (identifiers as the top-level data member.)
+     *
+     * @param JsonApiResource|object $resource
+     * @param string $fieldName
+     * @param iterable $related
+     * @return JsonApiDocument
+     */
+    public function withToMany(object $resource, string $fieldName, iterable $related): JsonApiDocument;
 }

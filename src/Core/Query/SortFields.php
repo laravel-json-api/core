@@ -21,8 +21,10 @@ namespace LaravelJsonApi\Core\Query;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use UnexpectedValueException;
 use function array_map;
 use function collect;
@@ -156,6 +158,49 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     public function all(): array
     {
         return $this->stack;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function collect(): Collection
+    {
+        return collect($this->stack);
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function filter(callable $callback): self
+    {
+        $copy = new self();
+        $copy->stack = collect($this->stack)->filter($callback)->all();
+
+        return $copy;
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function reject(callable $callback): self
+    {
+        $copy = new self();
+        $copy->stack = collect($this->stack)->reject($callback)->all();
+
+        return $copy;
+    }
+
+    /**
+     * @param Schema $schema
+     * @return $this
+     */
+    public function forSchema(Schema $schema): self
+    {
+        return $this->filter(
+            static fn(SortField $field) => $field->existsOnSchema($schema)
+        );
     }
 
     /**

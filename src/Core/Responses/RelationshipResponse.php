@@ -22,12 +22,17 @@ namespace LaravelJsonApi\Core\Responses;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Responses\Internal\PaginatedIdentifierResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceIdentifierCollectionResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceIdentifierResponse;
+use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
 use function is_null;
 
 class RelationshipResponse implements Responsable
 {
 
+    use Concerns\HasRelationshipMeta;
     use Concerns\IsResponsable;
 
     /**
@@ -82,6 +87,7 @@ class RelationshipResponse implements Responsable
             ->prepareDataResponse($request)
             ->withServer($this->server)
             ->withJsonApi($this->jsonApi())
+            ->withRelationshipMeta($this->hasRelationMeta)
             ->withMeta($this->meta)
             ->withLinks($this->links)
             ->withEncodeOptions($this->encodeOptions)
@@ -102,35 +108,41 @@ class RelationshipResponse implements Responsable
      * Convert the data member to a response class.
      *
      * @param $request
-     * @return ResourceIdentifierResponse|ResourceIdentifierCollectionResponse
+     * @return ResourceIdentifierResponse|ResourceIdentifierCollectionResponse|PaginatedIdentifierResponse
      */
     private function prepareDataResponse($request)
     {
-        $resolver = $this->server()->resources();
-        $resource = $resolver->resolve($this->resource);
+        $resources = $this->server()->resources();
+        $resource = $resources->cast($this->resource);
 
         if (is_null($this->related)) {
             return new ResourceIdentifierResponse(
                 $resource,
                 $this->fieldName,
-                null
+                null,
             );
         }
 
-        $parsed = $resolver->resolve($this->related);
+        if ($this->related instanceof Page) {
+            return new PaginatedIdentifierResponse(
+                $resource,
+                $this->fieldName,
+                $this->related,
+            );
+        }
 
-        if ($parsed instanceof JsonApiResource) {
+        if (is_object($this->related) && $resources->exists($this->related)) {
             return new ResourceIdentifierResponse(
                 $resource,
                 $this->fieldName,
-                $parsed
+                $this->related,
             );
         }
 
         return new ResourceIdentifierCollectionResponse(
             $resource,
             $this->fieldName,
-            $parsed
+            $this->related,
         );
     }
 

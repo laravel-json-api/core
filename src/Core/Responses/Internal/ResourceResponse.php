@@ -17,12 +17,13 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Core\Responses\Internal;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Core\Responses\Concerns;
 
 class ResourceResponse implements Responsable
 {
@@ -96,8 +97,8 @@ class ResourceResponse implements Responsable
     {
         $links = $this->links();
 
-        if ($this->resource) {
-            $links->push($this->resource->selfLink());
+        if ($this->resource && $self = $this->resource->selfLink()) {
+            $links->push($self);
         }
 
         $encoder = $this->server()->encoder();

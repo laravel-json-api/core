@@ -29,7 +29,6 @@ use LaravelJsonApi\Contracts\Store\QueriesAll;
 use LaravelJsonApi\Contracts\Store\QueriesOne;
 use LaravelJsonApi\Contracts\Store\QueriesToMany;
 use LaravelJsonApi\Contracts\Store\QueriesToOne;
-use LaravelJsonApi\Contracts\Store\QueryAllBuilder;
 use LaravelJsonApi\Contracts\Store\QueryManyBuilder;
 use LaravelJsonApi\Contracts\Store\QueryOneBuilder;
 use LaravelJsonApi\Contracts\Store\Repository;
@@ -38,8 +37,9 @@ use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Contracts\Store\ToManyBuilder;
 use LaravelJsonApi\Contracts\Store\ToOneBuilder;
 use LaravelJsonApi\Contracts\Store\UpdatesResources;
-use LaravelJsonApi\Core\Support\Str;
 use LogicException;
+use RuntimeException;
+use function sprintf;
 
 class Store implements StoreContract
 {
@@ -60,25 +60,31 @@ class Store implements StoreContract
     }
 
     /**
-     * @param string $name
-     * @param mixed $arguments
-     * @return Repository
+     * @inheritDoc
      */
-    public function __call(string $name, $arguments)
+    public function find(string $resourceType, string $resourceId): ?object
     {
-        return $this->resources(
-            Str::dasherize($name)
-        );
+        if ($repository = $this->resources($resourceType)) {
+            return $repository->find($resourceId);
+        }
+
+        return null;
     }
 
     /**
      * @inheritDoc
      */
-    public function find(string $resourceType, string $resourceId): ?object
+    public function findOrFail(string $resourceType, string $resourceId): object
     {
-        return $this
-            ->resources($resourceType)
-            ->find($resourceId);
+        if ($repository = $this->resources($resourceType)) {
+            return $repository->findOrFail($resourceId);
+        }
+
+        throw new RuntimeException(sprintf(
+            'Resource type %s with id %s does not exist.',
+            $resourceType,
+            $resourceId,
+        ));
     }
 
     /**
@@ -86,11 +92,9 @@ class Store implements StoreContract
      */
     public function findMany(array $identifiers): iterable
     {
-        return collect($identifiers)->groupBy('type')->map(function(Collection $ids, $type) {
-            return collect($this->resources($type)->findMany(
-                $ids->pluck('id')->unique()->all()
-            ));
-        })->flatten();
+        return collect($identifiers)
+            ->groupBy('type')
+            ->flatMap(fn($ids, $type) => $this->findManyByType($type, $ids));
     }
 
     /**
@@ -98,20 +102,22 @@ class Store implements StoreContract
      */
     public function exists(string $resourceType, string $resourceId): bool
     {
-        return $this
-            ->resources($resourceType)
-            ->exists($resourceId);
+        if ($repository = $this->resources($resourceType)) {
+            return $repository->exists($resourceId);
+        }
+
+        return false;
     }
 
     /**
      * @inheritDoc
      */
-    public function queryAll(string $resourceType): QueryAllBuilder
+    public function queryAll(string $resourceType): QueryManyBuilder
     {
         $repository = $this->resources($resourceType);
 
         if ($repository instanceof QueriesAll) {
-            return $repository->queryAll();
+            return new QueryAllHandler($repository->queryAll());
         }
 
         throw new LogicException("Querying all {$resourceType} resources is not supported.");
@@ -153,7 +159,9 @@ class Store implements StoreContract
         $repository = $this->resources($resourceType);
 
         if ($repository instanceof QueriesToMany) {
-            return $repository->queryToMany($modelOrResourceId, $fieldName);
+            return new QueryManyHandler(
+                $repository->queryToMany($modelOrResourceId, $fieldName)
+            );
         }
 
         throw new LogicException("Querying to-many relationships on a {$resourceType} resource is not supported.");
@@ -233,10 +241,28 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function resources(string $resourceType): Repository
+    public function resources(string $resourceType): ?Repository
     {
         return $this->schemas
             ->schemaFor($resourceType)
             ->repository();
+    }
+
+    /**
+     * Find many resources by a resource type.
+     *
+     * @param string $resourceType
+     * @param Collection $ids
+     * @return Collection
+     */
+    private function findManyByType(string $resourceType, Collection $ids): Collection
+    {
+        if ($repository = $this->resources($resourceType)) {
+            return collect($repository->findMany(
+                $ids->pluck('id')->unique()->all()
+            ));
+        }
+
+        return collect();
     }
 }

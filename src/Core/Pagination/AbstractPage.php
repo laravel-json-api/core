@@ -24,7 +24,7 @@ use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
-use LaravelJsonApi\Core\Responses\PaginatedResourceResponse;
+use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
 
 abstract class AbstractPage implements PageContract
 {

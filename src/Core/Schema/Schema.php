@@ -20,13 +20,16 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Schema;
 
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Pagination\Paginator;
 use LaravelJsonApi\Contracts\Schema\Attribute;
 use LaravelJsonApi\Contracts\Schema\Field;
+use LaravelJsonApi\Contracts\Schema\Filter;
 use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Contracts\Store\Repository;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LaravelJsonApi\Core\Support\Arr;
@@ -63,6 +66,13 @@ abstract class Schema implements SchemaContract, IteratorAggregate
      * @var int
      */
     protected int $maxDepth = 1;
+
+    /**
+     * Whether resources of this type have a self link.
+     *
+     * @var bool
+     */
+    protected bool $selfLink = true;
 
     /**
      * @var array|null
@@ -123,6 +133,18 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function model(): string
+    {
+        if (isset(static::$model)) {
+            return static::$model;
+        }
+
+        throw new LogicException('The model class name must be set.');
+    }
+
+    /**
      * Specify the callback to use to guess the resource class from the schema class.
      *
      * @param callable $resolver
@@ -177,6 +199,14 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
+    public function repository(): ?Repository
+    {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getIterator()
     {
         yield from $this->allFields();
@@ -204,6 +234,14 @@ abstract class Schema implements SchemaContract, IteratorAggregate
         array_unshift($extra, $this->uriType());
 
         return $this->server->url($extra, $secure);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function hasSelfLink(): bool
+    {
+        return $this->selfLink;
     }
 
     /**
@@ -351,6 +389,51 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
+    public function pagination(): ?Paginator
+    {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function filters(): iterable
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isFilter(string $name): bool
+    {
+        /** @var Filter $filter */
+        foreach ($this->filters() as $filter) {
+            if ($filter->key() === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isSparseField(string $fieldName): bool
+    {
+        foreach ($this->sparseFields() as $sparseField) {
+            if ($sparseField === $fieldName) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function sparseFields(): iterable
     {
         /** @var Field $field */
@@ -364,10 +447,26 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
+    public function isSortable(string $name): bool
+    {
+        foreach ($this->sortable() as $sortable) {
+            if ($sortable === $name) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function sortable(): iterable
     {
-        if ($this->id()->isSortable()) {
-            yield $this->id()->name();
+        $id = $this->id();
+
+        if ($id->isSortable()) {
+            yield $id->name();
         }
 
         /** @var Attribute $attr */

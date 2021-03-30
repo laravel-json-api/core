@@ -81,6 +81,9 @@ class ResourceObjectTest extends TestCase
                         'related' => 'http://localhost/api/v1/posts/1/tags',
                         'self' => 'http://localhost/api/v1/posts/1/relationships/tags',
                     ],
+                    'meta' => [
+                        'count' => 2,
+                    ],
                 ],
             ],
             'links' => [
@@ -622,6 +625,50 @@ class ResourceObjectTest extends TestCase
         $this->assertArrayNotHasKey('comments', $fields);
     }
 
+    public function testWithoutMeta(): void
+    {
+        $this->values['meta'] = ['foo' => 'bar'];
+        $this->resource = ResourceObject::fromArray($this->values);
+
+        $expected = $this->values;
+
+        unset(
+            $expected['meta'],
+            $expected['relationships']['tags']['meta'],
+        );
+
+        $this->assertNotSame($this->resource, $resource = $this->resource->withoutMeta());
+
+        $this->assertSame($this->values, $this->resource->jsonSerialize());
+        $this->assertSame($expected, $resource->jsonSerialize());
+    }
+
+    public function testWithRelationshipMeta(): void
+    {
+        $expected = $this->values;
+        $expected['relationships']['comments']['meta'] = ['count' => 5];
+
+        $actual = $this->resource->withRelationshipMeta('comments', ['count' => 5]);
+
+        $this->assertNotSame($this->resource, $actual);
+        $this->assertSame($this->values, $this->resource->jsonSerialize());
+        $this->assertSame($expected, $actual->jsonSerialize());
+    }
+
+    public function testWithRelationshipMetaOnNewRelationship(): void
+    {
+        $expected = $this->values;
+        $expected['relationships']['likes'] = [];
+        $expected['relationships']['likes']['meta'] = ['count' => 5];
+        ksort($expected['relationships']);
+
+        $actual = $this->resource->withRelationshipMeta('likes', ['count' => 5]);
+
+        $this->assertNotSame($this->resource, $actual);
+        $this->assertSame($this->values, $this->resource->jsonSerialize());
+        $this->assertSame($expected, $actual->jsonSerialize());
+    }
+
     public function testMerge(): void
     {
         $merge = [
@@ -644,6 +691,13 @@ class ResourceObjectTest extends TestCase
                         'id' => '2',
                     ],
                 ],
+                'tags' => [
+                    'data' => [
+                        [
+                            'tags' => '999',
+                        ],
+                    ],
+                ],
             ],
         ];
 
@@ -652,6 +706,7 @@ class ResourceObjectTest extends TestCase
         $expected['attributes']['title'] = $merge['attributes']['title'];
         $expected['relationships']['author']['data'] = $merge['relationships']['author']['data'];
         $expected['relationships']['site'] = $merge['relationships']['site'];
+        $expected['relationships']['tags']['data'] = $merge['relationships']['tags']['data'];
 
         ksort($expected['attributes']);
         ksort($expected['relationships']);

@@ -35,8 +35,8 @@ interface Relation extends Hideable
      * Get the JSON representation of the relationship.
      *
      * @param object $model
-     * @param string $baseUri
+     * @param string|null $baseUri
      * @return JsonApiRelation
      */
-    public function serialize(object $model, string $baseUri): JsonApiRelation;
+    public function serialize(object $model, ?string $baseUri): JsonApiRelation;
 }

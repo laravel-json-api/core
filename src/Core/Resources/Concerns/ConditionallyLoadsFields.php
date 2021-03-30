@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Resources\Concerns;
 use Closure;
 use LaravelJsonApi\Core\Resources\ConditionalField;
 use LaravelJsonApi\Core\Resources\ConditionalFields;
+use function boolval;
 
 trait ConditionallyLoadsFields
 {
@@ -29,24 +30,24 @@ trait ConditionallyLoadsFields
     /**
      * Conditionally include a field value.
      *
-     * @param bool $check
+     * @param bool|mixed $check
      * @param mixed $value
      * @return ConditionalField
      */
-    protected function when(bool $check, $value): ConditionalField
+    protected function when($check, $value): ConditionalField
     {
-        return new ConditionalField($check, $value);
+        return new ConditionalField(boolval($check), $value);
     }
 
     /**
      * Conditionally include a set of field values.
      *
-     * @param bool $check
+     * @param bool|mixed $check
      * @param Closure|iterable $values
      * @return ConditionalFields
      */
-    protected function mergeWhen(bool $check, $values): ConditionalFields
+    protected function mergeWhen($check, $values): ConditionalFields
     {
-        return new ConditionalFields($check, $values);
+        return new ConditionalFields(boolval($check), $values);
     }
 }

@@ -17,28 +17,35 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Core\Store;
 
-use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
+use LaravelJsonApi\Contracts\Store\HasSingularFilters;
 
-class ResourceIdentifierResponse implements Responsable
+class QueryAllHandler extends QueryManyHandler implements HasSingularFilters
 {
 
-    use Concerns\EncodesIdentifiers;
+    /**
+     * @inheritDoc
+     */
+    public function firstOrMany()
+    {
+        if ($this->builder instanceof HasSingularFilters) {
+            return $this->builder->firstOrMany();
+        }
+
+        return $this->builder->get();
+    }
 
     /**
-     * ResourceIdentifierResponse constructor.
-     *
-     * @param JsonApiResource $resource
-     * @param string $fieldName
-     * @param JsonApiResource|null $related
+     * @inheritDoc
      */
-    public function __construct(JsonApiResource $resource, string $fieldName, ?JsonApiResource $related)
+    public function firstOrPaginate(?array $page)
     {
-        $this->resource = $resource;
-        $this->fieldName = $fieldName;
-        $this->related = $related;
+        if ($this->builder instanceof HasSingularFilters) {
+            return $this->builder->firstOrPaginate($page);
+        }
+
+        return $this->getOrPaginate($page);
     }
 
 }

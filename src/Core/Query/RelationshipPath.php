@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Query;
 use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use UnexpectedValueException;
 use function collect;
 use function explode;
@@ -139,6 +140,21 @@ class RelationshipPath implements IteratorAggregate, Countable
     public function take(int $num): self
     {
         return new self(...collect($this->names)->take($num));
+    }
+
+    /**
+     * Does the path exist on the provided schema?
+     *
+     * @param Schema $schema
+     * @return bool
+     */
+    public function existsOnSchema(Schema $schema): bool
+    {
+        if ($schema->isRelationship($first = $this->first())) {
+            return $schema->relationship($first)->isIncludePath();
+        }
+
+        return false;
     }
 
     /**

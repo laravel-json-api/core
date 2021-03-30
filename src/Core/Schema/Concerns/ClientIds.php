@@ -17,28 +17,36 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses;
+namespace LaravelJsonApi\Core\Schema\Concerns;
 
-use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
-
-class ResourceIdentifierCollectionResponse implements Responsable
+trait ClientIds
 {
 
-    use Concerns\EncodesIdentifiers;
+    /**
+     * @var bool
+     */
+    private bool $clientIds = false;
 
     /**
-     * ResourceIdentifierResponse constructor.
+     * Mark the ID as accepting client-generated ids.
      *
-     * @param JsonApiResource $resource
-     * @param string $fieldName
-     * @param iterable $related
+     * @param bool $bool
+     * @return $this
      */
-    public function __construct(JsonApiResource $resource, string $fieldName, iterable $related)
+    public function clientIds(bool $bool = true): self
     {
-        $this->resource = $resource;
-        $this->fieldName = $fieldName;
-        $this->related = $related;
+        $this->clientIds = $bool;
+
+        return $this;
     }
 
+    /**
+     * Does the resource accept client generated ids?
+     *
+     * @return bool
+     */
+    public function acceptsClientIds(): bool
+    {
+        return $this->clientIds;
+    }
 }

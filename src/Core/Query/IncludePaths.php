@@ -21,8 +21,10 @@ namespace LaravelJsonApi\Core\Query;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use UnexpectedValueException;
 use function collect;
 use function count;
@@ -173,6 +175,14 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     }
 
     /**
+     * @return Collection
+     */
+    public function collect(): Collection
+    {
+        return collect($this->stack);
+    }
+
+    /**
      * @param int $num
      * @return $this
      */
@@ -184,6 +194,45 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
             ->values();
 
         return new self(...$items);
+    }
+
+    /**
+     * Run a filter over each relationship path.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function filter(callable $callback): self
+    {
+        return new self(
+            ...$this->collect()->filter($callback)
+        );
+    }
+
+    /**
+     * Create new include paths of all relationship paths that do not pass a given truth test.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function reject(callable $callback): self
+    {
+        return new self(
+            ...$this->collect()->reject($callback)
+        );
+    }
+
+    /**
+     * Get the include paths that are valid for the provided schema.
+     *
+     * @param Schema $schema
+     * @return $this
+     */
+    public function forSchema(Schema $schema): self
+    {
+        return $this->filter(
+            static fn(RelationshipPath $path) => $path->existsOnSchema($schema)
+        );
     }
 
     /**

@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Query;
 
 use Countable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use UnexpectedValueException;
@@ -115,12 +116,12 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     }
 
     /**
-     * @param string ...$keys
+     * @param string ...$resourceTypes
      * @return $this
      */
-    public function forget(string ...$keys): self
+    public function forget(string ...$resourceTypes): self
     {
-        foreach ($keys as $key) {
+        foreach ($resourceTypes as $key) {
             unset($this->stack[$key]);
         }
 
@@ -174,13 +175,22 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     }
 
     /**
+     * @return Collection
+     */
+    public function collect(): Collection
+    {
+        return collect($this->stack);
+    }
+
+    /**
      * @inheritDoc
      */
     public function toArray()
     {
-        return collect($this->stack)
-            ->map(fn(FieldSet $fieldSet) => $fieldSet->toString())
-            ->all();
+        return array_map(
+            static fn(FieldSet $fieldSet) => $fieldSet->toString(),
+            $this->stack,
+        );
     }
 
     /**
