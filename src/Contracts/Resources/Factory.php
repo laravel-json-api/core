@@ -25,11 +25,12 @@ interface Factory
 {
 
     /**
-     * Get the fully-qualified class names for the records that this factory handles.
+     * Can the factory create a resource for the supplied model?
      *
-     * @return iterable
+     * @param object $model
+     * @return bool
      */
-    public function handles(): iterable;
+    public function canCreate(object $model): bool;
 
     /**
      * Create a resource object for the supplied model.

@@ -26,10 +26,8 @@ use LaravelJsonApi\Contracts\Server\Server;
 use LogicException;
 use RuntimeException;
 use Throwable;
-use function collect;
 use function get_class;
 use function is_object;
-use function is_string;
 
 class Container implements ContainerContract
 {
@@ -60,6 +58,11 @@ class Container implements ContainerContract
     private array $schemas;
 
     /**
+     * @var array
+     */
+    private array $aliases;
+
+    /**
      * Container constructor.
      *
      * @param IlluminateContainer $container
@@ -73,6 +76,7 @@ class Container implements ContainerContract
         $this->types = [];
         $this->models = [];
         $this->schemas = [];
+        $this->aliases = [];
 
         foreach ($schemas as $schemaClass) {
             $this->types[$schemaClass::type()] = $schemaClass;
@@ -80,6 +84,14 @@ class Container implements ContainerContract
         }
 
         ksort($this->types);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function exists(string $resourceType): bool
+    {
+        return isset($this->types[$resourceType]);
     }
 
     /**
@@ -97,23 +109,26 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
-    public function schemaForModel($model): Schema
+    public function existsForModel($model): bool
     {
-        $model = is_object($model) ? get_class($model) : $model;
-
-        if (is_string($model) && isset($this->models[$model])) {
-            return $this->resolve($this->models[$model]);
-        }
-
-        throw new LogicException("No JSON:API schema for model {$model}.");
+        return !empty($this->modelClassFor($model));
     }
 
     /**
      * @inheritDoc
      */
-    public function exists(string $resourceType): bool
+    public function schemaForModel($model): Schema
     {
-        return isset($this->types[$resourceType]);
+        if ($class = $this->modelClassFor($model)) {
+            return $this->resolve(
+                $this->models[$class]
+            );
+        }
+
+        throw new LogicException(sprintf(
+            'No JSON:API schema for model %s.',
+            is_object($model) ? get_class($model) : $model,
+        ));
     }
 
     /**
@@ -125,13 +140,33 @@ class Container implements ContainerContract
     }
 
     /**
-     * @inheritDoc
+     * Resolve the JSON:API model class for the provided object.
+     *
+     * @param string|object $model
+     * @return string|null
      */
-    public function resources(): array
+    private function modelClassFor($model): ?string
     {
-        return collect($this->models)
-            ->map(fn($schemaClass) => $schemaClass::resource())
-            ->all();
+        $model = is_object($model) ? get_class($model) : $model;
+        $model = $this->aliases[$model] ?? $model;
+
+        if (isset($this->models[$model])) {
+            return $model;
+        }
+
+        foreach (class_parents($model) as $parent) {
+            if (isset($this->models[$parent])) {
+                return $this->aliases[$model] = $parent;
+            }
+        }
+
+        foreach (class_implements($model) as $interface) {
+            if (isset($this->models[$interface])) {
+                return $this->aliases[$model] = $interface;
+            }
+        }
+
+        return null;
     }
 
     /**

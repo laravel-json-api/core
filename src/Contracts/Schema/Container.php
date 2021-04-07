@@ -23,6 +23,14 @@ interface Container
 {
 
     /**
+     * Does a schema exist for the supplied resource type?
+     *
+     * @param string $resourceType
+     * @return bool
+     */
+    public function exists(string $resourceType): bool;
+
+    /**
      * Get a schema by JSON:API resource type.
      *
      * @param string $resourceType
@@ -39,12 +47,12 @@ interface Container
     public function schemaForModel($model): Schema;
 
     /**
-     * Does a schema exist for the supplied resource type?
+     * Does a schema exist for the provided model class?
      *
-     * @param string $resourceType
+     * @param string|object $model
      * @return bool
      */
-    public function exists(string $resourceType): bool;
+    public function existsForModel($model): bool;
 
     /**
      * Get a list of all the supported resource types.
@@ -53,10 +61,4 @@ interface Container
      */
     public function types(): array;
 
-    /**
-     * Get a list of model classes mapped to their resource classes.
-     *
-     * @return array
-     */
-    public function resources(): array;
 }

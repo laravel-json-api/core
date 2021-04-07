@@ -21,11 +21,10 @@ namespace LaravelJsonApi\Core\Resources;
 
 use LaravelJsonApi\Contracts\Resources\Factory as FactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\Schema;
 use LogicException;
 use Throwable;
-use function array_keys;
 use function get_class;
-use function is_array;
 use function sprintf;
 
 class Factory implements FactoryContract
@@ -38,28 +37,21 @@ class Factory implements FactoryContract
     protected SchemaContainer $schemas;
 
     /**
-     * @var array
-     */
-    private array $bindings;
-
-    /**
      * Factory constructor.
      *
      * @param SchemaContainer $schemas
-     * @param array|null $bindings
      */
-    public function __construct(SchemaContainer $schemas, array $bindings = null)
+    public function __construct(SchemaContainer $schemas)
     {
         $this->schemas = $schemas;
-        $this->bindings = is_array($bindings) ? $bindings : $schemas->resources();
     }
 
     /**
      * @inheritDoc
      */
-    public function handles(): iterable
+    public function canCreate(object $model): bool
     {
-        return array_keys($this->bindings);
+        return $this->schemas->existsForModel($model);
     }
 
     /**
@@ -67,21 +59,14 @@ class Factory implements FactoryContract
      */
     public function createResource(object $model): JsonApiResource
     {
-        $resource = $this->bindings[get_class($model)] ?? null;
-
-        if (!$resource) {
-            throw new LogicException(sprintf(
-                'Unexpected model class - %s',
-                get_class($model)
-            ));
-        }
-
         try {
-            return $this->build($resource, $model);
+            return $this->build(
+                $this->schemas->schemaForModel($model),
+                $model,
+            );
         } catch (Throwable $ex) {
             throw new LogicException(sprintf(
-                'Failed to build %s resource object for model %s.',
-                $resource,
+                'Failed to build a JSON:API resource for model %s.',
                 get_class($model),
             ), 0, $ex);
         }
@@ -90,16 +75,15 @@ class Factory implements FactoryContract
     /**
      * Build a new resource object instance.
      *
-     * @param string $fqn
+     * @param Schema $schema
      * @param object $model
      * @return JsonApiResource
      */
-    protected function build(string $fqn, object $model): JsonApiResource
+    protected function build(Schema $schema, object $model): JsonApiResource
     {
-        return new $fqn(
-            $this->schemas->schemaForModel($model),
-            $model,
-        );
+        $fqn = $schema->resource();
+
+        return new $fqn($schema, $model);
     }
 
 }
