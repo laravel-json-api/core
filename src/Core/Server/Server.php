@@ -20,6 +20,10 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Server;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
@@ -165,18 +169,18 @@ abstract class Server implements ServerContract
      */
     public function url($extra = [], bool $secure = null): string
     {
-        /**
-         * @TODO
-         *
-         * Annoyingly the Laravel URL helper does not append the parameters
-         * if the first argument is already a valid URL, i.e. has a schema
-         * and host. Whereas we want to *always* append the parameters, even
-         * if `baseUri()` returns a fully valid URL. So we need to manually
-         * append the parameters to the base URI *before* passing through
-         * to the URL helper. (We want to use the URL helper as it'll
-         * add the schema and host if base URI is not already a valid URL.)
-         */
-        return url($this->baseUri(), $extra, $secure);
+        $tail = Collection::make(Arr::wrap($extra))
+            ->map(fn($value) => ($value instanceof UrlRoutable) ? $value->getRouteKey() : $value)
+            ->map(fn($value) => rawurlencode($value))
+            ->implode('/');
+
+        $path = $this->baseUri();
+
+        if ($tail) {
+            $path = rtrim($path, '/') . '/' . $tail;
+        }
+
+        return $this->container->make(UrlGenerator::class)->to($path, [], $secure);
     }
 
     /**
