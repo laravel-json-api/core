@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Server;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use Illuminate\Contracts\Foundation\Application;
 use LaravelJsonApi\Core\Server\ServerRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -32,7 +32,7 @@ class ServerRepositoryTest extends TestCase
         $name = 'v1';
         $klass = TestServer::class;
 
-        $container = $this->createMock(IlluminateContainer::class);
+        $app = $this->createMock(Application::class);
         $config = $this->createMock(ConfigRepository::class);
 
         $config
@@ -41,9 +41,9 @@ class ServerRepositoryTest extends TestCase
             ->with("jsonapi.servers.{$name}")
             ->willReturn($klass);
 
-        $expected = new TestServer($container, $name);
+        $expected = new TestServer($app, $name);
 
-        $repository = new ServerRepository($container, $config);
+        $repository = new ServerRepository($app, $config);
 
         $actual = $repository->server($name);
 

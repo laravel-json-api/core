@@ -28,13 +28,10 @@ All notable changes to this project will be documented in this file. This projec
 - The `Core\Resources\Factory` class constructor was amended to only expect a schema container. Additionally the method
   signature of the protected `build()` method was changed to receive a schema instance and the model being converted to
   a JSON:API resource.
-
-### Removed
-
-- The `Contracts\Resources\Factory::handles()` method has been removed in favour of using the new `canCreate()` method
-  instead.
-- The `Contracts\Schema\Container::resources()` method has been removed, in favour of resource factories using the
-  schema container's `existsForModel()` and `schemaForModel()` methods.
+- The `Core\Server\Server` and `Core\Server\ServerRepository` classes are now injected with the Laravel application
+  instance, instead of just type-hinting the container. This change was made to allow code within servers to access the
+  application environment, using `$this->app->environment()` rather than having to use `app()->environment()`
+  (which used to be the case as the injection was only type-hinted as the container contract).
 
 ### Fixed
 
@@ -42,6 +39,18 @@ All notable changes to this project will be documented in this file. This projec
   Laravel's `url()` helper - but that helper only appends extra parameters if there is no HTTP host in the provided
   path. The server's `url()` method now passes these as we *always* went them appended, regardless of whether the API's
   base path has a HTTP host or not.
+
+### Deprecated
+
+- The `Core\Server\Server::$container` property is deprecated and will be removed in `1.0.0-stable`. Child classes
+  should use the new `Server::$app` property instead.
+
+### Removed
+
+- The `Contracts\Resources\Factory::handles()` method has been removed in favour of using the new `canCreate()` method
+  instead.
+- The `Contracts\Schema\Container::resources()` method has been removed, in favour of resource factories using the
+  schema container's `existsForModel()` and `schemaForModel()` methods.
 
 ## [1.0.0-beta.1] - 2021-03-30
 

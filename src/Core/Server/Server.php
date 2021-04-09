@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Server;
 
 use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
@@ -49,7 +50,13 @@ abstract class Server implements ServerContract
     protected string $baseUri = '';
 
     /**
+     * @var Application
+     */
+    protected Application $app;
+
+    /**
      * @var IlluminateContainer
+     * @deprecated 1.0-stable use `$this->app` instead.
      */
     protected IlluminateContainer $container;
 
@@ -78,16 +85,17 @@ abstract class Server implements ServerContract
     /**
      * Server constructor.
      *
-     * @param IlluminateContainer $container
+     * @param Application $app
      * @param string $name
      */
-    public function __construct(IlluminateContainer $container, string $name)
+    public function __construct(Application $app, string $name)
     {
         if (empty($name)) {
             throw new InvalidArgumentException('Expecting a non-empty string.');
         }
 
-        $this->container = $container;
+        $this->app = $app;
+        $this->container = $app;
         $this->name = $name;
     }
 
