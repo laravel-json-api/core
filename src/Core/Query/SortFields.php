@@ -92,6 +92,10 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
      */
     public static function fromString(string $value): self
     {
+        if (empty($value)) {
+            return new self();
+        }
+
         return new self(...collect(explode(',', $value))
             ->map(fn($field) => SortField::fromString($field))
         );

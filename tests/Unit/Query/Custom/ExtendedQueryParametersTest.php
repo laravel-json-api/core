@@ -27,6 +27,7 @@ use LaravelJsonApi\Core\Query\FilterParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\SortFields;
+use PHPUnit\Framework\Constraint\Count;
 use PHPUnit\Framework\TestCase;
 
 class ExtendedQueryParametersTest extends TestCase
@@ -112,6 +113,18 @@ class ExtendedQueryParametersTest extends TestCase
         $base = QueryParameters::cast($expected);
 
         $this->assertSame($expected, $base);
+    }
+
+    public function testCastEmpty(): void
+    {
+        $parameters = ExtendedQueryParameters::cast($value = ['withCount' => '']);
+
+        $this->assertEquals(new CountablePaths(), $parameters->countable());
+        $this->assertEquals($value, $parameters->toQuery());
+
+        $parameters = ExtendedQueryParameters::cast([]);
+
+        $this->assertNull($parameters->countable());
     }
 
     public function testSetCountable(): void

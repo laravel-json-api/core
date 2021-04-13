@@ -129,7 +129,7 @@ class ExtendedQueryParameters extends QueryParameters
         $parameters = parent::unrecognisedParameters();
         $countable = $this->countable();
 
-        if ($countable && $countable->isNotEmpty()) {
+        if ($countable) {
             $parameters[self::$withCount] = $countable->toString();
         }
 

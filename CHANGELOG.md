@@ -39,6 +39,8 @@ All notable changes to this project will be documented in this file. This projec
   Laravel's `url()` helper - but that helper only appends extra parameters if there is no HTTP host in the provided
   path. The server's `url()` method now passes these as we *always* went them appended, regardless of whether the API's
   base path has a HTTP host or not.
+- Include paths, sort fields and countable paths now correctly parse empty values. Previously an error was caused by
+  attempting to cast an empty string to the relevant query objects.
 
 ### Deprecated
 
