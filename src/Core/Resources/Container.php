@@ -32,33 +32,18 @@ class Container implements ContainerContract
 {
 
     /**
-     * @var array
+     * @var Factory
      */
-    private array $bindings;
+    private Factory $factory;
 
     /**
      * Container constructor.
      *
-     * @param Factory ...$factories
-     */
-    public function __construct(Factory ...$factories)
-    {
-        foreach ($factories as $factory) {
-            $this->attach($factory);
-        }
-    }
-
-    /**
-     * Attach a factory to the container.
-     *
      * @param Factory $factory
-     * @return void
      */
-    public function attach(Factory $factory): void
+    public function __construct(Factory $factory)
     {
-        foreach ($factory->handles() as $fqn) {
-            $this->bindings[$fqn] = $factory;
-        }
+        $this->factory = $factory;
     }
 
     /**
@@ -89,7 +74,7 @@ class Container implements ContainerContract
      */
     public function exists(object $model): bool
     {
-        return isset($this->bindings[get_class($model)]);
+        return $this->factory->canCreate($model);
     }
 
     /**
@@ -97,7 +82,7 @@ class Container implements ContainerContract
      */
     public function create(object $model): JsonApiResource
     {
-        return $this->factoryFor($model)->createResource(
+        return $this->factory->createResource(
             $model
         );
     }
@@ -119,30 +104,14 @@ class Container implements ContainerContract
      */
     public function cursor(iterable $models): Generator
     {
-        foreach ($models as $record) {
-            if ($record instanceof JsonApiResource) {
-                yield $record;
+        foreach ($models as $model) {
+            if ($model instanceof JsonApiResource) {
+                yield $model;
                 continue;
             }
 
-            yield $this->create($record);
+            yield $this->create($model);
         }
-    }
-
-    /**
-     * @param object $record
-     * @return Factory
-     */
-    private function factoryFor(object $record): Factory
-    {
-        if ($binding = $this->bindings[get_class($record)] ?? null) {
-            return $binding;
-        }
-
-        throw new LogicException(sprintf(
-            'Class %s does not have a resource object factory registered.',
-            get_class($record)
-        ));
     }
 
 }

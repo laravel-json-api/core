@@ -424,23 +424,23 @@ class QueryParameters implements QueryParametersContract, Arrayable
     {
         $query = $this->unrecognisedParameters();
 
-        if ($this->fieldSets && $this->includePaths->isNotEmpty()) {
+        if ($this->fieldSets) {
             $query['fields'] = $this->fieldSets->toArray();
         }
 
-        if ($this->filters && $this->filters->isNotEmpty()) {
+        if ($this->filters) {
             $query['filter'] = $this->filters->toArray();
         }
 
-        if ($this->includePaths && $this->includePaths->isNotEmpty()) {
+        if ($this->includePaths) {
             $query['include'] = $this->includePaths->toString();
         }
 
-        if (is_array($this->pagination) && !empty($this->pagination)) {
+        if (is_array($this->pagination)) {
             $query['page'] = $this->pagination;
         }
 
-        if ($this->sort && $this->sort->isNotEmpty()) {
+        if ($this->sort) {
             $query['sort'] = $this->sort->toString();
         }
 
@@ -456,23 +456,23 @@ class QueryParameters implements QueryParametersContract, Arrayable
     {
         $query = $this->unrecognisedParameters();
 
-        if ($this->fieldSets && $this->fieldSets->isNotEmpty()) {
+        if ($this->fieldSets) {
             $query['fields'] = $this->fieldSets->toArray();
         }
 
-        if ($this->filters && $this->filters->isNotEmpty()) {
+        if ($this->filters) {
             $query['filter'] = $this->filters->toArray();
         }
 
-        if ($this->includePaths && $this->includePaths->isNotEmpty()) {
+        if ($this->includePaths) {
             $query['include'] = $this->includePaths->toArray();
         }
 
-        if (is_array($this->pagination) && !empty($this->pagination)) {
+        if (is_array($this->pagination)) {
             $query['page'] = $this->pagination;
         }
 
-        if ($this->sort && $this->sort->isNotEmpty()) {
+        if ($this->sort) {
             $query['sort'] = $this->sort->toArray();
         }
 

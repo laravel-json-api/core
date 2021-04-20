@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-beta.2] - 2021-04-20
+
+### Added
+
+- The schema container now supports resolving schemas for models where the schema is registered against a parent class
+  or interface. Parent classes are matched *before* interfaces, and if a match is found the resolution is cached to
+  ensure the resolution logic runs once per model class.
+- The resource factory class now looks up schemas for a model first, then retrieves the fully-qualified resource class
+  from the matched schema. By delegating to the schema like this, the resource container can now convert models to
+  resources where a schema has been registered for a parent class or interface.
+- The `Contracts\Resources\Factory` interface now has a `canCreate()` method to determine whether the factory can create
+  a JSON:API resource for the supplied model.
+- The `Contracts\Schema\Container` interface now has a `existsForModel()` method, to determine whether a schema exists
+  for the supplied model class.
+
+### Changed
+
+- The `Core\Resources\Container` class now expects a single factory instance to its constructor. This was changed as
+  there was no requirement for multiple resource factories to be loaded into the container. The container still supports
+  injecting a factory, as this allows the creation of resources by the container to be customised, without having to
+  re-implement the logic within the container class. As part of this change, the `Container::attach()` method was also
+  removed.
+- The `Core\Resources\Factory` class constructor was amended to only expect a schema container. Additionally the method
+  signature of the protected `build()` method was changed to receive a schema instance and the model being converted to
+  a JSON:API resource.
+- The `Core\Server\Server` and `Core\Server\ServerRepository` classes are now injected with the Laravel application
+  instance, instead of just type-hinting the container. This change was made to allow code within servers to access the
+  application environment, using `$this->app->environment()` rather than having to use `app()->environment()`
+  (which used to be the case as the injection was only type-hinted as the container contract).
+
+### Fixed
+
+- The base `Server` class now correctly passes extra parameters in its `url()` method. Previously these were passed to
+  Laravel's `url()` helper - but that helper only appends extra parameters if there is no HTTP host in the provided
+  path. The server's `url()` method now passes these as we *always* went them appended, regardless of whether the API's
+  base path has a HTTP host or not.
+- Include paths, sort fields and countable paths now correctly parse empty values. Previously an error was caused by
+  attempting to cast an empty string to the relevant query objects.
+
+### Deprecated
+
+- The `Core\Server\Server::$container` property is deprecated and will be removed in `1.0.0-stable`. Child classes
+  should use the new `Server::$app` property instead.
+
+### Removed
+
+- The `Contracts\Resources\Factory::handles()` method has been removed in favour of using the new `canCreate()` method
+  instead.
+- The `Contracts\Schema\Container::resources()` method has been removed, in favour of resource factories using the
+  schema container's `existsForModel()` and `schemaForModel()` methods.
+
 ## [1.0.0-beta.1] - 2021-03-30
 
 ### Added

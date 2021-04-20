@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Server;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Container\Container as IlluminateContainer;
+use Illuminate\Contracts\Foundation\Application;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Server\Repository as RepositoryContract;
 use LaravelJsonApi\Contracts\Server\Server as ServerContract;
@@ -31,9 +31,9 @@ class ServerRepository implements RepositoryContract
 {
 
     /**
-     * @var IlluminateContainer
+     * @var Application
      */
-    private IlluminateContainer $container;
+    private Application $app;
 
     /**
      * @var ConfigRepository
@@ -48,12 +48,12 @@ class ServerRepository implements RepositoryContract
     /**
      * ServerRepository constructor.
      *
-     * @param IlluminateContainer $container
+     * @param Application $app
      * @param ConfigRepository $config
      */
-    public function __construct(IlluminateContainer $container, ConfigRepository $config)
+    public function __construct(Application $app, ConfigRepository $config)
     {
-        $this->container = $container;
+        $this->app = $app;
         $this->config = $config;
         $this->cache = [];
     }
@@ -78,7 +78,7 @@ class ServerRepository implements RepositoryContract
         }
 
         try {
-            $server = new $class($this->container, $name);
+            $server = new $class($this->app, $name);
         } catch (Throwable $ex) {
             throw new RuntimeException(
                 "Unable to construct server {$name} using class {$class}.",

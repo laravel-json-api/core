@@ -133,7 +133,45 @@ class QueryParametersTest extends TestCase
     {
         $parameters = QueryParameters::cast(null);
 
+        $this->assertNull($parameters->sparseFieldSets());
+        $this->assertNull($parameters->filter());
+        $this->assertNull($parameters->page());
+        $this->assertNull($parameters->includePaths());
+        $this->assertNull($parameters->sortFields());
+        $this->assertEquals([], $parameters->unrecognisedParameters());
         $this->assertSame([], $parameters->toQuery());
+    }
+
+    public function testCastEmptyArray(): void
+    {
+        $parameters = QueryParameters::cast([]);
+
+        $this->assertNull($parameters->sparseFieldSets());
+        $this->assertNull($parameters->filter());
+        $this->assertNull($parameters->page());
+        $this->assertNull($parameters->includePaths());
+        $this->assertNull($parameters->sortFields());
+        $this->assertEquals([], $parameters->unrecognisedParameters());
+        $this->assertSame([], $parameters->toQuery());
+    }
+
+    public function testCastWithEmptyValues(): void
+    {
+        $parameters = QueryParameters::cast($values = [
+            'fields' => [],
+            'filter' => [],
+            'include' => '',
+            'page' => [],
+            'sort' => '',
+        ]);
+
+        $this->assertEquals(new FieldSets(), $parameters->sparseFieldSets());
+        $this->assertEquals(new FilterParameters(), $parameters->filter());
+        $this->assertEquals([], $parameters->page());
+        $this->assertEquals(new IncludePaths(), $parameters->includePaths());
+        $this->assertEquals(new SortFields(), $parameters->sortFields());
+        $this->assertEquals([], $parameters->unrecognisedParameters());
+        $this->assertSame($values, $parameters->toQuery());
     }
 
     /**

@@ -79,9 +79,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
             throw new \InvalidArgumentException('Expecting an array or enumerable object.');
         }
 
-        return new self(...collect($paths)->map(function ($path) {
-            return RelationshipPath::cast($path);
-        }));
+        return new self(...collect($paths)->map(fn($path) => RelationshipPath::cast($path)));
     }
 
     /**
@@ -90,9 +88,13 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
      */
     public static function fromString(string $paths): self
     {
-        return new self(...collect(explode(',', $paths))->map(function (string $path) {
-            return RelationshipPath::fromString($path);
-        }));
+        if (empty($paths)) {
+            return new self();
+        }
+
+        return new self(...collect(explode(',', $paths))
+            ->map(fn(string $path) => RelationshipPath::fromString($path))
+        );
     }
 
     /**

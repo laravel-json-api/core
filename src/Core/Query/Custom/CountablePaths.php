@@ -84,6 +84,10 @@ class CountablePaths implements IteratorAggregate, Countable, Arrayable
      */
     public static function fromString(string $paths): self
     {
+        if (empty($paths)) {
+            return new self();
+        }
+
         return new self(...explode(',', $paths));
     }
 
