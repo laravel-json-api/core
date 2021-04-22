@@ -59,6 +59,11 @@ trait IsResponsable
     private array $headers = [];
 
     /**
+     * @var Request|null
+     */
+    private ?Request $request = null;
+
+    /**
      * Add the top-level JSON:API member to the response.
      *
      * @param $jsonApi
@@ -171,6 +176,27 @@ trait IsResponsable
         $this->headers = $headers;
 
         return $this;
+    }
+
+    /**
+     * Set the request.
+     *
+     * @param Request $request
+     * @return $this
+     */
+    public function withRequest(Request $request): self
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * @return Request|null
+     */
+    public function request(): ?Request
+    {
+        return $this->request;
     }
 
     /**

@@ -111,8 +111,8 @@ class DataResponse implements Responsable
     public function toResponse($request)
     {
         return $this
-            ->prepareResponse($request)
-            ->toResponse($request);
+            ->prepareResponse($this->request() ?? $request)
+            ->toResponse($this->request() ?? $request);
     }
 
     /**
