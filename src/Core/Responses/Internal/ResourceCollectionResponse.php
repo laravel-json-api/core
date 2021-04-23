@@ -25,12 +25,14 @@ use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
-use LaravelJsonApi\Core\Responses\Concerns;
+use LaravelJsonApi\Core\Responses\Concerns\HasEncodingParameters;
+use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
 class ResourceCollectionResponse implements Responsable
 {
 
-    use Concerns\IsResponsable;
+    use HasEncodingParameters;
+    use IsResponsable;
 
     /**
      * @var ResourceCollection
@@ -78,7 +80,7 @@ class ResourceCollectionResponse implements Responsable
         $document = $encoder
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
-            ->withFieldSets($this->fieldSets($request))
+            ->withFieldSets($this->sparseFieldSets($request))
             ->withResources($this->resources)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->meta())

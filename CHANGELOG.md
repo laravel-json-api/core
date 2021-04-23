@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- Include paths and sparse field sets that should be used when encoding JSON:API responses can now be manually set on
+  response classes using the `withIncludePaths()` and `withSparseFieldSets()` methods, or using the convenience
+  `withQueryParameters()` method to set both from a query parameters object. When include paths and/or sparse field sets
+  are set on the response, these are used when encoding the response JSON instead of determining these query parameters
+  from the request. If no include paths or sparse field sets are set on the response, the previous behaviour of
+  determining these from the request is used.
+
+### Changed
+
+- **BREAKING** Methods relating to include paths and sparse field sets have been moved from the
+  `Responses\Concerns\IsResponsable` trait to a new `Responses\Concerns\HasEncodingParameters` trait. As part of this
+  change, the previous `protected` method `fieldSets()` has been renamed `sparseFieldSets()`.
+
 ## [1.0.0-beta.2] - 2021-04-20
 
 ### Added

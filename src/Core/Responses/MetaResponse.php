@@ -25,12 +25,13 @@ use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Serializable as SerializableContract;
 use LaravelJsonApi\Core\Document\Concerns\Serializable;
 use LaravelJsonApi\Core\Json\Hash;
+use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 use LogicException;
 
 class MetaResponse implements SerializableContract, Responsable
 {
 
-    use Concerns\IsResponsable;
+    use IsResponsable;
     use Serializable;
 
     /**
