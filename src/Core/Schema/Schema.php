@@ -28,6 +28,7 @@ use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LaravelJsonApi\Contracts\Schema\Sortable;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Contracts\Store\Repository;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
@@ -447,9 +448,9 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function isSortable(string $name): bool
+    public function isSortField(string $name): bool
     {
-        foreach ($this->sortable() as $sortable) {
+        foreach ($this->sortFields() as $sortable) {
             if ($sortable === $name) {
                 return true;
             }
@@ -461,7 +462,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function sortable(): iterable
+    public function sortFields(): iterable
     {
         $id = $this->id();
 
@@ -475,6 +476,11 @@ abstract class Schema implements SchemaContract, IteratorAggregate
                 yield $attr->name();
             }
         }
+
+        /** @var Sortable $sortable */
+        foreach ($this->sortables() as $sortable) {
+            yield $sortable->sortField();
+        }
     }
 
     /**
@@ -483,6 +489,16 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     public function authorizable(): bool
     {
         return true;
+    }
+
+    /**
+     * Get additional sortable fields.
+     *
+     * @return iterable
+     */
+    protected function sortables(): iterable
+    {
+        return [];
     }
 
     /**

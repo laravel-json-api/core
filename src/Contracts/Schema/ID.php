@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Schema;
 
-interface ID extends Field, Sortable
+interface ID extends Field
 {
 
     /**
@@ -50,4 +50,11 @@ interface ID extends Field, Sortable
      * @return bool
      */
     public function acceptsClientIds(): bool;
+
+    /**
+     * Is the resource sortable by its id?
+     *
+     * @return bool
+     */
+    public function isSortable(): bool;
 }

@@ -19,6 +19,15 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING** Methods relating to include paths and sparse field sets have been moved from the
   `Responses\Concerns\IsResponsable` trait to a new `Responses\Concerns\HasEncodingParameters` trait. As part of this
   change, the previous `protected` method `fieldSets()` has been renamed `sparseFieldSets()`.
+- **BREAKING** Made several changes to interfaces for sort fields:
+    - The `Attribute` and `ID` interfaces no longer implement `Sortable` and instead have a `isSortable()` method
+      directly defined on their interface.
+    - The `Sortable` interface is now intended to be implemented on a class that is an additional sort field to those
+      that are attributes. It has one method: `sortField()` which returns the name of the sort field.
+    - The `Schema::isSortable()` method has been renamed `isSortField()`. This makes it clearer that the method is
+      querying whether the provided name is a valid sort field.
+    - The `Schema::sortable()` method has been renamed `sortFields()`. This makes it clearer that the method is
+      returning a list of the sort field names.
 
 ## [1.0.0-beta.2] - 2021-04-20
 
