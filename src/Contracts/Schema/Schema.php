@@ -248,6 +248,23 @@ interface Schema extends Traversable
      public function sortFields(): iterable;
 
     /**
+     * Get a sort field by name.
+     *
+     * @param string $name
+     * @return ID|Attribute|Sortable
+     */
+     public function sortField(string $name);
+
+    /**
+     * Get additional sortables.
+     *
+     * Get sortables that are not the resource ID or a resource attribute.
+     *
+     * @return Sortable[]|iterable
+     */
+     public function sortables(): iterable;
+
+    /**
      * Determine if the resource is authorizable.
      *
      * @return bool

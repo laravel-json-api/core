@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file. This projec
       querying whether the provided name is a valid sort field.
     - The `Schema::sortable()` method has been renamed `sortFields()`. This makes it clearer that the method is
       returning a list of the sort field names.
+    - Added the `sortField()` and `sortables()` methods to the `Schema` interface.
 
 ## [1.0.0-beta.2] - 2021-04-20
 
