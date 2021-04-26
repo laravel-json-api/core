@@ -27,7 +27,6 @@ use LaravelJsonApi\Core\Query\FilterParameters;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Query\SortFields;
-use PHPUnit\Framework\Constraint\Count;
 use PHPUnit\Framework\TestCase;
 
 class ExtendedQueryParametersTest extends TestCase
