@@ -24,6 +24,8 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Resources\ResourceCollection;
+use LaravelJsonApi\Core\Responses\Concerns\HasEncodingParameters;
+use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
@@ -32,7 +34,8 @@ use function is_null;
 class DataResponse implements Responsable
 {
 
-    use Concerns\IsResponsable;
+    use HasEncodingParameters;
+    use IsResponsable;
 
     /**
      * @var Page|object|iterable|null
@@ -102,6 +105,8 @@ class DataResponse implements Responsable
             ->withMeta($this->meta)
             ->withLinks($this->links)
             ->withEncodeOptions($this->encodeOptions)
+            ->withIncludePaths($this->includePaths)
+            ->withSparseFieldSets($this->fieldSets)
             ->withHeaders($this->headers());
     }
 

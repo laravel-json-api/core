@@ -25,12 +25,15 @@ use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Responses\Concerns;
+use LaravelJsonApi\Core\Responses\Concerns\HasRelationshipMeta;
+use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
 class ResourceIdentifierResponse implements Responsable
 {
 
-    use Concerns\HasRelationshipMeta;
-    use Concerns\IsResponsable;
+    use Concerns\HasEncodingParameters;
+    use HasRelationshipMeta;
+    use IsResponsable;
 
     /**
      * @var JsonApiResource
@@ -72,7 +75,7 @@ class ResourceIdentifierResponse implements Responsable
         $document = $encoder
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
-            ->withFieldSets($this->fieldSets($request))
+            ->withFieldSets($this->sparseFieldSets($request))
             ->withToOne($this->resource, $this->fieldName, $this->related)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->allMeta())

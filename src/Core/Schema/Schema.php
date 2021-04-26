@@ -28,6 +28,7 @@ use LaravelJsonApi\Contracts\Schema\ID;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
+use LaravelJsonApi\Contracts\Schema\Sortable;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Contracts\Store\Repository;
 use LaravelJsonApi\Core\Auth\AuthorizerResolver;
@@ -36,6 +37,7 @@ use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use function array_keys;
+use function iterator_to_array;
 use function sprintf;
 
 abstract class Schema implements SchemaContract, IteratorAggregate
@@ -447,9 +449,9 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function isSortable(string $name): bool
+    public function isSortField(string $name): bool
     {
-        foreach ($this->sortable() as $sortable) {
+        foreach ($this->sortFields() as $sortable) {
             if ($sortable === $name) {
                 return true;
             }
@@ -461,20 +463,37 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function sortable(): iterable
+    public function sortFields(): iterable
     {
-        $id = $this->id();
+        return array_keys(iterator_to_array(
+            $this->allSortFields()
+        ));
+    }
 
-        if ($id->isSortable()) {
-            yield $id->name();
-        }
-
-        /** @var Attribute $attr */
-        foreach ($this->attributes() as $attr) {
-            if ($attr->isSortable()) {
-                yield $attr->name();
+    /**
+     * @inheritDoc
+     */
+    public function sortField(string $name)
+    {
+        foreach ($this->allSortFields() as $key => $sortable) {
+            if ($name === $key) {
+                return $sortable;
             }
         }
+
+        throw new LogicException(sprintf(
+            'Sort field %s does not exist on schema %s.',
+            $name,
+            get_class($this),
+        ));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function sortables(): iterable
+    {
+        return [];
     }
 
     /**
@@ -529,5 +548,31 @@ abstract class Schema implements SchemaContract, IteratorAggregate
         return $this->relations = collect($this->allFields())
             ->whereInstanceOf(Relation::class)
             ->all();
+    }
+
+    /**
+     * Iterate through all the sort fields.
+     *
+     * @return iterable
+     */
+    private function allSortFields(): iterable
+    {
+        $id = $this->id();
+
+        if ($id->isSortable()) {
+            yield $id->name() => $id;
+        }
+
+        /** @var Attribute $attribute */
+        foreach ($this->attributes() as $attribute) {
+            if ($attribute->isSortable()) {
+                yield $attribute->name() => $attribute;
+            }
+        }
+
+        /** @var Sortable $sortable */
+        foreach ($this->sortables() as $sortable) {
+            yield $sortable->sortField() => $sortable;
+        }
     }
 }

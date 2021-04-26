@@ -23,9 +23,9 @@ interface Sortable
 {
 
     /**
-     * Is the field sortable?
+     * Get the name of the sort field.
      *
-     * @return bool
+     * @return string
      */
-    public function isSortable(): bool;
+    public function sortField(): string;
 }

@@ -233,19 +233,36 @@ interface Schema extends Traversable
      public function sparseFields(): iterable;
 
     /**
-     * Is the provided name a sort parameter?
+     * Is the provided name a sort field?
      *
      * @param string $name
      * @return bool
      */
-     public function isSortable(string $name): bool;
+     public function isSortField(string $name): bool;
 
     /**
-     * Get the parameters that can be used to sort this resource.
+     * Get the parameter names that can be used to sort this resource.
      *
      * @return string[]|iterable
      */
-     public function sortable(): iterable;
+     public function sortFields(): iterable;
+
+    /**
+     * Get a sort field by name.
+     *
+     * @param string $name
+     * @return ID|Attribute|Sortable
+     */
+     public function sortField(string $name);
+
+    /**
+     * Get additional sortables.
+     *
+     * Get sortables that are not the resource ID or a resource attribute.
+     *
+     * @return Sortable[]|iterable
+     */
+     public function sortables(): iterable;
 
     /**
      * Determine if the resource is authorizable.

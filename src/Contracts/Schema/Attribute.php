@@ -19,6 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Schema;
 
-interface Attribute extends Field, Sortable
+interface Attribute extends Field
 {
+
+    /**
+     * Is the attribute sortable?
+     *
+     * @return bool
+     */
+    public function isSortable(): bool;
 }

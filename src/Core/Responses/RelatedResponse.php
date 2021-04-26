@@ -22,6 +22,9 @@ namespace LaravelJsonApi\Core\Responses;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Pagination\Page;
+use LaravelJsonApi\Core\Responses\Concerns\HasEncodingParameters;
+use LaravelJsonApi\Core\Responses\Concerns\HasRelationshipMeta;
+use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedRelatedResourceResponse;
 use LaravelJsonApi\Core\Responses\Internal\RelatedResourceCollectionResponse;
 use LaravelJsonApi\Core\Responses\Internal\RelatedResourceResponse;
@@ -32,8 +35,9 @@ use function is_null;
 class RelatedResponse implements Responsable
 {
 
-    use Concerns\HasRelationshipMeta;
-    use Concerns\IsResponsable;
+    use HasEncodingParameters;
+    use HasRelationshipMeta;
+    use IsResponsable;
 
     /**
      * @var object
@@ -91,6 +95,8 @@ class RelatedResponse implements Responsable
             ->withMeta($this->meta)
             ->withLinks($this->links)
             ->withEncodeOptions($this->encodeOptions)
+            ->withIncludePaths($this->includePaths)
+            ->withSparseFieldSets($this->fieldSets)
             ->withHeaders($this->headers());
     }
 

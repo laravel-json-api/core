@@ -19,14 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Responses\Concerns;
 
-use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
-use LaravelJsonApi\Core\Query\FieldSets;
-use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Server\Concerns\ServerAware;
+use function array_merge;
 
 trait IsResponsable
 {
@@ -178,43 +175,10 @@ trait IsResponsable
      */
     protected function headers(): array
     {
-        return \collect(['Content-Type' => 'application/vnd.api+json'])
-            ->merge($this->headers ?: [])
-            ->all();
-    }
-
-    /**
-     * @param Request $request
-     * @return IncludePaths|null
-     */
-    protected function includePaths($request): ?IncludePaths
-    {
-        if ($request instanceof QueryParameters) {
-            return $request->includePaths();
-        }
-
-        if ($request->query->has('include')) {
-            return IncludePaths::fromString($request->query('include') ?: '');
-        }
-
-        return null;
-    }
-
-    /**
-     * @param Request $request
-     * @return FieldSets|null
-     */
-    protected function fieldSets($request): ?FieldSets
-    {
-        if ($request instanceof QueryParameters) {
-            return $request->sparseFieldSets();
-        }
-
-        if ($request->query->has('fields')) {
-            return FieldSets::fromArray($request->query('fields') ?: []);
-        }
-
-        return null;
+        return array_merge(
+            ['Content-Type' => 'application/vnd.api+json'],
+            $this->headers ?: [],
+        );
     }
 
     /**

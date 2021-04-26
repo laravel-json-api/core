@@ -168,6 +168,6 @@ class SortField
      */
     public function existsOnSchema(Schema $schema): bool
     {
-        return $schema->isSortable($this->name());
+        return $schema->isSortField($this->name());
     }
 }
