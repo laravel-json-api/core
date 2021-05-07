@@ -111,7 +111,7 @@ class ResourceResponse implements Responsable
             ->withFieldSets($this->sparseFieldSets($request))
             ->withResource($this->resource)
             ->withJsonApi($this->jsonApi())
-            ->withMeta($this->meta)
+            ->withMeta($this->meta())
             ->withLinks($links)
             ->toJson($this->encodeOptions);
 

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Fixed
+
+- Ensure internal response classes all consistently use the `links()` method when passing links to the encoder. This
+  fixes a bug whereby pagination links were not added to the compound document for related resources and relationship
+  identifier responses.
+
 ## [1.0.0-beta.3] - 2021-04-26
 
 ### Added
