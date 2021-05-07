@@ -27,6 +27,7 @@ use IteratorAggregate;
 use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Pagination\Page;
+use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
 use function count;
@@ -45,9 +46,9 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
     protected bool $preserveAllQueryParameters = false;
 
     /**
-     * @var array|null
+     * @var QueryParameters|null
      */
-    protected ?array $queryParameters = null;
+    protected ?QueryParameters $queryParameters = null;
 
     /**
      * ResourceCollection constructor.
@@ -74,13 +75,13 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
     /**
      * Specify the query string parameters that should be present on pagination links.
      *
-     * @param iterable $query
+     * @param mixed $query
      * @return $this
      */
-    public function withQuery(iterable $query): self
+    public function withQuery($query): self
     {
         $this->preserveAllQueryParameters = false;
-        $this->queryParameters = \collect($query)->all();
+        $this->queryParameters = QueryParameters::cast($query);
 
         return $this;
     }
@@ -161,7 +162,7 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
 
         if ($this->preserveAllQueryParameters) {
             $this->resources->withQuery($request->query());
-        } else if (\is_array($this->queryParameters)) {
+        } else if ($this->queryParameters) {
             $this->resources->withQuery($this->queryParameters);
         }
 
