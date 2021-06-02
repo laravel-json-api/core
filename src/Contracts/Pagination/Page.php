@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Contracts\Pagination;
 use Countable;
 use Illuminate\Contracts\Support\Responsable;
 use IteratorAggregate;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Document\Links;
 
 interface Page extends IteratorAggregate, Countable, Responsable
@@ -44,8 +45,8 @@ interface Page extends IteratorAggregate, Countable, Responsable
     /**
      * Specify the query string parameters that should be present on pagination links.
      *
-     * @param iterable $query
+     * @param QueryParameters|array|mixed $query
      * @return $this
      */
-    public function withQuery(iterable $query): self;
+    public function withQuery($query): self;
 }

@@ -79,7 +79,7 @@ class RelatedResourceResponse implements Responsable
             ->withResource($this->related)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->allMeta())
-            ->withLinks($this->links)
+            ->withLinks($this->links())
             ->toJson($this->encodeOptions);
 
         return new Response(

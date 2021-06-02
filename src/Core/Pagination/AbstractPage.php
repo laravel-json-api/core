@@ -20,11 +20,14 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Pagination;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
+use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
+use function ksort;
 
 abstract class AbstractPage implements PageContract
 {
@@ -53,9 +56,9 @@ abstract class AbstractPage implements PageContract
     /**
      * The query parameters that must be used for links.
      *
-     * @var array|null
+     * @var QueryParameters|null
      */
-    private ?array $queryParameters = null;
+    private ?QueryParameters $queryParameters = null;
 
     /**
      * Get the link to the first page.
@@ -177,9 +180,9 @@ abstract class AbstractPage implements PageContract
     /**
      * @inheritDoc
      */
-    public function withQuery(iterable $query): PageContract
+    public function withQuery($query): PageContract
     {
-        $this->queryParameters = collect($query)->all();
+        $this->queryParameters = QueryParameters::cast($query);
 
         return $this;
     }
@@ -246,7 +249,7 @@ abstract class AbstractPage implements PageContract
     {
         ksort($page);
 
-        return collect($this->queryParameters)
+        return Collection::make($this->queryParameters ? $this->queryParameters->toQuery() : [])
             ->put('page', $page)
             ->sortKeys()
             ->all();

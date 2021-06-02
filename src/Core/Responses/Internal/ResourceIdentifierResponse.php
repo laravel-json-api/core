@@ -79,7 +79,7 @@ class ResourceIdentifierResponse implements Responsable
             ->withToOne($this->resource, $this->fieldName, $this->related)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->allMeta())
-            ->withLinks($this->links)
+            ->withLinks($this->links())
             ->toJson($this->encodeOptions);
 
         return new Response(

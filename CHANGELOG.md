@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-beta.4] - 2021-06-02
+
+### Changed
+
+- **BREAKING** Removed the iterable type-hint from the `Contracts\Pagination\Page::withQuery()` method. The value passed
+  can be any value that can be cast to a `Core\Query\QueryParameters` object. This change also affects the
+  `Core\Pagination\AbstactPage::withQuery()` method, that has been updated to remove the type-hint. This will affect any
+  child classes that have overloaded this method.
+- **BREAKING** Remove the iterable type-hint from the `Core\Resources\ResourceCollection::withQuery()` method. The value
+  passed can be any value that can be cast to a `Core\Query\QueryParameters` object.
+
+### Fixed
+
+- Ensure internal response classes all consistently use the `links()` method when passing links to the encoder. This
+  fixes a bug whereby pagination links were not added to the compound document for related resources and relationship
+  identifier responses.
+- Query parameters passed to the abstract page object were not correctly encoding to a query string. This is because the
+  `collect()` method was being used, which meant `QueryParameters::toArray()` would be used to serialize query
+  parameters. This has now been updated to use `QueryParameters::toQuery()` instead, which is the correct method to use.
+
 ## [1.0.0-beta.3] - 2021-04-26
 
 ### Added
