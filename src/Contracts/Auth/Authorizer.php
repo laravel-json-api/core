@@ -69,7 +69,17 @@ interface Authorizer
     public function destroy(Request $request, object $model): bool;
 
     /**
-     * Authorize the show-related and show-relationship controller action.
+     * Authorize the show-related controller action.
+     *
+     * @param Request $request
+     * @param object $model
+     * @param string $fieldName
+     * @return bool
+     */
+    public function showRelated(Request $request, object $model, string $fieldName): bool;
+
+    /**
+     * Authorize the show-relationship controller action.
      *
      * @param Request $request
      * @param object $model

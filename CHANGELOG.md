@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- [#6](https://github.com/laravel-json-api/core/issues/6) The authorizer contract now has a `showRelated` method to
+  authorize the show-related controller action. Previously the `showRelationship` method was used to authorize both the
+  show-related and show-relationship controller actions. This change means that authorizers can implement different
+  authorization logic if needed. However, our default authorizer (the `Auth\Authorizer` class) remains unchanged in that
+  both actions expect there to be a `view<RelationshipName>` method on the policy to authorize these actions.
+
+### Changed
+
+- The `Auth\Authorizer` class is no longer `final` and can now be extended if needed.
+
 ## [1.0.0-beta.4] - 2021-06-02
 
 ### Changed
