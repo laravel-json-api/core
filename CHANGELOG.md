@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file. This projec
   show-related and show-relationship controller actions. This change means that authorizers can implement different
   authorization logic if needed. However, our default authorizer (the `Auth\Authorizer` class) remains unchanged in that
   both actions expect there to be a `view<RelationshipName>` method on the policy to authorize these actions.
+- The `JsonApiException` class now has `is4xx()` and `is5xx()` helper methods for determining whether the HTTP status
+  code is in the 4xx or 5xx range.
 
 ### Changed
 

@@ -87,6 +87,30 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
     }
 
     /**
+     * Does the exception have a 4xx status code?
+     *
+     * @return bool
+     */
+    public function is4xx(): bool
+    {
+        $status = $this->getStatusCode();
+
+        return (400 <= $status) && (500 > $status);
+    }
+
+    /**
+     * Does the exception have a 5xx status code?
+     *
+     * @return bool
+     */
+    public function is5xx(): bool
+    {
+        $status = $this->getStatusCode();
+
+        return (500 <= $status) && (600 > $status);
+    }
+
+    /**
      * @inheritDoc
      */
     public function getHeaders()
@@ -119,8 +143,8 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
         return $this->errors
             ->prepareResponse($request)
             ->withJsonApi($this->jsonApi())
-            ->withMeta($this->meta)
-            ->withLinks($this->links)
+            ->withMeta($this->meta())
+            ->withLinks($this->links())
             ->withHeaders($this->headers);
     }
 
