@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Responses\Concerns;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Json\Hash;
+use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Server\Concerns\ServerAware;
 use function array_merge;
 
@@ -189,7 +190,7 @@ trait IsResponsable
     protected function defaultJsonApi(): void
     {
         if ($this->jsonApi()->isEmpty()) {
-            $jsonApi = new JsonApi('1.0');
+            $jsonApi = new JsonApi(JsonApiService::JSON_API_VERSION);
 
             if ($server = $this->serverIfExists()) {
                 $jsonApi = $server->jsonApi();

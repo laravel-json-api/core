@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changed
 
 - The `Auth\Authorizer` class is no longer `final` and can now be extended if needed.
+- Moved the package JSON:API version to a constant on the `JsonApiService` class.
 
 ## [1.0.0-beta.4] - 2021-06-02
 
