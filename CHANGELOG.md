@@ -17,6 +17,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- The `Schema\Schema` class no longer sorts fields by their name. This means fields are now processed in the order that
+  they are defined by the developer. Fields can be listed in alphabetical order by the developer if that is the desired
+  order.
 - The `Auth\Authorizer` class is no longer `final` and can now be extended if needed.
 - Moved the package JSON:API version to a constant on the `JsonApiService` class.
 
