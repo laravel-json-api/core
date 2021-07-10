@@ -27,7 +27,7 @@ use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Store\LazyRelation;
 use LaravelJsonApi\Core\Support\Str;
 
-final class Authorizer implements AuthorizerContract
+class Authorizer implements AuthorizerContract
 {
 
     /**
@@ -130,7 +130,7 @@ final class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function showRelationship(Request $request, object $model, string $fieldName): bool
+    public function showRelated(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -140,6 +140,14 @@ final class Authorizer implements AuthorizerContract
         }
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function showRelationship(Request $request, object $model, string $fieldName): bool
+    {
+        return $this->showRelated($request, $model, $fieldName);
     }
 
     /**

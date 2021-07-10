@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
+use Illuminate\Support\Collection;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Pagination\Paginator;
 use LaravelJsonApi\Contracts\Schema\Attribute;
@@ -513,13 +514,18 @@ abstract class Schema implements SchemaContract, IteratorAggregate
             return $this->fields;
         }
 
-        return $this->fields = collect($this->fields())->keyBy(function (Field $field) {
+        $fields = [];
+
+        /** @var Field $field */
+        foreach ($this->fields() as $field) {
             if ($field instanceof SchemaAwareContract) {
                 $field->withSchemas($this->server->schemas());
             }
 
-            return $field->name();
-        })->sortKeys()->all();
+            $fields[$field->name()] = $field;
+        }
+
+        return $this->fields = $fields;
     }
 
     /**
@@ -531,7 +537,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
             return $this->attributes;
         }
 
-        return $this->attributes = collect($this->allFields())
+        return $this->attributes = Collection::make($this->allFields())
             ->whereInstanceOf(Attribute::class)
             ->all();
     }
@@ -545,7 +551,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
             return $this->relations;
         }
 
-        return $this->relations = collect($this->allFields())
+        return $this->relations = Collection::make($this->allFields())
             ->whereInstanceOf(Relation::class)
             ->all();
     }

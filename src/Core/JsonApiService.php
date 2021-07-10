@@ -30,6 +30,11 @@ class JsonApiService
 {
 
     /**
+     * @var string
+     */
+    public const JSON_API_VERSION = '1.0';
+
+    /**
      * @var Container
      */
     private Container $container;
