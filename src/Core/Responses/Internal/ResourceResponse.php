@@ -131,8 +131,8 @@ class ResourceResponse implements Responsable
             ->merge($this->headers ?: [])
             ->all();
 
-        if ($this->resourceWasCreated()) {
-            $headers['Location'] = $this->resource->selfUrl();
+        if ($this->resourceWasCreated() && $selfUrl = $this->resource->selfUrl()) {
+            $headers['Location'] = $selfUrl;
         }
 
         return $headers;

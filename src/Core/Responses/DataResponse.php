@@ -137,7 +137,9 @@ class DataResponse implements Responsable
         }
 
         if ($this->value instanceof JsonApiResource) {
-            return $this->value->prepareResponse($request);
+            return $this->value
+                ->prepareResponse($request)
+                ->withCreated($this->created);
         }
 
         $resources = $this->server()->resources();
