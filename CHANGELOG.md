@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Fixed
+
+- Ensure the `DataResponse` class passes on its created flag if its data member is already a `JsonApiResource`.
+- Only add the `Location` header to a response if the resource has a `self` URL. Previously the header would be set with
+  a `null` value.
+
 ## [1.0.0-beta.5] - 2021-07-10
 
 ### Added
