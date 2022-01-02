@@ -184,10 +184,7 @@ class JsonApiResource implements ArrayAccess, Responsable
     {
         foreach ($this->schema->relationships() as $relation) {
             if ($relation instanceof SerializableRelation && $relation->isNotHidden($request)) {
-                yield $relation->serializedFieldName() => $relation->serialize(
-                    $this->resource,
-                    $this->selfUrl(),
-                );
+                yield $relation->serializedFieldName() => $this->serializeRelation($relation);
             }
         }
     }
@@ -331,6 +328,20 @@ class JsonApiResource implements ArrayAccess, Responsable
             $keyName,
             $field ? $field->uriName() : null,
         );
+    }
+
+    /**
+     * Serialize a relation.
+     *
+     * Child classes can overload this method to further customise the serialization of
+     * the relationship.
+     *
+     * @param SerializableRelation $relation
+     * @return JsonApiRelation
+     */
+    protected function serializeRelation(SerializableRelation $relation): JsonApiRelation
+    {
+        return $relation->serialize($this->resource, $this->selfUrl());
     }
 
     /**

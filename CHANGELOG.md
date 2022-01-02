@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file. This projec
   field is meant to be skipped.
 - The `ConditionalFields` class now has a public `values()` method to get the values of the fields without checking
   whether the fields are meant to be skipped.
+- [laravel-#127](https://github.com/laravel-json-api/laravel/issues/127) The `JsonApiResource` class now has a
+  protected `serializeRelation()` method, that allows a developer to customise the serialization of a JSON:API
+  resource's relationship beyond the default implemented by this package.
 
 ### Fixed
 
