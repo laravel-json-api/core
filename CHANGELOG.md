@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- The `ConditionalField` class now has a `value()` method to get the value of the field without checking whether the
+  field is meant to be skipped.
+- The `ConditionalFields` class now has a public `values()` method to get the values of the fields without checking
+  whether the fields are meant to be skipped.
+
+### Fixed
+
+- [laravel-#130](https://github.com/laravel-json-api/laravel/issues/130) The `JsonApiResource::relationship()` method
+  now safely iterates over relationships even if they are conditional. This means the named relationship will always be
+  found even if it is marked to be skipped when serializing the resource. This is implemented through a
+  new `RelationIterator` class.
+
 ## [1.0.0] - 2021-07-31
 
 ### Fixed

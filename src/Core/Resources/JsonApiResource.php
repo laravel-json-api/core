@@ -252,14 +252,17 @@ class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get a resource relation by name.
      *
+     * When searching for a relationship by name, all relations will be checked
+     * regardless of whether they are conditional fields.
+     *
      * @param string $name
      * @return JsonApiRelation
      */
     public function relationship(string $name): JsonApiRelation
     {
         /** @var JsonApiRelation $relation */
-        foreach ($this->relationships(null) as $relation) {
-            if ($relation->fieldName() === $name) {
+        foreach (new RelationIterator($this) as $field => $relation) {
+            if ($field === $name) {
                 return $relation;
             }
         }
