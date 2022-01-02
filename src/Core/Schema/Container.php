@@ -19,10 +19,10 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
-use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Core\Support\ContainerResolver;
 use LogicException;
 use RuntimeException;
 use Throwable;
@@ -31,11 +31,10 @@ use function is_object;
 
 class Container implements ContainerContract
 {
-
     /**
-     * @var IlluminateContainer
+     * @var ContainerResolver
      */
-    private IlluminateContainer $container;
+    private ContainerResolver $container;
 
     /**
      * @var Server
@@ -65,11 +64,11 @@ class Container implements ContainerContract
     /**
      * Container constructor.
      *
-     * @param IlluminateContainer $container
+     * @param ContainerResolver $container
      * @param Server $server
      * @param iterable $schemas
      */
-    public function __construct(IlluminateContainer $container, Server $server, iterable $schemas)
+    public function __construct(ContainerResolver $container, Server $server, iterable $schemas)
     {
         $this->container = $container;
         $this->server = $server;
@@ -189,7 +188,7 @@ class Container implements ContainerContract
     private function make(string $schemaClass): Schema
     {
         try {
-            $schema = $this->container->make($schemaClass, [
+            $schema = $this->container->instance()->make($schemaClass, [
                 'schemas' => $this,
                 'server' => $this->server,
             ]);

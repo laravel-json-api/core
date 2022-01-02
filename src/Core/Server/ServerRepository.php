@@ -20,25 +20,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Server;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
-use Illuminate\Contracts\Foundation\Application;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Server\Repository as RepositoryContract;
 use LaravelJsonApi\Contracts\Server\Server as ServerContract;
+use LaravelJsonApi\Core\Support\AppResolver;
 use RuntimeException;
 use Throwable;
 
 class ServerRepository implements RepositoryContract
 {
-
     /**
-     * @var Application
+     * @var AppResolver
      */
-    private Application $app;
-
-    /**
-     * @var ConfigRepository
-     */
-    private ConfigRepository $config;
+    private AppResolver $app;
 
     /**
      * @var array
@@ -48,13 +42,11 @@ class ServerRepository implements RepositoryContract
     /**
      * ServerRepository constructor.
      *
-     * @param Application $app
-     * @param ConfigRepository $config
+     * @param AppResolver $app
      */
-    public function __construct(Application $app, ConfigRepository $config)
+    public function __construct(AppResolver $app)
     {
         $this->app = $app;
-        $this->config = $config;
         $this->cache = [];
     }
 
@@ -71,7 +63,7 @@ class ServerRepository implements RepositoryContract
             return $this->cache[$name];
         }
 
-        $class = $this->config->get("jsonapi.servers.{$name}");
+        $class = $this->config()->get("jsonapi.servers.{$name}");
 
         if (empty($class) || !class_exists($class)) {
             throw new RuntimeException("Server {$name} does not exist in config or is not a valid class.");
@@ -92,5 +84,13 @@ class ServerRepository implements RepositoryContract
         }
 
         throw new RuntimeException("Class for server {$name} is not a server instance.");
+    }
+
+    /**
+     * @return ConfigRepository
+     */
+    private function config(): ConfigRepository
+    {
+        return $this->app->instance()->make(ConfigRepository::class);
     }
 }

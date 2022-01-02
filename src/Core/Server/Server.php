@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Server;
 
-use Illuminate\Contracts\Container\Container as IlluminateContainer;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -37,11 +36,11 @@ use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Store\Store;
+use LaravelJsonApi\Core\Support\AppResolver;
 use LogicException;
 
 abstract class Server implements ServerContract
 {
-
     /**
      * The base URI for the server.
      *
@@ -50,15 +49,9 @@ abstract class Server implements ServerContract
     protected string $baseUri = '';
 
     /**
-     * @var Application
+     * @var AppResolver
      */
-    protected Application $app;
-
-    /**
-     * @var IlluminateContainer
-     * @deprecated 1.0-stable use `$this->app` instead.
-     */
-    protected IlluminateContainer $container;
+    private AppResolver $app;
 
     /**
      * @var string
@@ -85,17 +78,16 @@ abstract class Server implements ServerContract
     /**
      * Server constructor.
      *
-     * @param Application $app
+     * @param AppResolver $app
      * @param string $name
      */
-    public function __construct(Application $app, string $name)
+    public function __construct(AppResolver $app, string $name)
     {
         if (empty($name)) {
             throw new InvalidArgumentException('Expecting a non-empty string.');
         }
 
         $this->app = $app;
-        $this->container = $app;
         $this->name = $name;
     }
 
@@ -125,7 +117,7 @@ abstract class Server implements ServerContract
         }
 
         return $this->schemas = new SchemaContainer(
-            $this->container,
+            $this->app->container(),
             $this,
             $this->allSchemas(),
         );
@@ -159,7 +151,7 @@ abstract class Server implements ServerContract
     public function encoder(): Encoder
     {
         /** @var EncoderFactory $factory */
-        $factory = $this->container->make(EncoderFactory::class);
+        $factory = $this->app()->make(EncoderFactory::class);
 
         return $factory->build($this);
     }
@@ -188,7 +180,7 @@ abstract class Server implements ServerContract
             $path = rtrim($path, '/') . '/' . $tail;
         }
 
-        return $this->container->make(UrlGenerator::class)->to($path, [], $secure);
+        return $this->app()->make(UrlGenerator::class)->to($path, [], $secure);
     }
 
     /**
@@ -205,4 +197,13 @@ abstract class Server implements ServerContract
         throw new LogicException('No base URI set on server.');
     }
 
+    /**
+     * Get the application instance.
+     *
+     * @return Application
+     */
+    protected function app(): Application
+    {
+        return $this->app->instance();
+    }
 }
