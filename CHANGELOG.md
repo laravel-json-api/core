@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file. This projec
 - [laravel-#127](https://github.com/laravel-json-api/laravel/issues/127) The `JsonApiResource` class now has a
   protected `serializeRelation()` method, that allows a developer to customise the serialization of a JSON:API
   resource's relationship beyond the default implemented by this package.
+- The resource `Relation` class now has two additional helper methods: `onlySelfLink()` and `onlyRelatedLink()`.
 
 ### Fixed
 

@@ -265,7 +265,7 @@ class JsonApiResource implements ArrayAccess, Responsable
         }
 
         throw new LogicException(sprintf(
-            'Unexpected relationship %s on resource %s.',
+            'Unknown relationship %s on resource %s: relationship does not exist or is hidden.',
             $name,
             $this->type()
         ));
