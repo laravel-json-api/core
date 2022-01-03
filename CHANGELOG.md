@@ -15,6 +15,12 @@ All notable changes to this project will be documented in this file. This projec
   protected `serializeRelation()` method, that allows a developer to customise the serialization of a JSON:API
   resource's relationship beyond the default implemented by this package.
 - The resource `Relation` class now has two additional helper methods: `onlySelfLink()` and `onlyRelatedLink()`.
+- Added new features to the `Links` object:
+  - It now implements `ArrayAccess`.
+  - New `has()` method for checking whether a key exists in the links object.
+  - New `hasSelf()` and `getSelf()` methods for accessing the `self` link defined by the JSON:API spec.
+  - New `hasRelated()` and `getRelated()` methods for accessing the `related` link defined by the JSON:API spec.
+  - New `all()` method for getting the links as an array.
 
 ### Fixed
 
