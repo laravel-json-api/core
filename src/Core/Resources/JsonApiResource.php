@@ -184,10 +184,7 @@ class JsonApiResource implements ArrayAccess, Responsable
     {
         foreach ($this->schema->relationships() as $relation) {
             if ($relation instanceof SerializableRelation && $relation->isNotHidden($request)) {
-                yield $relation->serializedFieldName() => $relation->serialize(
-                    $this->resource,
-                    $this->selfUrl(),
-                );
+                yield $relation->serializedFieldName() => $this->serializeRelation($relation);
             }
         }
     }
@@ -252,20 +249,23 @@ class JsonApiResource implements ArrayAccess, Responsable
     /**
      * Get a resource relation by name.
      *
+     * When searching for a relationship by name, all relations will be checked
+     * regardless of whether they are conditional fields.
+     *
      * @param string $name
      * @return JsonApiRelation
      */
     public function relationship(string $name): JsonApiRelation
     {
         /** @var JsonApiRelation $relation */
-        foreach ($this->relationships(null) as $relation) {
-            if ($relation->fieldName() === $name) {
+        foreach (new RelationIterator($this) as $field => $relation) {
+            if ($field === $name) {
                 return $relation;
             }
         }
 
         throw new LogicException(sprintf(
-            'Unexpected relationship %s on resource %s.',
+            'Unknown relationship %s on resource %s: relationship does not exist or is hidden.',
             $name,
             $this->type()
         ));
@@ -328,6 +328,20 @@ class JsonApiResource implements ArrayAccess, Responsable
             $keyName,
             $field ? $field->uriName() : null,
         );
+    }
+
+    /**
+     * Serialize a relation.
+     *
+     * Child classes can overload this method to further customise the serialization of
+     * the relationship.
+     *
+     * @param SerializableRelation $relation
+     * @return JsonApiRelation
+     */
+    protected function serializeRelation(SerializableRelation $relation): JsonApiRelation
+    {
+        return $relation->serialize($this->resource, $this->selfUrl());
     }
 
     /**

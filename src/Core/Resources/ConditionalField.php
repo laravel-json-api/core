@@ -79,10 +79,20 @@ class ConditionalField implements JsonSerializable, Skippable
     public function get()
     {
         if (false === $this->skip()) {
-            return ($this)();
+            return $this->value();
         }
 
         throw new LogicException('Conditional attribute must not be serialized.');
+    }
+
+    /**
+     * Get the value without checking if it should be skipped.
+     *
+     * @return mixed
+     */
+    public function value()
+    {
+        return ($this)();
     }
 
     /**

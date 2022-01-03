@@ -25,25 +25,14 @@ use Illuminate\Http\Response;
 use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Responses\Concerns;
-use LaravelJsonApi\Core\Responses\Concerns\HasRelationshipMeta;
+use LaravelJsonApi\Core\Responses\Concerns\HasRelationship;
 use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 
 class ResourceIdentifierResponse implements Responsable
 {
-
     use Concerns\HasEncodingParameters;
-    use HasRelationshipMeta;
+    use HasRelationship;
     use IsResponsable;
-
-    /**
-     * @var JsonApiResource
-     */
-    private JsonApiResource $resource;
-
-    /**
-     * @var string
-     */
-    private string $fieldName;
 
     /**
      * @var object|null
@@ -79,7 +68,7 @@ class ResourceIdentifierResponse implements Responsable
             ->withToOne($this->resource, $this->fieldName, $this->related)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->allMeta())
-            ->withLinks($this->links())
+            ->withLinks($this->allLinks())
             ->toJson($this->encodeOptions);
 
         return new Response(
@@ -88,28 +77,4 @@ class ResourceIdentifierResponse implements Responsable
             $this->headers()
         );
     }
-
-    /**
-     * @return Hash|null
-     */
-    private function allMeta(): ?Hash
-    {
-        return Hash::cast($this->metaForRelationship())
-            ->merge($this->meta());
-    }
-
-    /**
-     * @return array|null
-     */
-    private function metaForRelationship(): ?array
-    {
-        if ($this->hasRelationMeta) {
-            return $this->resource
-                ->relationship($this->fieldName)
-                ->meta();
-        }
-
-        return null;
-    }
-
 }

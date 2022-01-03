@@ -85,7 +85,7 @@ class ConditionalFields implements IteratorAggregate, Skippable
     /**
      * @return iterable
      */
-    private function values(): iterable
+    public function values(): iterable
     {
         if ($this->values instanceof Closure) {
             $values = ($this->values)();

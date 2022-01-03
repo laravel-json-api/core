@@ -131,6 +131,36 @@ class RelationTest extends TestCase
         ), $relation->links());
     }
 
+    public function testOnlySelfLink(): void
+    {
+        $relation = new Relation(
+            $this->model,
+            'http://localhost/api/v1/posts/1',
+            'author',
+        );
+
+        $this->assertSame($relation, $relation->onlySelfLink());
+
+        $this->assertEquals(new Links(
+            new Link('self', 'http://localhost/api/v1/posts/1/relationships/author'),
+        ), $relation->links());
+    }
+
+    public function testOnlyRelatedLink(): void
+    {
+        $relation = new Relation(
+            $this->model,
+            'http://localhost/api/v1/posts/1',
+            'author',
+        );
+
+        $this->assertSame($relation, $relation->onlyRelatedLink());
+
+        $this->assertEquals(new Links(
+            new Link('related', 'http://localhost/api/v1/posts/1/author'),
+        ), $relation->links());
+    }
+
     public function testWithoutLinks(): void
     {
         $relation = new Relation(
