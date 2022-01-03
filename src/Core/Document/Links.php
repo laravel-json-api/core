@@ -19,19 +19,20 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Document;
 
+use ArrayAccess;
 use Countable;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Json\Json;
 use LogicException;
-use function collect;
 use function count;
 use function json_encode;
 use function ksort;
 
-class Links implements Serializable, IteratorAggregate, Countable
+class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
 {
-
     use Concerns\Serializable;
 
     /**
@@ -97,6 +98,47 @@ class Links implements Serializable, IteratorAggregate, Countable
     }
 
     /**
+     * @inheritDoc
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->stack[$offset]);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetGet($offset)
+    {
+        return $this->stack[$offset];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetSet($offset, $value)
+    {
+        if ($value instanceof Link && $offset === $value->key()) {
+            $this->push($value);
+            return;
+        }
+
+        if ($value instanceof Link) {
+            throw new InvalidArgumentException("Expecting link to have the key '$offset'.");
+        }
+
+        throw new InvalidArgumentException('Expecting a link object.');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetUnset($offset)
+    {
+        unset($this->stack[$offset]);
+    }
+
+    /**
      * Get a link by its key.
      *
      * @param string $key
@@ -105,6 +147,55 @@ class Links implements Serializable, IteratorAggregate, Countable
     public function get(string $key): ?Link
     {
         return $this->stack[$key] ?? null;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function has(string $key): bool
+    {
+        return isset($this->stack[$key]);
+    }
+
+    /**
+     * Get the "self" link.
+     *
+     * @return Link|null
+     */
+    public function getSelf(): ?Link
+    {
+        return $this->get('self');
+    }
+
+    /**
+     * Does the "self" link exist?
+     *
+     * @return bool
+     */
+    public function hasSelf(): bool
+    {
+        return $this->has('self');
+    }
+
+    /**
+     * Get the "related" link.
+     *
+     * @return Link|null
+     */
+    public function getRelated(): ?Link
+    {
+        return $this->get('related');
+    }
+
+    /**
+     * Does the "related" link exist?
+     *
+     * @return bool
+     */
+    public function hasRelated(): bool
+    {
+        return $this->has('related');
     }
 
     /**
@@ -192,11 +283,19 @@ class Links implements Serializable, IteratorAggregate, Countable
     }
 
     /**
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->stack;
+    }
+
+    /**
      * @inheritDoc
      */
     public function toArray()
     {
-        return collect($this->stack)->toArray();
+        return Collection::make($this->stack)->toArray();
     }
 
     /**

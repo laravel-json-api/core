@@ -245,11 +245,27 @@ class Relation implements JsonApiRelation
     /**
      * @return $this
      */
+    public function onlySelfLink(): self
+    {
+        return $this->withoutRelatedLink();
+    }
+
+    /**
+     * @return $this
+     */
     public function withoutRelatedLink(): self
     {
         $this->showRelated = false;
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function onlyRelatedLink(): self
+    {
+        return $this->withoutSelfLink();
     }
 
     /**

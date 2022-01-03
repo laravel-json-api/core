@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.1.0] - 2022-01-03
+
+### Added
+
+- Relationship response classes now merge relationship links with the links set on the response classes. This can be
+  disabled by calling the `withoutRelationshipLinks()` method on these classes.
+- The `ConditionalField` class now has a `value()` method to get the value of the field without checking whether the
+  field is meant to be skipped.
+- The `ConditionalFields` class now has a public `values()` method to get the values of the fields without checking
+  whether the fields are meant to be skipped.
+- [laravel-#127](https://github.com/laravel-json-api/laravel/issues/127) The `JsonApiResource` class now has a
+  protected `serializeRelation()` method, that allows a developer to customise the serialization of a JSON:API
+  resource's relationship beyond the default implemented by this package.
+- The resource `Relation` class now has two additional helper methods: `onlySelfLink()` and `onlyRelatedLink()`.
+- Added new features to the `Links` object:
+    - It now implements `ArrayAccess`.
+    - New `has()` method for checking whether a key exists in the links object.
+    - New `hasSelf()` and `getSelf()` methods for accessing the `self` link defined by the JSON:API spec.
+    - New `hasRelated()` and `getRelated()` methods for accessing the `related` link defined by the JSON:API spec.
+    - New `all()` method for getting the links as an array.
+
+### Fixed
+
+- [laravel-#130](https://github.com/laravel-json-api/laravel/issues/130) The `JsonApiResource::relationship()` method
+  now safely iterates over relationships even if they are conditional. This means the named relationship will always be
+  found even if it is marked to be skipped when serializing the resource. This is implemented through a
+  new `RelationIterator` class.
+- [laravel-#105](https://github.com/laravel-json-api/laravel/issues/105) The relationship response classes now handle
+  the relationship not existing on the resource. This can happen if a developer has marked the relationship as hidden.
+  While it is not recommended to hide relationships that have relationship endpoints, this gracefully handles this
+  scenario when merging links and meta into the top-level document response.
+
 ## [1.0.0] - 2021-07-31
 
 ### Fixed
