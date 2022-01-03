@@ -108,6 +108,7 @@ class Link implements Serializable
     /**
      * @inheritDoc
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         if ($this->doesntHaveMeta()) {

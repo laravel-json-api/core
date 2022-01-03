@@ -31,6 +31,7 @@ use IteratorAggregate;
 use JsonSerializable;
 use LaravelJsonApi\Core\Document\Concerns\Serializable;
 use LogicException;
+use Traversable;
 use UnexpectedValueException;
 use function json_decode;
 use function strval;
@@ -228,7 +229,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
@@ -236,6 +237,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->fieldValues->offsetGet($offset);
@@ -244,7 +246,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new LogicException('Resource object is immutable.');
     }
@@ -252,7 +254,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new LogicException('Resource object is immutable.');
     }
@@ -784,7 +786,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->fieldValues->getIterator();
     }
@@ -792,7 +794,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return collect([
             'type' => $this->type,

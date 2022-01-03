@@ -24,6 +24,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Pagination\Page as PageContract;
 use LaravelJsonApi\Core\Document\Link;
+use Traversable;
 use function collect;
 use function count;
 use function is_null;
@@ -183,7 +184,7 @@ class Page extends AbstractPage
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->paginator;
     }
@@ -191,7 +192,7 @@ class Page extends AbstractPage
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->paginator);
     }

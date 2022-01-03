@@ -98,6 +98,7 @@ class ConditionalField implements JsonSerializable, Skippable
     /**
      * @inheritDoc
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->get();

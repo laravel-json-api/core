@@ -29,6 +29,7 @@ use LaravelJsonApi\Contracts\ErrorProvider;
 use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Responses\ErrorResponse;
 use LogicException;
+use Traversable;
 use function array_merge;
 use function collect;
 
@@ -182,7 +183,7 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->stack;
     }
@@ -190,7 +191,7 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->stack);
     }
@@ -206,7 +207,7 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->stack;
     }

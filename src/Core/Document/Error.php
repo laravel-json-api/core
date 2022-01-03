@@ -419,7 +419,7 @@ class Error implements Serializable, Responsable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_filter([
             'code' => $this->code(),

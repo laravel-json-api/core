@@ -26,6 +26,7 @@ use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Schema\PolymorphicRelation;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use Traversable;
 
 class IncludePathIterator implements \IteratorAggregate, Arrayable
 {
@@ -82,7 +83,7 @@ class IncludePathIterator implements \IteratorAggregate, Arrayable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         /** @var Relation $relation */
         foreach ($this->schema->relationships() as $relation) {
