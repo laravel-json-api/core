@@ -123,7 +123,7 @@ class MetaResponse implements SerializableContract, Responsable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return array_filter([
             'jsonapi' => $this->jsonApi()->jsonSerialize(),

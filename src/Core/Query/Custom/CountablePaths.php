@@ -26,6 +26,7 @@ use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Implementations\Countable\CountableSchema;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use Traversable;
 use UnexpectedValueException;
 use function is_array;
 use function is_null;
@@ -203,7 +204,7 @@ class CountablePaths implements IteratorAggregate, Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->paths);
     }
@@ -211,7 +212,7 @@ class CountablePaths implements IteratorAggregate, Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->paths;
     }

@@ -188,7 +188,7 @@ class ErrorSource implements Serializable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): ?array
     {
         return $this->toArray() ?: null;
     }

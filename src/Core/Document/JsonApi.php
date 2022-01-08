@@ -182,7 +182,7 @@ class JsonApi implements Serializable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): ?array
     {
         if ($this->version && $this->hasMeta()) {
             return ['version' => $this->version, 'meta' => $this->meta];

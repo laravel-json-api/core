@@ -27,6 +27,7 @@ use IteratorAggregate;
 use LaravelJsonApi\Contracts\Serializable;
 use LaravelJsonApi\Core\Json\Json;
 use LogicException;
+use Traversable;
 use function count;
 use function json_encode;
 use function ksort;
@@ -100,7 +101,7 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->stack[$offset]);
     }
@@ -108,7 +109,7 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): Link
     {
         return $this->stack[$offset];
     }
@@ -116,7 +117,7 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($value instanceof Link && $offset === $value->key()) {
             $this->push($value);
@@ -133,7 +134,7 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->stack[$offset]);
     }
@@ -301,7 +302,7 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->stack;
     }
@@ -309,7 +310,7 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->stack);
     }
@@ -317,7 +318,7 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): ?array
     {
         return $this->stack ?: null;
     }

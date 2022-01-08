@@ -24,6 +24,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
+use Traversable;
 use UnexpectedValueException;
 use function array_map;
 use function collect;
@@ -196,7 +197,7 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->stack;
     }
@@ -204,7 +205,7 @@ class FieldSets implements Arrayable, IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->stack);
     }

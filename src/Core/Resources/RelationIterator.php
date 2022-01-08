@@ -23,6 +23,7 @@ use Generator;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Resources\JsonApiRelation;
 use RuntimeException;
+use Traversable;
 
 class RelationIterator implements IteratorAggregate
 {
@@ -44,7 +45,7 @@ class RelationIterator implements IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->cursor();
     }

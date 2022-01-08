@@ -26,6 +26,7 @@ use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\Support\Arr;
 use LogicException;
+use Traversable;
 
 class LazyRelation implements IteratorAggregate
 {
@@ -81,7 +82,7 @@ class LazyRelation implements IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         if ($this->relation->toMany()) {
             yield from $this->toMany();

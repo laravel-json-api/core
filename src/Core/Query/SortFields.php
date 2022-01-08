@@ -25,6 +25,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use Traversable;
 use UnexpectedValueException;
 use function array_map;
 use function collect;
@@ -210,7 +211,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->stack;
     }
@@ -218,7 +219,7 @@ class SortFields implements IteratorAggregate, Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->stack);
     }

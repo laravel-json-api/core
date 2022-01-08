@@ -25,6 +25,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use Traversable;
 use UnexpectedValueException;
 use function collect;
 use function count;
@@ -155,7 +156,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->stack;
     }
@@ -163,7 +164,7 @@ class IncludePaths implements IteratorAggregate, Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->stack);
     }

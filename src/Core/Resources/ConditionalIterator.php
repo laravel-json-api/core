@@ -23,6 +23,7 @@ use Generator;
 use IteratorAggregate;
 use JsonSerializable;
 use LaravelJsonApi\Contracts\Resources\Skippable;
+use Traversable;
 use function iterator_to_array;
 
 class ConditionalIterator implements IteratorAggregate, JsonSerializable
@@ -73,7 +74,7 @@ class ConditionalIterator implements IteratorAggregate, JsonSerializable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->cursor();
     }
@@ -81,7 +82,7 @@ class ConditionalIterator implements IteratorAggregate, JsonSerializable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): ?array
     {
         return $this->all() ?: null;
     }
