@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Added return types for internal methods, to remove deprecation warnings on PHP 8.1.
 - **BREAKING**: Made the following changes to support Laravel Octane:
     - The `Schema\Container` class now takes an instance of `Support\ContainerResolver` as its first constructor
       argument. This allows the schema container to lazily load the current container instance.
