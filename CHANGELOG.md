@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
+- Package now supports Laravel 9.
 - Added two new utility classes - `Support\AppResolver` and `Support\ContainerResolver` - that lazily resolve the
   current application and container instances. These have been added to enable support for Laravel Octane, which
   recommends injecting a closure resolver for getting that current instances of the application or container. These
