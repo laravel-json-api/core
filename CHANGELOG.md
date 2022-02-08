@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.1.1] - 2022-02-08
+
+### Added
+
+- Added a `JsonApiException` test as this class requires breaking changes when upgrading Symfony to the next version.
+
 ## [1.1.0] - 2022-01-03
 
 ### Added
