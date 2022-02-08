@@ -32,7 +32,6 @@ use Throwable;
 
 class JsonApiException extends Exception implements HttpExceptionInterface, Responsable, ErrorProvider
 {
-
     use IsResponsable;
 
     /**
@@ -157,5 +156,4 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
             ->prepareResponse($request)
             ->toResponse($request);
     }
-
 }
