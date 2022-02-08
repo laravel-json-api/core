@@ -15,17 +15,25 @@
  * limitations under the License.
  */
 
-namespace LaravelJsonApi\Contracts\Encoder;
+declare(strict_types=1);
 
-use LaravelJsonApi\Contracts\Server\Server;
+namespace LaravelJsonApi\Core\Tests\Unit\Support;
 
-interface Factory
+use Illuminate\Contracts\Foundation\Application;
+use LaravelJsonApi\Core\Support\AppResolver;
+use PHPUnit\Framework\TestCase;
+
+class AppResolverTest extends TestCase
 {
-    /**
-     * Build a new encoder instance for the supplied server.
-     *
-     * @param Server $server
-     * @return Encoder
-     */
-    public function build(Server $server): Encoder;
+    public function test(): void
+    {
+        $mock = $this->createMock(Application::class);
+
+        $resolver = new AppResolver(
+            static fn() => $mock
+        );
+
+        $this->assertSame($mock, $resolver->instance());
+        $this->assertSame($mock, $resolver->container()->instance());
+    }
 }

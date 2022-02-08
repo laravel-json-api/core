@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ use LaravelJsonApi\Core\Pagination\Page;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
+use Traversable;
 use function count;
 
 class ResourceCollection implements Responsable, IteratorAggregate, Countable
@@ -105,7 +106,7 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->resources;
     }
@@ -113,7 +114,7 @@ class ResourceCollection implements Responsable, IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->resources);
     }

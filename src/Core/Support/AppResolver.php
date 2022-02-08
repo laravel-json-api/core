@@ -17,39 +17,45 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Responses\Concerns;
+namespace LaravelJsonApi\Core\Support;
 
-trait HasRelationshipMeta
+use Closure;
+use Illuminate\Contracts\Foundation\Application;
+
+class AppResolver
 {
-
     /**
-     * @var bool
+     * @var Closure
      */
-    private bool $hasRelationMeta = true;
+    private Closure $resolver;
 
     /**
-     * Set whether relationship meta should appear in the top-level meta member.
+     * AppResolver constructor.
      *
-     * @param bool $bool
-     * @return $this
+     * @param Closure $resolver
      */
-    public function withRelationshipMeta(bool $bool = true): self
+    public function __construct(Closure $resolver)
     {
-        $this->hasRelationMeta = $bool;
-
-        return $this;
+        $this->resolver = $resolver;
     }
 
     /**
-     * Do not add relationship meta to the top-level meta member.
+     * Get the application instance.
      *
-     * @return $this
+     * @return Application
      */
-    public function withoutRelationshipMeta(): self
+    public function instance(): Application
     {
-        $this->hasRelationMeta = false;
-
-        return $this;
+        return ($this->resolver)();
     }
 
+    /**
+     * Get a container resolver.
+     *
+     * @return ContainerResolver
+     */
+    public function container(): ContainerResolver
+    {
+        return new ContainerResolver($this->resolver);
+    }
 }

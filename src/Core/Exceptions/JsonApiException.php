@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
     /**
      * @inheritDoc
      */
-    public function getStatusCode()
+    public function getStatusCode(): int
     {
         return $this->errors->status();
     }
@@ -112,7 +112,7 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
     /**
      * @inheritDoc
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }

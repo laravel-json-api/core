@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Json\Concerns;
 use Generator;
 use LaravelJsonApi\Core\Support\Arr;
 use LogicException;
+use Traversable;
 use function iterator_to_array;
 
 trait ArrayList
@@ -35,7 +36,7 @@ trait ArrayList
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return Arr::exists($this->value, $offset);
     }
@@ -43,6 +44,7 @@ trait ArrayList
     /**
      * @inheritDoc
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->value[$offset];
@@ -51,7 +53,7 @@ trait ArrayList
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if ($this->next() !== intval($offset)) {
             throw new LogicException('Can only set the next element in the array list.');
@@ -63,7 +65,7 @@ trait ArrayList
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         Arr::forget($this->value, $offset);
     }
@@ -71,7 +73,7 @@ trait ArrayList
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->value);
     }
@@ -79,7 +81,7 @@ trait ArrayList
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->value;
     }
@@ -105,7 +107,7 @@ trait ArrayList
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->cursor();
     }

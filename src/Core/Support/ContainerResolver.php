@@ -15,17 +15,37 @@
  * limitations under the License.
  */
 
-namespace LaravelJsonApi\Contracts\Encoder;
+declare(strict_types=1);
 
-use LaravelJsonApi\Contracts\Server\Server;
+namespace LaravelJsonApi\Core\Support;
 
-interface Factory
+use Closure;
+use Illuminate\Contracts\Container\Container;
+
+class ContainerResolver
 {
     /**
-     * Build a new encoder instance for the supplied server.
-     *
-     * @param Server $server
-     * @return Encoder
+     * @var Closure
      */
-    public function build(Server $server): Encoder;
+    private Closure $resolver;
+
+    /**
+     * ContainerResolver constructor.
+     *
+     * @param Closure $resolver
+     */
+    public function __construct(Closure $resolver)
+    {
+        $this->resolver = $resolver;
+    }
+
+    /**
+     * Get the container instance.
+     *
+     * @return Container
+     */
+    public function instance(): Container
+    {
+        return ($this->resolver)();
+    }
 }

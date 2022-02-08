@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Resources\Skippable;
 use LogicException;
+use Traversable;
 
 class ConditionalFields implements IteratorAggregate, Skippable
 {
@@ -67,7 +68,7 @@ class ConditionalFields implements IteratorAggregate, Skippable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         if (true === $this->skip()) {
             throw new LogicException('Conditional attributes must not be iterated.');

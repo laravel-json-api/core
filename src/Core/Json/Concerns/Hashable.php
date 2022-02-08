@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Json\Concerns;
 use Generator;
 use InvalidArgumentException;
 use LaravelJsonApi\Core\Support\Arr;
+use Traversable;
 use function asort;
 use function iterator_to_array;
 use function ksort;
@@ -56,7 +57,7 @@ trait Hashable
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return Arr::exists($this->value, $offset);
     }
@@ -64,6 +65,7 @@ trait Hashable
     /**
      * @inheritDoc
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->value[$offset];
@@ -72,7 +74,7 @@ trait Hashable
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->value[$offset] = $value;
     }
@@ -80,7 +82,7 @@ trait Hashable
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         Arr::forget($this->value, $offset);
     }
@@ -286,7 +288,7 @@ trait Hashable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->value);
     }
@@ -294,7 +296,7 @@ trait Hashable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): ?array
     {
         if ($this->isNotEmpty()) {
             return $this->all();
@@ -334,7 +336,7 @@ trait Hashable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return $this->cursor();
     }
