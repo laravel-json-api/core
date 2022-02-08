@@ -23,6 +23,7 @@ use Countable;
 use Illuminate\Support\Enumerable;
 use InvalidArgumentException;
 use IteratorAggregate;
+use Traversable;
 use UnexpectedValueException;
 use function count;
 use function explode;
@@ -174,7 +175,7 @@ class FieldSet implements IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->fields;
     }
@@ -182,7 +183,7 @@ class FieldSet implements IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->fields);
     }

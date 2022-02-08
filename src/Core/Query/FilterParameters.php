@@ -24,6 +24,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Enumerable;
 use InvalidArgumentException;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use Traversable;
 use UnexpectedValueException;
 
 class FilterParameters implements \IteratorAggregate, \Countable, Arrayable
@@ -232,7 +233,7 @@ class FilterParameters implements \IteratorAggregate, \Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->stack);
     }
@@ -240,7 +241,7 @@ class FilterParameters implements \IteratorAggregate, \Countable, Arrayable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->stack;
     }

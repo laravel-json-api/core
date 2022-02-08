@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased (2.0)
+
+### Added
+
+- Package now supports Laravel 9.
+- Added two new utility classes - `Support\AppResolver` and `Support\ContainerResolver` - that lazily resolve the
+  current application and container instances. These have been added to enable support for Laravel Octane, which
+  recommends injecting a closure resolver for getting that current instances of the application or container. These
+  utility classes enable strictly type-hinted constructor dependency injection, as these classes are more specific about
+  what the resolver than just type-hinting the generic `\Closure` class which could return anything.
+
+### Changed
+
+- Added return types for internal methods, to remove deprecation warnings on PHP 8.1.
+- **BREAKING**: Made the following changes to support Laravel Octane:
+    - The `Schema\Container` class now takes an instance of `Support\ContainerResolver` as its first constructor
+      argument. This allows the schema container to lazily load the current container instance.
+    - The `Server\Server` class now takes an instance of `Support\AppResolver` as its first constructor argument. In
+      addition, the `$app` property has been made private, and the deprecated `$container` property has been removed.
+      Child classes that need to access either the application or the container should use the new protected `app()`
+      method. This change allows the server instance to lazily load the current application instance.
+    - The `Server\ServerRepository` class now only has a single constructor argument, which is an instance
+      of `Support\AppResolver`. The private `$config` property has also been removed. This change allows the server
+      repository to lazily load the current application instance.
+
 ## [1.1.1] - 2022-02-08
 
 ### Added

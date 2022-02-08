@@ -23,6 +23,7 @@ use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use Traversable;
 use UnexpectedValueException;
 use function collect;
 use function explode;
@@ -110,7 +111,7 @@ class RelationshipPath implements IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->names;
     }
@@ -118,7 +119,7 @@ class RelationshipPath implements IteratorAggregate, Countable
     /**
      * @inheritDoc
      */
-    public function count()
+    public function count(): int
     {
         return count($this->names);
     }

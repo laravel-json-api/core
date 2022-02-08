@@ -24,6 +24,7 @@ use InvalidArgumentException;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Resources\Skippable;
 use LogicException;
+use Traversable;
 
 class ConditionalFields implements IteratorAggregate, Skippable
 {
@@ -67,7 +68,7 @@ class ConditionalFields implements IteratorAggregate, Skippable
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         if (true === $this->skip()) {
             throw new LogicException('Conditional attributes must not be iterated.');

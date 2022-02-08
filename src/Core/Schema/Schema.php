@@ -37,6 +37,7 @@ use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Core\Support\Str;
 use LogicException;
+use Traversable;
 use function array_keys;
 use function iterator_to_array;
 use function sprintf;
@@ -210,7 +211,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         yield from $this->allFields();
     }

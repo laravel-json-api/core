@@ -121,7 +121,7 @@ class LinkHref implements JsonSerializable
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): string
     {
         return $this->toString();
     }
