@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 
 - The `LazyRelation` class now has an `all()` method to get the related resources for a to-many relation as an array.
+- The `LazyRelation` class now caches the to-one resource. Previously it only cached the to-many resources, so this
+  change makes the behaviour consistent.
 
 ### Fixed
 

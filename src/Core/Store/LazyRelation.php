@@ -45,9 +45,25 @@ class LazyRelation implements IteratorAggregate
     private array $json;
 
     /**
+     * The cached to-one resource.
+     *
+     * @var object|null
+     */
+    private ?object $toOne = null;
+
+    /**
+     * Whether the to-one resource has been loaded.
+     *
+     * @var bool
+     */
+    private bool $loadedToOne = false;
+
+    /**
+     * The cached to-many resources.
+     *
      * @var Collection|null
      */
-    private ?Collection $resources = null;
+    private ?Collection $toMany = null;
 
     /**
      * RelatedResource constructor.
@@ -121,16 +137,23 @@ class LazyRelation implements IteratorAggregate
      */
     private function toOne(): ?object
     {
+        if (true === $this->loadedToOne) {
+            return $this->toOne;
+        }
+
         $data = $this->json['data'] ?? [];
+        $value = null;
 
         if ($this->isValid($data)) {
-            return $this->server->store()->find(
+            $value = $this->server->store()->find(
                 $data['type'],
                 $data['id']
             );
         }
 
-        return null;
+        $this->loadedToOne = true;
+
+        return $this->toOne = $value;
     }
 
     /**
@@ -138,8 +161,8 @@ class LazyRelation implements IteratorAggregate
      */
     private function toMany(): Collection
     {
-        if ($this->resources) {
-            return $this->resources;
+        if ($this->toMany) {
+            return $this->toMany;
         }
 
         $data = $this->json['data'] ?? [];
@@ -153,10 +176,10 @@ class LazyRelation implements IteratorAggregate
         }
 
         if (empty($identifiers)) {
-            return $this->resources = new Collection();
+            return $this->toMany = new Collection();
         }
 
-        return $this->resources = Collection::make(
+        return $this->toMany = Collection::make(
             $this->server->store()->findMany($identifiers)
         );
     }

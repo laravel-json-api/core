@@ -116,6 +116,7 @@ class LazyRelationTest extends TestCase
         );
 
         $this->assertSame($expected, $relation->get());
+        $this->assertSame($expected, $relation->get(), 'The related object must be cached.');
     }
 
     public function testToOneIsNull(): void
@@ -234,6 +235,7 @@ class LazyRelationTest extends TestCase
         $this->assertInstanceOf(Collection::class, $actual);
         $this->assertSame($expected, $actual->all());
         $this->assertSame($expected, iterator_to_array($relation));
+        $this->assertSame($expected, $relation->all());
     }
 
     public function testToManyIsEmpty(): void
@@ -375,6 +377,7 @@ class LazyRelationTest extends TestCase
     private function willFind(string $type, string $id, ?object $result): void
     {
         $this->store
+            ->expects($this->once())
             ->method('find')
             ->with($type, $id)
             ->willReturn($result);
