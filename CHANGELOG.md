@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.1.0] - 2022-02-20
+
+### Added
+
+- The `LazyRelation` class now has an `all()` method to get the related resources for a to-many relation as an array.
+- The `LazyRelation` class now caches the to-one resource. Previously it only cached the to-many resources, so this
+  change makes the behaviour consistent.
+
+### Fixed
+
+- Previously the `LazyRelation` class would always throw an exception if iterated over. This has now been fixed.
+
 ## [2.0.0] - 2022-02-08
 
 ### Added

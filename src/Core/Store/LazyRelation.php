@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Store;
 
 use Illuminate\Support\Collection;
 use IteratorAggregate;
-use LaravelJsonApi\Contracts\Schema\PolymorphicRelation;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\Support\Arr;
@@ -30,7 +29,6 @@ use Traversable;
 
 class LazyRelation implements IteratorAggregate
 {
-
     /**
      * @var Server
      */
@@ -47,9 +45,25 @@ class LazyRelation implements IteratorAggregate
     private array $json;
 
     /**
+     * The cached to-one resource.
+     *
+     * @var object|null
+     */
+    private ?object $toOne = null;
+
+    /**
+     * Whether the to-one resource has been loaded.
+     *
+     * @var bool
+     */
+    private bool $loadedToOne = false;
+
+    /**
+     * The cached to-many resources.
+     *
      * @var Collection|null
      */
-    private ?Collection $resources = null;
+    private ?Collection $toMany = null;
 
     /**
      * RelatedResource constructor.
@@ -86,6 +100,7 @@ class LazyRelation implements IteratorAggregate
     {
         if ($this->relation->toMany()) {
             yield from $this->toMany();
+            return;
         }
 
         throw new LogicException('Can only iterate over a to-many relation.');
@@ -106,22 +121,39 @@ class LazyRelation implements IteratorAggregate
     }
 
     /**
+     * Retrieve the related resources for a to-many relation.
+     *
+     * @return array
+     */
+    public function all(): array
+    {
+        return $this->toMany()->all();
+    }
+
+    /**
      * Retrieve the related resource for a to-one relation.
      *
      * @return object|null
      */
     private function toOne(): ?object
     {
+        if (true === $this->loadedToOne) {
+            return $this->toOne;
+        }
+
         $data = $this->json['data'] ?? [];
+        $value = null;
 
         if ($this->isValid($data)) {
-            return $this->server->store()->find(
+            $value = $this->server->store()->find(
                 $data['type'],
                 $data['id']
             );
         }
 
-        return null;
+        $this->loadedToOne = true;
+
+        return $this->toOne = $value;
     }
 
     /**
@@ -129,20 +161,25 @@ class LazyRelation implements IteratorAggregate
      */
     private function toMany(): Collection
     {
-        if ($this->resources) {
-            return $this->resources;
+        if ($this->toMany) {
+            return $this->toMany;
         }
 
         $data = $this->json['data'] ?? [];
         $identifiers = [];
 
         if (is_array($data) && !Arr::isAssoc($data)) {
-            $identifiers = collect($data)
-                ->filter(fn($value) => $this->isValid($value))
+            $identifiers = Collection::make($data)
+                ->filter(fn($value): bool => $this->isValid($value))
+                ->values()
                 ->all();
         }
 
-        return $this->resources = collect(
+        if (empty($identifiers)) {
+            return $this->toMany = new Collection();
+        }
+
+        return $this->toMany = Collection::make(
             $this->server->store()->findMany($identifiers)
         );
     }
@@ -166,7 +203,7 @@ class LazyRelation implements IteratorAggregate
      */
     private function isType($type): bool
     {
-        return in_array($type, $this->expects(), true);
+        return in_array($type, $this->relation->allInverse(), true);
     }
 
     /**
@@ -181,17 +218,4 @@ class LazyRelation implements IteratorAggregate
 
         return false;
     }
-
-    /**
-     * @return array
-     */
-    private function expects(): array
-    {
-        if ($this->relation instanceof PolymorphicRelation) {
-            return $this->relation->inverseTypes();
-        }
-
-        return [$this->relation->inverse()];
-    }
-
 }
