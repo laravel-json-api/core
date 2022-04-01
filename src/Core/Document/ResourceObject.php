@@ -166,7 +166,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
         }
 
         $this->type = $type;
-        $this->id = $id ?: null;
+        $this->id = ResourceIdentifier::idIsEmpty($id) ? null : $id;
         $this->attributes = $attributes;
         $this->relationships = $relationships;
         $this->meta = $meta;
@@ -303,7 +303,7 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
     public function withId(?string $id): self
     {
         $copy = clone $this;
-        $copy->id = $id ?: null;
+        $copy->id = ResourceIdentifier::idIsEmpty($id) ? null : $id;
         $copy->normalize();
 
         return $copy;
@@ -796,16 +796,18 @@ class ResourceObject implements IteratorAggregate, JsonSerializable, ArrayAccess
      */
     public function jsonSerialize(): array
     {
-        return collect([
+        return Collection::make([
             'type' => $this->type,
             'id' => $this->id,
             'attributes' => $this->attributes,
-            'relationships' => collect($this->relationships)->filter(
-                fn(array $relation) => Arr::hasAny($relation, ['links', 'data', 'meta'])
+            'relationships' => Collection::make($this->relationships)->filter(
+                fn(array $relation): bool => Arr::hasAny($relation, ['links', 'data', 'meta'])
             )->all(),
             'links' => $this->links,
             'meta' => $this->meta,
-        ])->filter()->all();
+        ])->reject(
+            fn($value): bool => null === $value || (is_array($value) && empty($value))
+        )->all();
     }
 
     /**
