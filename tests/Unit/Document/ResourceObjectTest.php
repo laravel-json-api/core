@@ -94,6 +94,21 @@ class ResourceObjectTest extends TestCase
         $this->resource = ResourceObject::cast($this->values);
     }
 
+    public function testTypeAndId(): void
+    {
+        $this->assertSame($this->values['type'], $this->resource->getType());
+        $this->assertSame($this->values['id'], $this->resource->getId());
+    }
+
+    public function testIdIsZero(): void
+    {
+        $this->values['id'] = '0';
+
+        $resource = ResourceObject::cast($this->values);
+
+        $this->assertSame('0', $resource->getId());
+    }
+
     public function testFields(): array
     {
         $expected = [
@@ -542,6 +557,15 @@ class ResourceObjectTest extends TestCase
 
         $this->assertNotSame($this->resource, $actual = $this->resource->withId('99'));
         $this->assertSame($this->values, $this->resource->jsonSerialize(), 'original resource is not modified');
+        $this->assertSame($expected, $actual->jsonSerialize());
+    }
+
+    public function testWithZeroId(): void
+    {
+        $expected = $this->values;
+        $expected['id'] = '0';
+
+        $this->assertNotSame($this->resource, $actual = $this->resource->withId('0'));
         $this->assertSame($expected, $actual->jsonSerialize());
     }
 

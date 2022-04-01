@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- New `Document\ResourceIdentifier::idIsEmpty()` static method for checking that an `id` value is not empty. This check
+  ensures that the trimmed string is empty and that the string is not `"0"`, as zero could be used for a resource id.
+  This new static method has been added to ensure the logic of determining if an id value is empty is in one place.
+
+### Fixed
+
+- The `Document\ResourceObject` class now accepts an id of `"0"`. Previously this was treated as empty, which is
+  incorrect.
+
 ## [2.1.0] - 2022-02-20
 
 ### Added

@@ -24,7 +24,6 @@ use LaravelJsonApi\Core\Document\Concerns;
 
 class ResourceIdentifier
 {
-
     use Concerns\HasMeta;
 
     /**
@@ -69,6 +68,21 @@ class ResourceIdentifier
     }
 
     /**
+     * Is the provided id empty?
+     *
+     * @param string|null $id
+     * @return bool
+     */
+    public static function idIsEmpty(?string $id): bool
+    {
+        if (null === $id) {
+            return true;
+        }
+
+        return '0' !== $id && empty(trim($id));
+    }
+
+    /**
      * ResourceIdentifier constructor.
      *
      * @param string $type
@@ -76,6 +90,14 @@ class ResourceIdentifier
      */
     public function __construct(string $type, string $id)
     {
+        if (empty(trim($type))) {
+            throw new InvalidArgumentException('Expecting a non-empty resource type.');
+        }
+
+        if (self::idIsEmpty($id)) {
+            throw new InvalidArgumentException('Expecting a non-empty resource id.');
+        }
+
         $this->type = $type;
         $this->id = $id;
     }
@@ -95,5 +117,4 @@ class ResourceIdentifier
     {
         return $this->id;
     }
-
 }
