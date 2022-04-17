@@ -3,13 +3,18 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## [2.2.0] - 2022-04-01
+## [2.3.0] - 2022-04-17
 
 ### Added
 
 - The `JsonApiException` now has a `context()` method. The Laravel exception handler uses this to obtain additional
   context information to log when logging the exception. This method returns the status code and the JSON:API errors so
   that these can be seen if a JSON:API exception is logged.
+
+## [2.2.0] - 2022-04-01
+
+### Added
+
 - New `Document\ResourceIdentifier::idIsEmpty()` static method for checking that an `id` value is not empty. This check
   ensures that the trimmed string is empty and that the string is not `"0"`, as zero could be used for a resource id.
   This new static method has been added to ensure the logic of determining if an id value is empty is in one place.
