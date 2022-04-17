@@ -134,6 +134,19 @@ class JsonApiException extends Exception implements HttpExceptionInterface, Resp
     }
 
     /**
+     * Get the exception's context information.
+     *
+     * @return array
+     */
+    public function context(): array
+    {
+        return [
+            'status' => $this->getStatusCode(),
+            'errors' => $this->errors->toArray(),
+        ];
+    }
+
+    /**
      * @param $request
      * @return ErrorResponse
      */

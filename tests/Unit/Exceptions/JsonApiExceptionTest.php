@@ -151,6 +151,30 @@ class JsonApiExceptionTest extends TestCase
         $this->assertSame($expected, $exception->is5xx());
     }
 
+    public function testContext(): void
+    {
+        $errors = [
+            [
+                'title' => 'Error!',
+                'detail' => 'This is the error detail.',
+            ],
+        ];
+
+        $mock = $this->createMock(ErrorList::class);
+
+        $mock
+            ->method('toArray')
+            ->willReturn($errors);
+
+        $mock
+            ->method('status')
+            ->willReturn(422);
+
+        $exception = new JsonApiException($mock);
+
+        $this->assertSame(['status' => 422, 'errors' => $errors], $exception->context());
+    }
+
     public function testToResponse(): void
     {
         $request = $this->createMock(Request::class);
