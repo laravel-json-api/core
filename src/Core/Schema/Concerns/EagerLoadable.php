@@ -28,9 +28,11 @@ trait EagerLoadable
     /**
      * @var Closure|bool
      */
-    private bool $includePath = true;
+    private $includePath = true;
 
     /**
+     * Set whether the relation can be eager loaded (via include paths).
+     *
      * @param Closure|bool $callback
      * @return $this
      */
@@ -46,11 +48,15 @@ trait EagerLoadable
     }
 
     /**
+     * Mark the relation as not eager-loadable (i.e. not an include path).
+     *
      * @return $this
      */
     public function cannotEagerLoad(): self
     {
-        return $this->canEagerLoad(false);
+        $this->includePath = false;
+
+        return $this;
     }
 
     /**
