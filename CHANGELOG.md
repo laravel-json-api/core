@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.4.0] - 2023-01-15
+
+### Added
+
+- [#8](https://github.com/laravel-json-api/core/pull/8) Allow relations to be conditionally eager loadable.
+
 ## [2.3.0] - 2022-04-17
 
 ### Added
