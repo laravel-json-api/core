@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- [#9](https://github.com/laravel-json-api/core/pull/9) Can now cast a `stdClass` object to a `Hash` via
+  the `Hash::cast()` method.
+
 ## [3.0.0] - 2023-02-14
 
 ### Changed

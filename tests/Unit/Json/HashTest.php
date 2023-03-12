@@ -24,6 +24,55 @@ use PHPUnit\Framework\TestCase;
 
 class HashTest extends TestCase
 {
+    public function testCastHash(): void
+    {
+        $hash = new Hash(['foo' => 'bar']);
+
+        $this->assertSame($hash, Hash::cast($hash));
+    }
+
+    public function testCastJsonSerializable(): void
+    {
+        $object = new class() implements \JsonSerializable {
+            public function jsonSerialize(): array {
+                return ['foo' => 'bar'];
+            }
+        };
+
+        $expected = new Hash(['foo' => 'bar']);
+        $actual = Hash::cast($object);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testCastArray(): void
+    {
+        $expected = new Hash(['foo' => 'bar']);
+        $actual = Hash::cast(['foo' => 'bar']);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testCastStdClass(): void
+    {
+        $expected = new Hash(['foo' => 'bar']);
+        $actual = Hash::cast((object) ['foo' => 'bar']);
+
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function testCastNull(): void
+    {
+        $actual = Hash::cast(null);
+
+        $this->assertEquals(new Hash(), $actual);
+    }
+
+    public function testCastInvalidValue(): void
+    {
+        $this->expectException(\LogicException::class);
+        Hash::cast(true);
+    }
 
     public function testCamelize(): array
     {

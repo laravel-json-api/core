@@ -24,17 +24,17 @@ use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use IteratorAggregate;
 use JsonSerializable;
+use stdClass;
 use function collect;
 
 class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, JsonSerializable
 {
-
     use Concerns\Hashable;
 
     /**
      * Cast a value to a JSON hash.
      *
-     * @param Hash|JsonSerializable|array|null $value
+     * @param Hash|JsonSerializable|array|stdClass|null $value
      * @return static
      */
     public static function cast($value): self
@@ -47,11 +47,11 @@ class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Json
             $value = $value->jsonSerialize();
         }
 
-        if ($value instanceof \stdClass) {
+        if ($value instanceof stdClass) {
             $value = (array) $value;
         }
 
-        if (is_array($value) || is_null($value)) {
+        if (is_array($value) || null === $value) {
             return new self($value);
         }
 
