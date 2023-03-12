@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [3.1.0] - 2023-03-12
+
 ### Added
 
 - [#9](https://github.com/laravel-json-api/core/pull/9) Can now cast a `stdClass` object to a `Hash` via
