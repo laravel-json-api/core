@@ -19,7 +19,10 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Auth;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
@@ -29,27 +32,18 @@ use LaravelJsonApi\Core\Support\Str;
 
 class Authorizer implements AuthorizerContract
 {
-
     /**
-     * @var Gate
-     */
-    private Gate $gate;
-
-    /**
-     * @var JsonApiService
-     */
-    private JsonApiService $service;
-
-    /**
-     * AnonymousAuthorizer constructor.
+     * Authorizer constructor.
      *
+     * @param Guard $auth
      * @param Gate $gate
      * @param JsonApiService $service
      */
-    public function __construct(Gate $gate, JsonApiService $service)
-    {
-        $this->gate = $gate;
-        $this->service = $service;
+    public function __construct(
+        private readonly Guard $auth,
+        private readonly Gate $gate,
+        private readonly JsonApiService $service,
+    ) {
     }
 
     /**
@@ -193,6 +187,18 @@ class Authorizer implements AuthorizerContract
         }
 
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function failed(): \Throwable
+    {
+        if ($this->auth->guest()) {
+            throw new AuthenticationException();
+        }
+
+        throw new AuthorizationException();
     }
 
     /**

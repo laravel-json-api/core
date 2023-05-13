@@ -117,4 +117,11 @@ interface Authorizer
      * @return bool
      */
     public function detachRelationship(Request $request, object $model, string $fieldName): bool;
+
+    /**
+     * Get the exception to throw when authorization fails.
+     *
+     * @return \Throwable
+     */
+    public function failed(): \Throwable;
 }
