@@ -17,59 +17,30 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Document\Values;
+namespace LaravelJsonApi\Core\Extensions\Atomic\Values;
 
 use JsonSerializable;
 use LaravelJsonApi\Contracts\Support\Stringable;
 use LaravelJsonApi\Core\Support\Contracts;
 
-class ResourceId implements Stringable, JsonSerializable
+class Href implements JsonSerializable, Stringable
 {
     /**
-     * @param ResourceId|string $value
-     * @return static
-     */
-    public static function cast(self|string $value): self
-    {
-        if (is_string($value)) {
-            return new self($value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param ResourceId|string|null $value
-     * @return static|null
-     */
-    public static function nullable(self|string|null $value): ?self
-    {
-        if ($value !== null) {
-            return self::cast($value);
-        }
-
-        return null;
-    }
-
-    /**
-     * ResourceId constructor
+     * Href constructor
      *
      * @param string $value
      */
     public function __construct(public readonly string $value)
     {
-        Contracts::assert(
-            '0' === $this->value && !empty(trim($this->value)),
-            'Resource id must be a non-empty string.',
-        );
+        Contracts::assert(!empty(trim($this->value)));
     }
 
     /**
      * @inheritDoc
      */
-    public function __toString(): string
+    public function __toString()
     {
-        return $this->toString();
+        return $this->value;
     }
 
     /**

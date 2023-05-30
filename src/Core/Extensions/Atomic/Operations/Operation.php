@@ -17,11 +17,13 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Extensions\Atomic;
+namespace LaravelJsonApi\Core\Extensions\Atomic\Operations;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
-use LaravelJsonApi\Core\Document\Values\ResourceObject;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
 
 abstract class Operation implements JsonSerializable, Arrayable
 {
@@ -30,13 +32,11 @@ abstract class Operation implements JsonSerializable, Arrayable
      *
      * @param OpCodeEnum $op
      * @param Ref|Href|null $target
-     * @param ResourceObject|null $data
      * @param array $meta
      */
     public function __construct(
         public readonly OpCodeEnum $op,
         public readonly Ref|Href|null $target = null,
-        public readonly ResourceObject|null $data = null,
         public readonly array $meta = [],
     ) {
     }
@@ -66,6 +66,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation creating a resource?
+     *
      * @return bool
      */
     public function isCreating(): bool
@@ -74,6 +76,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation updating a resource?
+     *
      * @return bool
      */
     public function isUpdating(): bool
@@ -82,6 +86,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation creating or updating a resource?
+     *
      * @return bool
      */
     public function isCreatingOrUpdating(): bool
@@ -90,6 +96,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation deleting a resource?
+     *
      * @return bool
      */
     public function isDeleting(): bool
@@ -98,6 +106,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Get the relationship field name that is being modified.
+     *
      * @return string|null
      */
     public function getFieldName(): ?string
@@ -106,6 +116,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation updating a relationship?
+     *
      * @return bool
      */
     public function isUpdatingRelationship(): bool
@@ -114,6 +126,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation attaching resources to a relationship?
+     *
      * @return bool
      */
     public function isAttachingRelationship(): bool
@@ -122,6 +136,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation detaching resources from a relationship?
+     *
      * @return bool
      */
     public function isDetachingRelationship(): bool
@@ -130,6 +146,8 @@ abstract class Operation implements JsonSerializable, Arrayable
     }
 
     /**
+     * Is the operation modifying a relationship?
+     *
      * @return bool
      */
     public function isModifyingRelationship(): bool
@@ -137,49 +155,5 @@ abstract class Operation implements JsonSerializable, Arrayable
         return $this->isUpdatingRelationship() ||
             $this->isAttachingRelationship() ||
             $this->isDetachingRelationship();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function toArray(): array
-    {
-        $arr = ['op' => $this->op->value];
-
-        if ($this->target instanceof Ref) {
-            $arr['ref'] = $this->target->toArray();
-        }
-
-        if ($this->target instanceof Href) {
-            $arr['href'] = $this->target->value;
-        }
-
-        if (!empty($this->meta)) {
-            $arr['meta'] = $this->meta;
-        }
-
-        return $arr;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function jsonSerialize(): array
-    {
-        $json = ['op' => $this->op];
-
-        if ($this->target instanceof Ref) {
-            $json['ref'] = $this->target;
-        }
-
-        if ($this->target instanceof Href) {
-            $json['href'] = $this->target;
-        }
-
-        if (!empty($this->meta)) {
-            $json['meta'] = $this->meta;
-        }
-
-        return $json;
     }
 }

@@ -17,28 +17,41 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Extensions\Atomic;
+namespace LaravelJsonApi\Core\Document\Input\Values;
 
 use JsonSerializable;
 use LaravelJsonApi\Contracts\Support\Stringable;
 use LaravelJsonApi\Core\Support\Contracts;
 
-class Href implements JsonSerializable, Stringable
+class ResourceType implements Stringable, JsonSerializable
 {
     /**
-     * Href constructor
+     * @param ResourceType|string $value
+     * @return static
+     */
+    public static function cast(self|string $value): self
+    {
+        if (is_string($value)) {
+            return new self($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * ResourceType constructor.
      *
      * @param string $value
      */
     public function __construct(public readonly string $value)
     {
-        Contracts::assert(!empty(trim($this->value)));
+        Contracts::assert(!empty(trim($this->value)), 'Resource type must be a non-empty string.');
     }
 
     /**
      * @inheritDoc
      */
-    public function toString(): string
+    public function __toString(): string
     {
         return $this->toString();
     }
@@ -46,7 +59,7 @@ class Href implements JsonSerializable, Stringable
     /**
      * @inheritDoc
      */
-    public function __toString()
+    public function toString(): string
     {
         return $this->value;
     }
@@ -57,5 +70,14 @@ class Href implements JsonSerializable, Stringable
     public function jsonSerialize(): string
     {
         return $this->value;
+    }
+
+    /**
+     * @param ResourceType $other
+     * @return bool
+     */
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
     }
 }

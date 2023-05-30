@@ -19,10 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Extensions\Atomic\Operations;
 
-use LaravelJsonApi\Core\Document\Values\ResourceObject;
-use LaravelJsonApi\Core\Extensions\Atomic\Href;
-use LaravelJsonApi\Core\Extensions\Atomic\OpCodeEnum;
-use LaravelJsonApi\Core\Extensions\Atomic\Operation;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 
 class Store extends Operation
 {
@@ -35,14 +34,13 @@ class Store extends Operation
      */
     public function __construct(
         Href $target,
-        ResourceObject $data,
+        public readonly ResourceObject $data,
         array $meta = []
     ) {
         parent::__construct(
             op: OpCodeEnum::Add,
             target: $target,
-            data: $data,
-            meta: $meta
+            meta: $meta,
         );
     }
 
@@ -52,5 +50,29 @@ class Store extends Operation
     public function isCreating(): bool
     {
         return true;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function toArray(): array
+    {
+        return [
+            'op' => $this->op->value,
+            'href' => $this->href()->value,
+            'data' => $this->data->toArray(),
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize(): array
+    {
+        return [
+            'op' => $this->op,
+            'href' => $this->target,
+            'data' => $this->data,
+        ];
     }
 }

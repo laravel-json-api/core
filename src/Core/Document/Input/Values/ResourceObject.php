@@ -17,23 +17,28 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Document\Values;
+namespace LaravelJsonApi\Core\Document\Input\Values;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
+use LaravelJsonApi\Core\Support\Contracts;
 
 class ResourceObject implements JsonSerializable, Arrayable
 {
     /**
      * ResourceObject constructor
      *
-     * @param ResourceIdentifier $identifier
+     * @param ResourceType $type
+     * @param ResourceId|null $id
+     * @param ResourceId|null $lid
      * @param array $attributes
      * @param array $relationships
      * @param array $meta
      */
     public function __construct(
-        public readonly ResourceIdentifier $identifier,
+        public readonly ResourceType $type,
+        public readonly ResourceId|null $id = null,
+        public readonly ResourceId|null $lid = null,
         public readonly array $attributes = [],
         public readonly array $relationships = [],
         public readonly array $meta = [],
@@ -49,8 +54,12 @@ class ResourceObject implements JsonSerializable, Arrayable
      */
     public function withId(ResourceId|string $id): self
     {
+        Contracts::assert($this->id === null, 'Resource object already has an id.');
+
         return new self(
-            identifier: $this->identifier->withId($id),
+            type: $this->type,
+            id: ResourceId::cast($id),
+            lid: $this->lid,
             attributes: $this->attributes,
             relationships: $this->relationships,
             meta: $this->meta,
@@ -62,21 +71,14 @@ class ResourceObject implements JsonSerializable, Arrayable
      */
     public function toArray(): array
     {
-        $arr = $this->identifier->toArray();
-
-        if (!empty($this->attributes)) {
-            $arr['attributes'] = $this->attributes;
-        }
-
-        if (!empty($this->relationships)) {
-            $arr['relationships'] = $this->relationships;
-        }
-
-        if (!empty($this->meta)) {
-            $arr['meta'] = $this->meta;
-        }
-
-        return $arr;
+        return array_filter([
+            'type' => $this->type->value,
+            'id' => $this->id?->value,
+            'lid' => $this->lid?->value,
+            'attributes' => $this->attributes ?: null,
+            'relationships' => $this->relationships ?: null,
+            'meta' => $this->meta ?: null,
+        ], static fn(mixed $value): bool => $value !== null);
     }
 
     /**
@@ -84,20 +86,13 @@ class ResourceObject implements JsonSerializable, Arrayable
      */
     public function jsonSerialize(): array
     {
-        $json = $this->identifier->jsonSerialize();
-
-        if (!empty($this->attributes)) {
-            $json['attributes'] = $this->attributes;
-        }
-
-        if (!empty($this->relationships)) {
-            $json['relationships'] = $this->relationships;
-        }
-
-        if (!empty($this->meta)) {
-            $json['meta'] = $this->meta;
-        }
-
-        return $json;
+        return array_filter([
+            'type' => $this->type,
+            'id' => $this->id,
+            'lid' => $this->lid,
+            'attributes' => $this->attributes ?: null,
+            'relationships' => $this->relationships ?: null,
+            'meta' => $this->meta ?: null,
+        ], static fn(mixed $value): bool => $value !== null);
     }
 }

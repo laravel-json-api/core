@@ -17,16 +17,16 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Document\Values;
+namespace LaravelJsonApi\Core\Document\Input\Values;
 
 use JsonSerializable;
 use LaravelJsonApi\Contracts\Support\Stringable;
 use LaravelJsonApi\Core\Support\Contracts;
 
-class ResourceType implements Stringable, JsonSerializable
+class ResourceId implements Stringable, JsonSerializable
 {
     /**
-     * @param ResourceType|string $value
+     * @param ResourceId|string $value
      * @return static
      */
     public static function cast(self|string $value): self
@@ -39,13 +39,29 @@ class ResourceType implements Stringable, JsonSerializable
     }
 
     /**
-     * ResourceType constructor.
+     * @param ResourceId|string|null $value
+     * @return static|null
+     */
+    public static function nullable(self|string|null $value): ?self
+    {
+        if ($value !== null) {
+            return self::cast($value);
+        }
+
+        return null;
+    }
+
+    /**
+     * ResourceId constructor
      *
      * @param string $value
      */
     public function __construct(public readonly string $value)
     {
-        Contracts::assert(!empty(trim($this->value)), 'Resource type must be a non-empty string.');
+        Contracts::assert(
+            '0' === $this->value || !empty(trim($this->value)),
+            'Resource id must be a non-empty string.',
+        );
     }
 
     /**
@@ -70,5 +86,14 @@ class ResourceType implements Stringable, JsonSerializable
     public function jsonSerialize(): string
     {
         return $this->value;
+    }
+
+    /**
+     * @param ResourceId $other
+     * @return bool
+     */
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
     }
 }

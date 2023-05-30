@@ -17,11 +17,19 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Extensions\Atomic;
+namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
-enum OpCodeEnum: string
+use Closure;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
+
+interface ParsesOperationFromArray
 {
-    case Add = 'add';
-    case Update = 'updated';
-    case Remove = 'remove';
+    /**
+     * Parse an operation from an array.
+     *
+     * @param array $operation
+     * @param Closure $next
+     * @return Operation
+     */
+    public function parse(array $operation, Closure $next): Operation;
 }

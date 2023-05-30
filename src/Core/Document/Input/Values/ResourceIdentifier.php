@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Document\Values;
+namespace LaravelJsonApi\Core\Document\Input\Values;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
@@ -25,30 +25,6 @@ use LaravelJsonApi\Core\Support\Contracts;
 
 class ResourceIdentifier implements JsonSerializable, Arrayable
 {
-    /**
-     * Make a new instance of a resource identifier.
-     *
-     * @param ResourceType|string $type
-     * @param ResourceId|string|null $id
-     * @param ResourceId|string|null $lid
-     * @param array|null $meta
-     * @return static
-     */
-    public static function make(
-        ResourceType|string $type,
-        ResourceId|string|null $id = null,
-        ResourceId|string|null $lid = null,
-        array|null $meta = null,
-    ): self
-    {
-        return new self(
-            type: ResourceType::cast($type),
-            id: ResourceId::nullable($id),
-            lid: ResourceId::nullable($lid),
-            meta: $meta ?? [],
-        );
-    }
-
     /**
      * @param ResourceType $type
      * @param ResourceId|null $id
@@ -63,7 +39,7 @@ class ResourceIdentifier implements JsonSerializable, Arrayable
     ) {
         Contracts::assert(
             $this->id !== null || $this->lid !== null,
-            'Resource identifier must have an id or a lid.',
+            'Resource identifier must have an id or lid.',
         );
     }
 
@@ -75,10 +51,7 @@ class ResourceIdentifier implements JsonSerializable, Arrayable
      */
     public function withId(ResourceId|string $id): self
     {
-        Contracts::assert(
-            $this->id === null,
-            'Cannot set id on resource identifier that already has an id.',
-        );
+        Contracts::assert($this->id === null, 'Resource identifier already has an id.');
 
         return new self(
             type: $this->type,
