@@ -19,11 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Validation;
 
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+
 interface Container
 {
     /**
-     * @param string $resourceType
+     * @param ResourceType $resourceType
      * @return Factory
      */
-    public function validatorsFor(string $resourceType): Factory;
+    public function validatorsFor(ResourceType $resourceType): Factory;
 }

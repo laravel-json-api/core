@@ -19,24 +19,26 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Schema;
 
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+
 interface Container
 {
 
     /**
      * Does a schema exist for the supplied resource type?
      *
-     * @param string $resourceType
+     * @param string|ResourceType $resourceType
      * @return bool
      */
-    public function exists(string $resourceType): bool;
+    public function exists(string|ResourceType $resourceType): bool;
 
     /**
      * Get a schema by JSON:API resource type.
      *
-     * @param string $resourceType
+     * @param string|ResourceType $resourceType
      * @return Schema
      */
-    public function schemaFor(string $resourceType): Schema;
+    public function schemaFor(string|ResourceType $resourceType): Schema;
 
     /**
      * Get a schema for the provided model class.

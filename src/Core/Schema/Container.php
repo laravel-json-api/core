@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Schema;
 use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Support\ContainerResolver;
 use LogicException;
 use RuntimeException;
@@ -88,16 +89,20 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
-    public function exists(string $resourceType): bool
+    public function exists(string|ResourceType $resourceType): bool
     {
+        $resourceType = (string) $resourceType;
+
         return isset($this->types[$resourceType]);
     }
 
     /**
      * @inheritDoc
      */
-    public function schemaFor(string $resourceType): Schema
+    public function schemaFor(string|ResourceType $resourceType): Schema
     {
+        $resourceType = (string) $resourceType;
+
         if (isset($this->types[$resourceType])) {
             return $this->resolve($this->types[$resourceType]);
         }

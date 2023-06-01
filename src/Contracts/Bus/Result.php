@@ -17,19 +17,30 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Operations\Commands\Store;
+namespace LaravelJsonApi\Contracts\Bus;
 
-use LaravelJsonApi\Contracts\Operations\Result\Result;
-use LaravelJsonApi\Core\Operations\Commands\Store\StoreCommand;
-use LaravelJsonApi\Core\Operations\Commands\Store\StoreResult;
+use LaravelJsonApi\Core\Document\ErrorList;
 
-interface StoreCommandHandler
+interface Result
 {
     /**
-     * Execute the command to store a new resource.
+     * Is this a success result?
      *
-     * @param StoreCommand $command
-     * @return StoreResult|Result
+     * @return bool
      */
-    public function execute(StoreCommand $command): StoreResult|Result;
+    public function didSucceed(): bool;
+
+    /**
+     * Is this a failure result?
+     *
+     * @return bool
+     */
+    public function didFail(): bool;
+
+    /**
+     * Get the result errors.
+     *
+     * @return ErrorList
+     */
+    public function errors(): ErrorList;
 }

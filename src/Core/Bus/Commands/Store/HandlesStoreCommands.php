@@ -17,17 +17,17 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Operations\Commands\Store;
+namespace LaravelJsonApi\Core\Bus\Commands\Store;
 
-use LaravelJsonApi\Contracts\Operations\Result\Result;
-use LaravelJsonApi\Core\Operations\Commands\Store\StoreCommand;
+use Closure;
+use LaravelJsonApi\Core\Bus\Commands\Result;
 
-interface StoreCommandMiddleware
+interface HandlesStoreCommands
 {
     /**
      * @param StoreCommand $command
-     * @param \Closure $next
+     * @param Closure $next
      * @return Result
      */
-    public function __invoke(StoreCommand $command, \Closure $next): Result;
+    public function handle(StoreCommand $command, Closure $next): Result;
 }

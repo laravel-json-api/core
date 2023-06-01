@@ -17,32 +17,30 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Extensions\Atomic\Operations;
+namespace LaravelJsonApi\Core\Extensions\Atomic\Results;
 
 use Countable;
-use Illuminate\Contracts\Support\Arrayable;
 use IteratorAggregate;
-use JsonSerializable;
 use LaravelJsonApi\Core\Support\Contracts;
 use Traversable;
 
-class ListOfOperations implements IteratorAggregate, Countable, JsonSerializable, Arrayable
+class ListOfResults implements IteratorAggregate, Countable
 {
     /**
-     * @var Operation[]
+     * @var Result[]
      */
-    private readonly array $ops;
+    private readonly array $results;
 
     /**
-     * ListOfOperations constructor
+     * ListOfResults constructor
      *
-     * @param Operation ...$operations
+     * @param Result ...$results
      */
-    public function __construct(Operation ...$operations)
+    public function __construct(Result ...$results)
     {
-        Contracts::assert(!empty($operations), 'Operation list must have at least one operation.');
+        Contracts::assert(!empty($results), 'Result list must have at least one result.');
 
-        $this->ops = $operations;
+        $this->results = $results;
     }
 
     /**
@@ -50,7 +48,7 @@ class ListOfOperations implements IteratorAggregate, Countable, JsonSerializable
      */
     public function getIterator(): Traversable
     {
-        yield from $this->ops;
+        yield from $this->results;
     }
 
     /**
@@ -58,33 +56,36 @@ class ListOfOperations implements IteratorAggregate, Countable, JsonSerializable
      */
     public function count(): int
     {
-        return count($this->ops);
+        return count($this->results);
     }
 
     /**
-     * @return Operation[]
+     * @return Result[]
      */
     public function all(): array
     {
-        return $this->ops;
+        return $this->results;
     }
 
     /**
-     * @inheritDoc
+     * @return bool
      */
-    public function toArray(): array
+    public function isEmpty(): bool
     {
-        return array_map(
-            static fn(Operation $op): array => $op->toArray(),
-            $this->ops,
-        );
+        foreach ($this->results as $result) {
+            if ($result->isNotEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * @inheritDoc
+     * @return bool
      */
-    public function jsonSerialize(): array
+    public function isNotEmpty(): bool
     {
-        return $this->ops;
+        return !$this->isEmpty();
     }
 }

@@ -19,11 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Auth;
 
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+
 interface Container
 {
     /**
-     * @param string $resourceType
+     * @param ResourceType $type
      * @return Authorizer
      */
-    public function authorizerFor(string $resourceType): Authorizer;
+    public function authorizerFor(ResourceType $type): Authorizer;
 }

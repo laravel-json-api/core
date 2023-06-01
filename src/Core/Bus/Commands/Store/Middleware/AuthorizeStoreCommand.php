@@ -17,17 +17,22 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Operations\Commands\Store\Middleware;
+namespace LaravelJsonApi\Core\Bus\Commands\Store\Middleware;
 
+use Closure;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
-use LaravelJsonApi\Contracts\Operations\Commands\Store\StoreCommandMiddleware;
-use LaravelJsonApi\Contracts\Operations\Result\Result;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Core\Operations\Commands\Store\StoreCommand;
+use LaravelJsonApi\Core\Bus\Commands\Result;
+use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
+use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
-class AuthorizeStoreCommand implements StoreCommandMiddleware
+class AuthorizeStoreCommand implements HandlesStoreCommands
 {
     /**
+     * AuthorizeStoreCommand constructor
+     *
      * @param AuthorizerContainer $authorizerContainer
      * @param SchemaContainer $schemaContainer
      */
@@ -40,28 +45,26 @@ class AuthorizeStoreCommand implements StoreCommandMiddleware
     /**
      * @inheritDoc
      */
-    public function __invoke(StoreCommand $command, \Closure $next): Result
+    public function handle(StoreCommand $command, Closure $next): Result
     {
-        if ($command->mustAuthorize() && $command->hasRequest()) {
-            $this->authorize($command);
+        if ($command->mustAuthorize() && $request = $command->request()) {
+            $this->authorize($request, $command->type());
         }
 
         return $next($command);
     }
 
     /**
-     * @param StoreCommand $command
+     * @param Request $request
+     * @param ResourceType $type
      * @return void
      * @throws \Throwable
      */
-    private function authorize(StoreCommand $command): void
+    private function authorize(Request $request, ResourceType $type): void
     {
-        $authorizer = $this->authorizerContainer->authorizerFor($command->type());
-        $schema = $this->schemaContainer->schemaFor($command->type());
-        $passes = $authorizer->store(
-            $command->requestOrFail(),
-            $schema->model(),
-        );
+        $authorizer = $this->authorizerContainer->authorizerFor($type);
+        $schema = $this->schemaContainer->schemaFor($type);
+        $passes = $authorizer->store($request, $schema->model());
 
         if ($passes === false) {
             throw $authorizer->failed();

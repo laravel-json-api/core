@@ -17,20 +17,23 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Operations\Commands\Store\Middleware;
+namespace LaravelJsonApi\Core\Bus\Commands\Store\Middleware;
 
-use LaravelJsonApi\Contracts\Operations\Commands\Store\StoreCommandMiddleware;
-use LaravelJsonApi\Contracts\Operations\Result\Result as ResultContract;
+use Closure;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
+use LaravelJsonApi\Core\Bus\Commands\Result;
+use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
+use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Document\ResourceObject;
-use LaravelJsonApi\Core\Operations\Commands\Store\StoreCommand;
-use LaravelJsonApi\Core\Operations\Result\Result;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 
-class ValidateStoreCommand implements StoreCommandMiddleware
+class ValidateStoreCommand implements HandlesStoreCommands
 {
     /**
+     * ValidateStoreCommand constructor
+     *
      * @param ValidatorContainer $validatorContainer
      * @param SchemaContainer $schemaContainer
      * @param ResourceErrorFactory $errorFactory
@@ -45,12 +48,14 @@ class ValidateStoreCommand implements StoreCommandMiddleware
     /**
      * @inheritDoc
      */
-    public function __invoke(StoreCommand $command, \Closure $next): ResultContract
+    public function handle(StoreCommand $command, Closure $next): Result
     {
+        $operation = $command->operation();
+
         if ($command->mustValidate()) {
             $validator = $this->validatorContainer
                 ->validatorsFor($command->type())
-                ->store($this->validationData($command));
+                ->store($this->validationData($operation));
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -61,12 +66,14 @@ class ValidateStoreCommand implements StoreCommandMiddleware
                 );
             }
 
-            $command = $command->withValidated($validator->validated());
+            $command = $command->withValidated(
+                $validator->validated(),
+            );
         }
 
-        if (!$command->isValidated()) {
+        if ($command->isNotValidated()) {
             $command = $command->withValidated(
-                $this->validationData($command),
+                $this->validationData($operation),
             );
         }
 
@@ -74,11 +81,14 @@ class ValidateStoreCommand implements StoreCommandMiddleware
     }
 
     /**
-     * @param StoreCommand $command
+     * Get the validation data.
+     *
+     * @param Store $operation
      * @return array
      */
-    private function validationData(StoreCommand $command): array
+    private function validationData(Store $operation): array
     {
-        return ResourceObject::fromArray($command->data())->all();
+        return ResourceObject::fromArray($operation->data->toArray())
+            ->all();
     }
 }
