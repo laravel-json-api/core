@@ -27,6 +27,18 @@ use LaravelJsonApi\Core\Bus\Commands\Command;
 class StoreCommand extends Command
 {
     /**
+     * Fluent constructor.
+     *
+     * @param Request|null $request
+     * @param Store $operation
+     * @return self
+     */
+    public static function make(?Request $request, Store $operation): self
+    {
+        return new self($request, $operation);
+    }
+
+    /**
      * StoreCommand constructor
      *
      * @param Request|null $request

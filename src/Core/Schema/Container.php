@@ -113,9 +113,19 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
+    public function modelClassFor(string|ResourceType $resourceType): string
+    {
+        return $this
+            ->schemaFor($resourceType)
+            ->model();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function existsForModel($model): bool
     {
-        return !empty($this->modelClassFor($model));
+        return !empty($this->resolveModelClassFor($model));
     }
 
     /**
@@ -123,7 +133,7 @@ class Container implements ContainerContract
      */
     public function schemaForModel($model): Schema
     {
-        if ($class = $this->modelClassFor($model)) {
+        if ($class = $this->resolveModelClassFor($model)) {
             return $this->resolve(
                 $this->models[$class]
             );
@@ -149,7 +159,7 @@ class Container implements ContainerContract
      * @param string|object $model
      * @return string|null
      */
-    private function modelClassFor($model): ?string
+    private function resolveModelClassFor(string|object $model): ?string
     {
         $model = is_object($model) ? get_class($model) : $model;
         $model = $this->aliases[$model] ?? $model;

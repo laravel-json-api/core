@@ -20,6 +20,9 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Auth;
 
 use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Document\ErrorList;
+use Throwable;
 
 interface Authorizer
 {
@@ -35,11 +38,11 @@ interface Authorizer
     /**
      * Authorize the store controller action.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param string $modelClass
      * @return bool
      */
-    public function store(Request $request, string $modelClass): bool;
+    public function store(?Request $request, string $modelClass): bool;
 
     /**
      * Authorize the show controller action.
@@ -119,9 +122,9 @@ interface Authorizer
     public function detachRelationship(Request $request, object $model, string $fieldName): bool;
 
     /**
-     * Get the exception to throw when authorization fails.
+     * Get the value to use when authorization fails.
      *
-     * @return \Throwable
+     * @return Throwable|ErrorList|Error
      */
-    public function failed(): \Throwable;
+    public function failed(): Throwable|ErrorList|Error;
 }

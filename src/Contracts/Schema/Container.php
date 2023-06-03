@@ -57,6 +57,14 @@ interface Container
     public function existsForModel($model): bool;
 
     /**
+     * Get the fully qualified model class for the provided resource type.
+     *
+     * @param string|ResourceType $resourceType
+     * @return string
+     */
+    public function modelClassFor(string|ResourceType $resourceType): string;
+
+    /**
      * Get a list of all the supported resource types.
      *
      * @return array

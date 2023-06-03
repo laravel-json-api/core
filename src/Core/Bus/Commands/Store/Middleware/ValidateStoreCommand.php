@@ -23,11 +23,11 @@ use Closure;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
+use LaravelJsonApi\Contracts\Validation\StoreValidator;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
-use LaravelJsonApi\Core\Document\ResourceObject;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
 class ValidateStoreCommand implements HandlesStoreCommands
 {
@@ -53,9 +53,9 @@ class ValidateStoreCommand implements HandlesStoreCommands
         $operation = $command->operation();
 
         if ($command->mustValidate()) {
-            $validator = $this->validatorContainer
-                ->validatorsFor($command->type())
-                ->store($this->validationData($operation));
+            $validator = $this
+                ->validatorFor($command->type())
+                ->make($command->request(), $operation);
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -72,23 +72,26 @@ class ValidateStoreCommand implements HandlesStoreCommands
         }
 
         if ($command->isNotValidated()) {
-            $command = $command->withValidated(
-                $this->validationData($operation),
-            );
+            $data = $this
+                ->validatorFor($command->type())
+                ->extract($operation);
+
+            $command = $command->withValidated($data);
         }
 
         return $next($command);
     }
 
     /**
-     * Get the validation data.
+     * Make a store validator.
      *
-     * @param Store $operation
-     * @return array
+     * @param ResourceType $type
+     * @return StoreValidator
      */
-    private function validationData(Store $operation): array
+    private function validatorFor(ResourceType $type): StoreValidator
     {
-        return ResourceObject::fromArray($operation->data->toArray())
-            ->all();
+        return $this->validatorContainer
+            ->validatorsFor($type)
+            ->store();
     }
 }

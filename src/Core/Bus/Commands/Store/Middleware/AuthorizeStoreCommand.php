@@ -21,12 +21,16 @@ namespace LaravelJsonApi\Core\Bus\Commands\Store\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
+use LaravelJsonApi\Core\Document\Error;
+use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use Throwable;
 
 class AuthorizeStoreCommand implements HandlesStoreCommands
 {
@@ -47,27 +51,55 @@ class AuthorizeStoreCommand implements HandlesStoreCommands
      */
     public function handle(StoreCommand $command, Closure $next): Result
     {
-        if ($command->mustAuthorize() && $request = $command->request()) {
-            $this->authorize($request, $command->type());
+        $errors = null;
+
+        if ($command->mustAuthorize()) {
+            $errors = $this->authorize(
+                $command->request(),
+                $command->type(),
+            );
+        }
+
+        if ($errors) {
+            return Result::failed($errors);
         }
 
         return $next($command);
     }
 
     /**
-     * @param Request $request
+     * @param Request|null $request
      * @param ResourceType $type
-     * @return void
-     * @throws \Throwable
+     * @return ErrorList|Error|null
      */
-    private function authorize(Request $request, ResourceType $type): void
+    private function authorize(?Request $request, ResourceType $type): ErrorList|Error|null
     {
         $authorizer = $this->authorizerContainer->authorizerFor($type);
-        $schema = $this->schemaContainer->schemaFor($type);
-        $passes = $authorizer->store($request, $schema->model());
+        $passes = $authorizer->store(
+            $request,
+            $this->schemaContainer->modelClassFor($type),
+        );
 
         if ($passes === false) {
-            throw $authorizer->failed();
+            return $this->failed($authorizer);
         }
+
+        return null;
+    }
+
+    /**
+     * @param Authorizer $authorizer
+     * @return ErrorList|Error
+     * @throws Throwable
+     */
+    private function failed(Authorizer $authorizer): ErrorList|Error
+    {
+        $exceptionOrErrors = $authorizer->failed();
+
+        if ($exceptionOrErrors instanceof Throwable) {
+            throw $exceptionOrErrors;
+        }
+
+        return $exceptionOrErrors;
     }
 }

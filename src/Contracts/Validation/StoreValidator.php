@@ -20,11 +20,25 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 
-interface Factory
+interface StoreValidator
 {
     /**
-     * @return StoreValidator
+     * Extract validation data from the store operation.
+     *
+     * @param Store $operation
+     * @return array
      */
-    public function store(): StoreValidator;
+    public function extract(Store $operation): array;
+
+    /**
+     * Make a validator for the store operation.
+     *
+     * @param Request|null $request
+     * @param Store $operation
+     * @return Validator
+     */
+    public function make(?Request $request, Store $operation): Validator;
 }
