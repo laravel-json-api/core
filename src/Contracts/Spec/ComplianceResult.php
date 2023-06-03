@@ -17,19 +17,30 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Spec;
 
-use Illuminate\Contracts\Validation\Validator;
+use LaravelJsonApi\Core\Document\ErrorList;
 
-interface Factory
+interface ComplianceResult
 {
     /**
-     * @return QueryOneValidator
+     * Did the input comply with the spec?
+     *
+     * @return bool
      */
-    public function queryOne(): QueryOneValidator;
+    public function didPass(): bool;
 
     /**
-     * @return StoreValidator
+     * Did the input fail compliance with the spec?
+     *
+     * @return bool
      */
-    public function store(): StoreValidator;
+    public function didFail(): bool;
+
+    /**
+     * Get the compliance errors.
+     *
+     * @return ErrorList
+     */
+    public function errors(): ErrorList;
 }

@@ -17,19 +17,18 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Bus\Queries;
 
-use Illuminate\Contracts\Validation\Validator;
+use LaravelJsonApi\Core\Bus\Queries\Query;
+use LaravelJsonApi\Core\Bus\Queries\Result;
 
-interface Factory
+interface Dispatcher
 {
     /**
-     * @return QueryOneValidator
+     * Dispatch a JSON:API query.
+     *
+     * @param Query $query
+     * @return Result
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function dispatch(Query $query): Result;
 }

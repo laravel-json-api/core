@@ -32,18 +32,10 @@ interface Builder
      *
      * When setting the request, the request query parameters MUST be used.
      *
-     * @param Request $request
-     * @return $this
-     */
-    public function withRequest(Request $request): self;
-
-    /**
-     * Use the request as the context for the building action, if provided.
-     *
      * @param Request|null $request
      * @return $this
      */
-    public function maybeWithRequest(?Request $request): self;
+    public function withRequest(?Request $request): self;
 
     /**
      * Use the provided query parameters for the building action.

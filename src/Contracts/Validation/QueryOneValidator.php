@@ -20,16 +20,16 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Request;
 
-interface Factory
+interface QueryOneValidator
 {
     /**
-     * @return QueryOneValidator
+     * Make a validator for query parameters when fetching zero-to-one resources.
+     *
+     * @param Request|null $request
+     * @param array $parameters
+     * @return Validator
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function make(?Request $request, array $parameters): Validator;
 }

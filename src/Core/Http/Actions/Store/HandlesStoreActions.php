@@ -17,19 +17,18 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Http\Actions\Store;
 
-use Illuminate\Contracts\Validation\Validator;
+use LaravelJsonApi\Core\Responses\DataResponse;
 
-interface Factory
+interface HandlesStoreActions
 {
     /**
-     * @return QueryOneValidator
+     * Handle a store action.
+     *
+     * @param StoreAction $action
+     * @param \Closure $next
+     * @return DataResponse
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function handle(StoreAction $action, \Closure $next): DataResponse;
 }

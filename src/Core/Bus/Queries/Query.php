@@ -17,20 +17,25 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands;
+namespace LaravelJsonApi\Core\Bus\Queries;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
+use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Support\Contracts;
 
-abstract class Command
+abstract class Query
 {
     /**
-     * @var bool
+     * @var ResourceType
      */
-    private bool $authorize = true;
+    private readonly ResourceType $type;
+
+    /**
+     * @var array|null
+     */
+    private ?array $parameters = null;
 
     /**
      * @var bool
@@ -38,36 +43,31 @@ abstract class Command
     private bool $validate = true;
 
     /**
-     * @var array|null
+     * @var QueryParametersContract|null
      */
-    private ?array $validated = null;
+    private ?QueryParametersContract $validated = null;
 
     /**
-     * @var QueryParameters|null
+     * Query constructor
+     *
+     * @param Request|null $request
+     * @param ResourceType|string $type
      */
-    private ?QueryParameters $queryParameters = null;
+    public function __construct(
+        private readonly ?Request $request,
+        ResourceType|string $type,
+    ) {
+        $this->type = ResourceType::cast($type);
+    }
 
     /**
      * Get the primary resource type.
      *
      * @return ResourceType
      */
-    abstract public function type(): ResourceType;
-
-    /**
-     * Get the operation object.
-     *
-     * @return Operation
-     */
-    abstract public function operation(): Operation;
-
-    /**
-     * Command constructor
-     *
-     * @param Request|null $request
-     */
-    public function __construct(private readonly ?Request $request)
+    public function type(): ResourceType
     {
+        return $this->type;
     }
 
     /**
@@ -81,44 +81,32 @@ abstract class Command
     }
 
     /**
-     * Set the query parameters that will be used when processing the result payload.
+     * Set the query parameters.
      *
-     * @param QueryParameters|null $query
+     * @param array $params
      * @return $this
      */
-    public function withQuery(?QueryParameters $query): static
+    public function withParameters(array $params): static
     {
         $copy = clone $this;
-        $copy->queryParameters = $query;
+        $copy->parameters = $params;
 
         return $copy;
     }
 
     /**
-     * @return QueryParameters|null
+     * Get the query parameters.
+     *
+     * @return array
      */
-    public function query(): ?QueryParameters
+    public function parameters(): array
     {
-        return $this->queryParameters;
-    }
+        if ($this->parameters === null) {
+            $parameters = $this->request?->query();
+            $this->parameters = $parameters ?? [];
+        }
 
-    /**
-     * @return bool
-     */
-    public function mustAuthorize(): bool
-    {
-        return $this->authorize;
-    }
-
-    /**
-     * @return static
-     */
-    public function skipAuthorization(): static
-    {
-        $copy = clone $this;
-        $copy->authorize = false;
-
-        return $copy;
+        return $this->parameters;
     }
 
     /**
@@ -143,11 +131,15 @@ abstract class Command
     }
 
     /**
-     * @param array $data
+     * @param QueryParametersContract|array $data
      * @return static
      */
-    public function withValidated(array $data): static
+    public function withValidated(QueryParametersContract|array $data): static
     {
+        if (is_array($data)) {
+            $data = QueryParameters::fromArray($data);
+        }
+
         $copy = clone $this;
         $copy->validated = $data;
 
@@ -171,12 +163,12 @@ abstract class Command
     }
 
     /**
-     * @return array
+     * @return QueryParametersContract
      */
-    public function validated(): array
+    public function validated(): QueryParametersContract
     {
-        Contracts::assert($this->validated !== null, 'No validated data set.');
+        Contracts::assert($this->validated !== null, 'No validated query parameters set.');
 
-        return $this->validated ?? [];
+        return $this->validated ?? new QueryParameters();
     }
 }

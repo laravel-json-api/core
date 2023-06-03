@@ -17,19 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Http\Actions;
 
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Request;
 
-interface Factory
+class Action
 {
     /**
-     * @return QueryOneValidator
+     * Action constructor
+     *
+     * @param Request $request
      */
-    public function queryOne(): QueryOneValidator;
+    public function __construct(private readonly Request $request)
+    {
+    }
 
     /**
-     * @return StoreValidator
+     * @return Request
      */
-    public function store(): StoreValidator;
+    public function request(): Request
+    {
+        return $this->request;
+    }
 }

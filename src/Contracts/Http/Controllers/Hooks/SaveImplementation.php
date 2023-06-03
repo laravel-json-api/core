@@ -17,19 +17,28 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
 
-interface Factory
+interface SaveImplementation
 {
     /**
-     * @return QueryOneValidator
+     * @param object|null $model
+     * @param Request $request
+     * @param QueryParameters $parameters
+     * @return void
+     * @throws AbortException
      */
-    public function queryOne(): QueryOneValidator;
+    public function saving(?object $model, Request $request, QueryParameters $parameters): void;
 
     /**
-     * @return StoreValidator
+     * @param object $model
+     * @param Request $request
+     * @param QueryParameters $parameters
+     * @return void
+     * @throws AbortException
      */
-    public function store(): StoreValidator;
+    public function saved(object $model, Request $request, QueryParameters $parameters): void;
 }

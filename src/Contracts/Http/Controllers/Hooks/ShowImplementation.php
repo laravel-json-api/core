@@ -17,19 +17,24 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Request;
 
-interface Factory
+interface ShowImplementation
 {
     /**
-     * @return QueryOneValidator
+     * @param Request $request
+     * @return void
+     * @throws AbortException
      */
-    public function queryOne(): QueryOneValidator;
+    public function reading(Request $request): void;
 
     /**
-     * @return StoreValidator
+     * @param object|null $model
+     * @param Request $request
+     * @return void
+     * @throws AbortException
      */
-    public function store(): StoreValidator;
+    public function read(?object $model, Request $request): void;
 }

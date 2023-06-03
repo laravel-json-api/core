@@ -17,69 +17,70 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands\Store;
+namespace LaravelJsonApi\Core\Bus\Queries\FetchOne;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
+use LaravelJsonApi\Core\Bus\Queries\Query;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
-use LaravelJsonApi\Core\Bus\Commands\Command;
 
-class StoreCommand extends Command
+class FetchOneQuery extends Query
 {
     /**
-     * @var StoreImplementation|null
+     * @var ResourceId
      */
-    private ?StoreImplementation $hooks = null;
+    private readonly ResourceId $id;
+
+    /**
+     * @var ShowImplementation|null
+     */
+    private ?ShowImplementation $hooks = null;
 
     /**
      * Fluent constructor.
      *
      * @param Request|null $request
-     * @param Store $operation
+     * @param ResourceType|string $type
+     * @param ResourceId|string $id
      * @return self
      */
-    public static function make(?Request $request, Store $operation): self
+    public static function make(?Request $request, ResourceType|string $type, ResourceId|string $id): self
     {
-        return new self($request, $operation);
+        return new self($request, $type, $id);
     }
 
     /**
-     * StoreCommand constructor
+     * FetchOneQuery constructor
      *
      * @param Request|null $request
-     * @param Store $operation
+     * @param ResourceType|string $type
+     * @param ResourceId|string $id
      */
     public function __construct(
         ?Request $request,
-        private readonly Store $operation
+        ResourceType|string $type,
+        ResourceId|string $id,
     ) {
-        parent::__construct($request);
+        parent::__construct($request, $type);
+        $this->id = ResourceId::cast($id);
     }
 
     /**
-     * @inheritDoc
+     * @return ResourceId
      */
-    public function type(): ResourceType
+    public function id(): ResourceId
     {
-        return $this->operation->data->type;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function operation(): Store
-    {
-        return $this->operation;
+        return $this->id;
     }
 
     /**
      * Set the hooks implementation.
      *
-     * @param StoreImplementation|null $hooks
+     * @param ShowImplementation|null $hooks
      * @return $this
      */
-    public function withHooks(?StoreImplementation $hooks): self
+    public function withHooks(?ShowImplementation $hooks): self
     {
         $copy = clone $this;
         $copy->hooks = $hooks;
@@ -88,9 +89,9 @@ class StoreCommand extends Command
     }
 
     /**
-     * @return StoreImplementation|null
+     * @return ShowImplementation|null
      */
-    public function hooks(): ?StoreImplementation
+    public function hooks(): ?ShowImplementation
     {
         return $this->hooks;
     }

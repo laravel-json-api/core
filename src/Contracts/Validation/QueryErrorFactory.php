@@ -20,16 +20,16 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
+use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Core\Document\ErrorList;
 
-interface Factory
+interface QueryErrorFactory
 {
     /**
-     * @return QueryOneValidator
+     * Make JSON:API errors for the provided validator.
+     *
+     * @param Validator $validator
+     * @return ErrorList
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function make(Validator $validator): ErrorList;
 }

@@ -17,19 +17,27 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Spec;
 
-use Illuminate\Contracts\Validation\Validator;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
-interface Factory
+interface ResourceDocumentValidator
 {
     /**
-     * @return QueryOneValidator
+     * Set the expected resource type and id in the document.
+     *
+     * @param ResourceType|string $type
+     * @param ResourceId|string|null $id
+     * @return self
      */
-    public function queryOne(): QueryOneValidator;
+    public function expects(ResourceType|string $type, ResourceId|string $id = null): self;
 
     /**
-     * @return StoreValidator
+     * Check whether the provided content passes compliance with the JSON:API spec.
+     *
+     * @param string $json
+     * @return ComplianceResult
      */
-    public function store(): StoreValidator;
+    public function validate(string $json): ComplianceResult;
 }

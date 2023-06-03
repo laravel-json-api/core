@@ -17,19 +17,19 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Bus\Queries\FetchOne;
 
-use Illuminate\Contracts\Validation\Validator;
+use Closure;
+use LaravelJsonApi\Core\Bus\Queries\Result;
 
-interface Factory
+interface HandlesFetchOneQueries
 {
     /**
-     * @return QueryOneValidator
+     * Handle a "fetch one" query.
+     *
+     * @param FetchOneQuery $query
+     * @param Closure $next
+     * @return Result
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function handle(FetchOneQuery $query, Closure $next): Result;
 }

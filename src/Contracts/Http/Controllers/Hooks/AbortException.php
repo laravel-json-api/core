@@ -17,19 +17,19 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
-use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Throwable;
 
-interface Factory
+interface AbortException extends Throwable
 {
     /**
-     * @return QueryOneValidator
+     * Render the result of the hook aborting execution.
+     *
+     * @param Request $request
+     * @return Response|bool
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function render(Request $request): Response|bool;
 }

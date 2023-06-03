@@ -17,21 +17,20 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands\Store;
+namespace LaravelJsonApi\Core\Bus\Queries\FetchOne;
 
 use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Store\Store;
-use LaravelJsonApi\Core\Bus\Commands\Result;
-use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\AuthorizeStoreCommand;
-use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\TriggerStoreHooks;
-use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\ValidateStoreCommand;
+use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
+use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\ValidateFetchOneQuery;
+use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use UnexpectedValueException;
 
-class StoreCommandHandler
+class FetchOneQueryHandler
 {
     /**
-     * StoreCommandHandler constructor
+     * FetchOneQueryHandler constructor
      *
      * @param Pipeline $pipeline
      * @param Store $store
@@ -43,45 +42,49 @@ class StoreCommandHandler
     }
 
     /**
-     * Execute a store command.
+     * Execute a "fetch one" query.
      *
-     * @param StoreCommand $command
+     * @param FetchOneQuery $query
      * @return Result
      */
-    public function execute(StoreCommand $command): Result
+    public function execute(FetchOneQuery $query): Result
     {
         $pipes = [
-            AuthorizeStoreCommand::class,
-            ValidateStoreCommand::class,
-            TriggerStoreHooks::class,
+            ValidateFetchOneQuery::class,
+            TriggerShowHooks::class,
         ];
 
         $result = $this->pipeline
-            ->send($command)
+            ->send($query)
             ->through($pipes)
             ->via('handle')
-            ->then(fn (StoreCommand $cmd): Result => $this->handle($cmd));
+            ->then(fn (FetchOneQuery $q): Result => $this->handle($q));
 
         if ($result instanceof Result) {
             return $result;
         }
 
-        throw new UnexpectedValueException('Expecting pipeline to return a command result.');
+        throw new UnexpectedValueException('Expecting pipeline to return a query result.');
     }
 
     /**
-     * Handle the command.
+     * Handle the query.
      *
-     * @param StoreCommand $command
+     * @param FetchOneQuery $query
      * @return Result
      */
-    private function handle(StoreCommand $command): Result
+    private function handle(FetchOneQuery $query): Result
     {
-        $resource = $this->store
-            ->create($command->type()->value)
-            ->withRequest($command->request())
-            ->store($command->validated());
+        $params = $query->validated();
 
-        return Result::ok(new Payload($resource, true));
+        $model = $this->store
+            ->queryOne($query->type()->value, $query->id()->value)
+            ->withQuery($params)
+            ->first();
+
+        return Result::ok(
+            new Payload($model, true),
+            $params,
+        );
     }
 }

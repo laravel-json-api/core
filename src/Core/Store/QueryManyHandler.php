@@ -50,7 +50,7 @@ class QueryManyHandler implements QueryManyBuilder, HasPagination
     /**
      * @inheritDoc
      */
-    public function withRequest(Request $request): Builder
+    public function withRequest(?Request $request): Builder
     {
         $this->builder->withRequest($request);
 
