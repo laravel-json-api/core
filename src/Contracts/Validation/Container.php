@@ -24,8 +24,8 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 interface Container
 {
     /**
-     * @param ResourceType $resourceType
+     * @param ResourceType|string $resourceType
      * @return Factory
      */
-    public function validatorsFor(ResourceType $resourceType): Factory;
+    public function validatorsFor(ResourceType|string $resourceType): Factory;
 }

@@ -21,16 +21,15 @@ namespace LaravelJsonApi\Core\Bus\Queries\FetchOne;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
+use LaravelJsonApi\Core\Bus\Queries\Concerns\Identifiable;
+use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
-class FetchOneQuery extends Query
+class FetchOneQuery extends Query implements IsIdentifiable
 {
-    /**
-     * @var ResourceId
-     */
-    private readonly ResourceId $id;
+    use Identifiable;
 
     /**
      * @var ShowImplementation|null
@@ -42,10 +41,14 @@ class FetchOneQuery extends Query
      *
      * @param Request|null $request
      * @param ResourceType|string $type
-     * @param ResourceId|string $id
+     * @param ResourceId|string|null $id
      * @return self
      */
-    public static function make(?Request $request, ResourceType|string $type, ResourceId|string $id): self
+    public static function make(
+        ?Request $request,
+        ResourceType|string $type,
+        ResourceId|string|null $id = null
+    ): self
     {
         return new self($request, $type, $id);
     }
@@ -55,23 +58,15 @@ class FetchOneQuery extends Query
      *
      * @param Request|null $request
      * @param ResourceType|string $type
-     * @param ResourceId|string $id
+     * @param ResourceId|string|null $id
      */
     public function __construct(
         ?Request $request,
         ResourceType|string $type,
-        ResourceId|string $id,
+        ResourceId|string|null $id = null,
     ) {
         parent::__construct($request, $type);
-        $this->id = ResourceId::cast($id);
-    }
-
-    /**
-     * @return ResourceId
-     */
-    public function id(): ResourceId
-    {
-        return $this->id;
+        $this->id = ResourceId::nullable($id);
     }
 
     /**

@@ -25,6 +25,14 @@ use Illuminate\Http\Request;
 interface QueryOneValidator
 {
     /**
+     * Make a validate for query parameters in the provided request.
+     *
+     * @param Request $request
+     * @return Validator
+     */
+    public function forRequest(Request $request): Validator;
+
+    /**
      * Make a validator for query parameters when fetching zero-to-one resources.
      *
      * @param Request|null $request

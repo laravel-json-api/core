@@ -17,18 +17,12 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Store;
+namespace LaravelJsonApi\Core\Http\Actions\FetchOne;
 
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Store\ModelKey;
+use LaravelJsonApi\Core\Bus\Queries\Concerns\Identifiable;
+use LaravelJsonApi\Core\Http\Actions\Action;
 
-interface QueriesOne
+class FetchOneAction extends Action
 {
-    /**
-     * Query a single resource.
-     *
-     * @param ResourceId|ModelKey $idOrKey
-     * @return QueryOneBuilder
-     */
-    public function queryOne(ResourceId|ModelKey $idOrKey): QueryOneBuilder;
+    use Identifiable;
 }

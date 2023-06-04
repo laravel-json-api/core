@@ -17,6 +17,11 @@
 
 namespace LaravelJsonApi\Contracts\Store;
 
+use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Store\ModelKey;
+
 interface Store
 {
     /**
@@ -53,6 +58,20 @@ interface Store
     public function exists(string $resourceType, string $resourceId): bool;
 
     /**
+     * Can the provided model be returned for the supplied query parameters?
+     *
+     * @param ResourceType|string $resourceType
+     * @param object $model
+     * @param QueryParameters $parameters
+     * @return bool
+     */
+    public function canSkipQuery(
+        ResourceType|string $resourceType,
+        object $model,
+        QueryParameters $parameters,
+    ): bool;
+
+    /**
      * Query all resources by JSON:API resource type.
      *
      * @param string $resourceType
@@ -63,11 +82,15 @@ interface Store
     /**
      * Query one resource by JSON:API resource type.
      *
-     * @param string $resourceType
-     * @param object|string $modelOrResourceId
+     * @param ResourceType|string $resourceType
+     * @param ResourceId|string|ModelKey $idOrKey
+     *      string is interpreted as the resource id, not a model key.
      * @return QueryOneBuilder
      */
-    public function queryOne(string $resourceType, $modelOrResourceId): QueryOneBuilder;
+    public function queryOne(
+        ResourceType|string $resourceType,
+        ResourceId|string|ModelKey $idOrKey
+    ): QueryOneBuilder;
 
     /**
      * Query a to-one relationship.
@@ -92,10 +115,10 @@ interface Store
     /**
      * Create a new resource.
      *
-     * @param string $resourceType
+     * @param ResourceType|string $resourceType
      * @return ResourceBuilder
      */
-    public function create(string $resourceType): ResourceBuilder;
+    public function create(ResourceType|string $resourceType): ResourceBuilder;
 
     /**
      * Update an existing resource.
@@ -138,8 +161,8 @@ interface Store
     /**
      * Access a resource repository by its JSON:API resource type.
      *
-     * @param string $resourceType
+     * @param ResourceType|string $resourceType
      * @return Repository|null
      */
-    public function resources(string $resourceType): ?Repository;
+    public function resources(ResourceType|string $resourceType): ?Repository;
 }

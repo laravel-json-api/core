@@ -20,7 +20,9 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Store;
 
 use Illuminate\Support\Collection;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Contracts\Schema\Container;
+use LaravelJsonApi\Contracts\Store\CanSkipQueries;
 use LaravelJsonApi\Contracts\Store\CreatesResources;
 use LaravelJsonApi\Contracts\Store\DeletesResources;
 use LaravelJsonApi\Contracts\Store\ModifiesToMany;
@@ -37,6 +39,8 @@ use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Contracts\Store\ToManyBuilder;
 use LaravelJsonApi\Contracts\Store\ToOneBuilder;
 use LaravelJsonApi\Contracts\Store\UpdatesResources;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LogicException;
 use RuntimeException;
 use function sprintf;
@@ -112,6 +116,24 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
+    public function canSkipQuery(
+        ResourceType|string $resourceType,
+        object $model,
+        QueryParameters $parameters
+    ): bool
+    {
+        $repository = $this->resources($resourceType);
+
+        if ($repository instanceof CanSkipQueries) {
+            return $repository->canSkipQuery($model, $parameters);
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function queryAll(string $resourceType): QueryManyBuilder
     {
         $repository = $this->resources($resourceType);
@@ -126,12 +148,19 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function queryOne(string $resourceType, $modelOrResourceId): QueryOneBuilder
+    public function queryOne(
+        ResourceType|string $resourceType,
+        ResourceId|string|ModelKey $idOrKey
+    ): QueryOneBuilder
     {
+        if (is_string($idOrKey)) {
+            $idOrKey = new ResourceId($idOrKey);
+        }
+
         $repository = $this->resources($resourceType);
 
         if ($repository instanceof QueriesOne) {
-            return $repository->queryOne($modelOrResourceId);
+            return $repository->queryOne($idOrKey);
         }
 
         throw new LogicException("Querying one {$resourceType} resource is not supported.");
@@ -170,7 +199,7 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function create(string $resourceType): ResourceBuilder
+    public function create(ResourceType|string $resourceType): ResourceBuilder
     {
         $repository = $this->resources($resourceType);
 
@@ -241,7 +270,7 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function resources(string $resourceType): ?Repository
+    public function resources(ResourceType|string $resourceType): ?Repository
     {
         return $this->schemas
             ->schemaFor($resourceType)

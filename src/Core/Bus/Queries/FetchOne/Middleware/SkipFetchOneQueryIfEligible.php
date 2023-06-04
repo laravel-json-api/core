@@ -20,39 +20,38 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware;
 
 use Closure;
+use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\HandlesFetchOneQueries;
 use LaravelJsonApi\Core\Bus\Queries\Result;
-use RuntimeException;
+use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 
-class TriggerShowHooks implements HandlesFetchOneQueries
+class SkipFetchOneQueryIfEligible implements HandlesFetchOneQueries
 {
+    /**
+     * SkipFetchOneQueryIfEligible constructor
+     *
+     * @param Store $store
+     */
+    public function __construct(private readonly Store $store)
+    {
+    }
+
     /**
      * @inheritDoc
      */
     public function handle(FetchOneQuery $query, Closure $next): Result
     {
-        $hooks = $query->hooks();
+        $model = $query->model();
+        $skip = $model && $this->store->canSkipQuery($query->type(), $model, $query->validated());
 
-        if ($hooks === null) {
-            return $next($query);
+        if ($skip === true) {
+            return Result::ok(
+                new Payload($model, true),
+                $query->validated(),
+            );
         }
 
-        $request = $query->request();
-
-        if ($request === null) {
-            throw new RuntimeException('Show hooks require a request to be set on the query.');
-        }
-
-        $hooks->reading($request, $query->model());
-
-        /** @var Result $result */
-        $result = $next($query);
-
-        if ($result->didSucceed()) {
-            $hooks->read($result->payload()->data, $request);
-        }
-
-        return $result;
+        return $next($query);
     }
 }

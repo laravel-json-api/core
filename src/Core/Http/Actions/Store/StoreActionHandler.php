@@ -22,13 +22,13 @@ namespace LaravelJsonApi\Core\Http\Actions\Store;
 use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcher;
-use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactory;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
+use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ValidateQueryParameters;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use RuntimeException;
 use UnexpectedValueException;
@@ -41,13 +41,11 @@ class StoreActionHandler
      * @param Pipeline $pipeline
      * @param CommandDispatcher $commands
      * @param QueryDispatcher $queries
-     * @param ResourceFactory $resources
      */
     public function __construct(
         private readonly Pipeline $pipeline,
         private readonly CommandDispatcher $commands,
         private readonly QueryDispatcher $queries,
-        private readonly ResourceFactory $resources,
     ) {
     }
 
@@ -56,12 +54,12 @@ class StoreActionHandler
      *
      * @param StoreAction $action
      * @return DataResponse
-     * @throws JsonApiException
      */
     public function execute(StoreAction $action): DataResponse
     {
         $pipes = [
             CheckRequestJsonIsCompliant::class,
+            ValidateQueryParameters::class,
             ParseStoreOperation::class,
         ];
 
@@ -87,16 +85,20 @@ class StoreActionHandler
      */
     private function handle(StoreAction $action): DataResponse
     {
-        $result = $this->dispatch($action);
+        $command = $this->dispatch($action);
 
-        if (!is_object($result->data)) {
+        if ($command->hasData === false || !is_object($command->data)) {
             throw new RuntimeException('Expecting command result to have an object as data.');
         }
 
-        $query = $this->query($action, $result->data);
+        $query = $this->query($action, $command->data);
+
+        if ($query->hasData === false) {
+            throw new RuntimeException('Expecting query result to have data.');
+        }
 
         return DataResponse::make($query->data)
-            ->withMeta(array_merge($result->meta, $query->meta))
+            ->withMeta(array_merge($command->meta, $query->meta))
             ->didCreate();
     }
 
@@ -109,12 +111,11 @@ class StoreActionHandler
      */
     private function dispatch(StoreAction $action): Payload
     {
-        $result = $this->commands->dispatch(
-            new StoreCommand(
-                $action->request(),
-                $action->operation(),
-            ),
-        );
+        $command = StoreCommand::make($action->request(), $action->operation())
+            ->withQuery($action->query())
+            ->withHooks($action->hooks());
+
+        $result = $this->commands->dispatch($command);
 
         if ($result->didSucceed()) {
             return $result->payload();
@@ -133,21 +134,18 @@ class StoreActionHandler
      */
     private function query(StoreAction $action, object $model): Payload
     {
-        $resource = $this->resources
-            ->createResource($model);
+        $query = FetchOneQuery::make($action->request(), $action->type())
+            ->withModel($model)
+            ->skipAuthorization()
+            ->withValidated($action->query())
+            ->withHooks($action->hooks());
 
-        $query = $this->queries->dispatch(
-            new FetchOneQuery(
-                $action->request(),
-                $resource->type(),
-                $resource->id(),
-            ),
-        );
+        $result = $this->queries->dispatch($query);
 
-        if ($query->didSucceed()) {
-            return $query->payload();
+        if ($result->didSucceed()) {
+            return $result->payload();
         }
 
-        throw new JsonApiException($query->errors());
+        throw new JsonApiException($result->errors());
     }
 }

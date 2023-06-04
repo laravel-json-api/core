@@ -19,22 +19,24 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 
 interface ShowImplementation
 {
     /**
      * @param Request $request
+     * @param object|null $model
      * @return void
-     * @throws AbortException
+     * @throws HttpResponseException
      */
-    public function reading(Request $request): void;
+    public function reading(Request $request, ?object $model): void;
 
     /**
      * @param object|null $model
      * @param Request $request
      * @return void
-     * @throws AbortException
+     * @throws HttpResponseException
      */
     public function read(?object $model, Request $request): void;
 }

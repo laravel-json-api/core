@@ -33,6 +33,11 @@ abstract class Query
     private readonly ResourceType $type;
 
     /**
+     * @var bool
+     */
+    private bool $authorize = true;
+
+    /**
      * @var array|null
      */
     private ?array $parameters = null;
@@ -107,6 +112,25 @@ abstract class Query
         }
 
         return $this->parameters;
+    }
+
+    /**
+     * @return bool
+     */
+    public function mustAuthorize(): bool
+    {
+        return $this->authorize;
+    }
+
+    /**
+     * @return static
+     */
+    public function skipAuthorization(): static
+    {
+        $copy = clone $this;
+        $copy->authorize = false;
+
+        return $copy;
     }
 
     /**

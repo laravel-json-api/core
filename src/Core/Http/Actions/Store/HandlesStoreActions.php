@@ -19,6 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\Store;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
+use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
 interface HandlesStoreActions
@@ -29,6 +31,8 @@ interface HandlesStoreActions
      * @param StoreAction $action
      * @param \Closure $next
      * @return DataResponse
+     * @throws HttpResponseException
+     * @throws JsonApiException
      */
     public function handle(StoreAction $action, \Closure $next): DataResponse;
 }

@@ -20,21 +20,26 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Store\Middleware;
 
 use Closure;
-use LaravelJsonApi\Contracts\Spec\ResourceDocumentValidator;
+use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
+use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Http\Actions\Store\HandlesStoreActions;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreAction;
+use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
-class CheckRequestJsonIsCompliant implements HandlesStoreActions
+class ValidateQueryParameters implements HandlesStoreActions
 {
     /**
-     * CheckJsonApiSpecCompliance constructor
+     * ValidateQueryParameters constructor
      *
-     * @param ResourceDocumentValidator $validator
+     * @param ValidatorContainer $validatorContainer
+     * @param QueryErrorFactory $errorFactory
      */
-    public function __construct(private readonly ResourceDocumentValidator $validator)
-    {
+    public function __construct(
+        private readonly ValidatorContainer $validatorContainer,
+        private readonly QueryErrorFactory  $errorFactory,
+    ) {
     }
 
     /**
@@ -42,13 +47,18 @@ class CheckRequestJsonIsCompliant implements HandlesStoreActions
      */
     public function handle(StoreAction $action, Closure $next): DataResponse
     {
-        $result = $this->validator
-            ->expects($action->type())
-            ->validate($action->request()->getContent());
+        $validator = $this->validatorContainer
+            ->validatorsFor($action->type())
+            ->queryOne()
+            ->forRequest($action->request());
 
-        if ($result->didFail()) {
-            throw new JsonApiException($result->errors());
+        if ($validator->fails()) {
+            throw new JsonApiException($this->errorFactory->make($validator));
         }
+
+        $action = $action->withQuery(
+            QueryParameters::fromArray($validator->validated()),
+        );
 
         return $next($action);
     }

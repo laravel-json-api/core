@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 
@@ -28,7 +29,7 @@ interface StoreImplementation extends SaveImplementation
      * @param Request $request
      * @param QueryParameters $parameters
      * @return void
-     * @throws AbortException
+     * @throws HttpResponseException
      */
     public function creating(Request $request, QueryParameters $parameters): void;
 
@@ -37,7 +38,7 @@ interface StoreImplementation extends SaveImplementation
      * @param Request $request
      * @param QueryParameters $parameters
      * @return void
-     * @throws AbortException
+     * @throws HttpResponseException
      */
     public function created(object $model, Request $request, QueryParameters $parameters): void;
 }

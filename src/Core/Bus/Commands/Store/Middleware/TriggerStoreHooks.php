@@ -52,10 +52,12 @@ class TriggerStoreHooks implements HandlesStoreCommands
 
         /** @var Result $result */
         $result = $next($command);
-        $model = $result->payload()->data;
 
-        $hooks->created($model, $request, $query);
-        $hooks->saved($model, $request, $query);
+        if ($result->didSucceed()) {
+            $model = $result->payload()->data;
+            $hooks->created($model, $request, $query);
+            $hooks->saved($model, $request, $query);
+        }
 
         return $result;
     }

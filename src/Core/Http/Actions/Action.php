@@ -20,16 +20,36 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions;
 
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Http\Controllers\Hooks\HooksImplementation;
+use RuntimeException;
 
 class Action
 {
+    /**
+     * @var ResourceType
+     */
+    private readonly ResourceType $type;
+
+    /**
+     * @var QueryParameters|null
+     */
+    private ?QueryParameters $queryParameters = null;
+
+    /**
+     * @var HooksImplementation|null
+     */
+    private ?HooksImplementation $hooks = null;
+
     /**
      * Action constructor
      *
      * @param Request $request
      */
-    public function __construct(private readonly Request $request)
+    public function __construct(private readonly Request $request, ResourceType|string $type)
     {
+        $this->type = ResourceType::cast($type);
     }
 
     /**
@@ -38,5 +58,61 @@ class Action
     public function request(): Request
     {
         return $this->request;
+    }
+
+    /**
+     * @return ResourceType
+     */
+    public function type(): ResourceType
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param QueryParameters $query
+     * @return static
+     */
+    public function withQuery(QueryParameters $query): static
+    {
+        $copy = clone $this;
+        $copy->queryParameters = $query;
+
+        return $copy;
+    }
+
+    /**
+     * @return QueryParameters
+     */
+    public function query(): QueryParameters
+    {
+        if ($this->queryParameters) {
+            return $this->queryParameters;
+        }
+
+        throw new RuntimeException('Expecting validated query parameters to be set on action.');
+    }
+
+    /**
+     * Set the hooks for the action.
+     *
+     * @param object|null $target
+     * @return $this
+     */
+    public function withHooks(?object $target): static
+    {
+        $copy = clone $this;
+        $copy->hooks = $target ? new HooksImplementation($target) : null;
+
+        return $copy;
+    }
+
+    /**
+     * Get the hooks for the action.
+     *
+     * @return HooksImplementation|null
+     */
+    public function hooks(): ?HooksImplementation
+    {
+        return $this->hooks;
     }
 }

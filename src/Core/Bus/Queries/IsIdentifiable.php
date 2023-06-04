@@ -17,19 +17,35 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
+namespace LaravelJsonApi\Core\Bus\Queries;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Throwable;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Store\ModelKey;
 
-interface AbortException extends Throwable
+interface IsIdentifiable
 {
     /**
-     * Render the result of the hook aborting execution.
-     *
-     * @param Request $request
-     * @return Response|bool
+     * @return ResourceId|null
      */
-    public function render(Request $request): Response|bool;
+    public function id(): ?ResourceId;
+
+    /**
+     * Return a new instance with the resource id set.
+     *
+     * @param ResourceId|string $id
+     * @return static
+     */
+    public function withId(ResourceId|string $id): static;
+
+    /**
+     * Get the model for the query.
+     *
+     * @return object
+     */
+    public function modelOrFail(): object;
+
+    /**
+     * @return ModelKey|null
+     */
+    public function modelKey(): ?ModelKey;
 }

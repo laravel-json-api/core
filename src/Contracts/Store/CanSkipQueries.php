@@ -17,29 +17,18 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
+namespace LaravelJsonApi\Contracts\Store;
 
-use Illuminate\Http\Exceptions\HttpResponseException;
-use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 
-interface SaveImplementation
+interface CanSkipQueries
 {
     /**
-     * @param object|null $model
-     * @param Request $request
-     * @param QueryParameters $parameters
-     * @return void
-     * @throws HttpResponseException
-     */
-    public function saving(?object $model, Request $request, QueryParameters $parameters): void;
-
-    /**
+     * Can the provided model be returned for the supplied query parameters?
+     *
      * @param object $model
-     * @param Request $request
      * @param QueryParameters $parameters
-     * @return void
-     * @throws HttpResponseException
+     * @return bool
      */
-    public function saved(object $model, Request $request, QueryParameters $parameters): void;
+    public function canSkipQuery(object $model, QueryParameters $parameters): bool;
 }

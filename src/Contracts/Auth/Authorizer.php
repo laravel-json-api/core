@@ -47,11 +47,11 @@ interface Authorizer
     /**
      * Authorize the show controller action.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param object $model
      * @return bool
      */
-    public function show(Request $request, object $model): bool;
+    public function show(?Request $request, object $model): bool;
 
     /**
      * Authorize the update controller action.
