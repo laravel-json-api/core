@@ -77,11 +77,11 @@ class StoreCommandHandler
      */
     private function handle(StoreCommand $command): Result
     {
-        $resource = $this->store
-            ->create($command->type()->value)
+        $model = $this->store
+            ->create($command->type())
             ->withRequest($command->request())
             ->store($command->validated());
 
-        return Result::ok(new Payload($resource, true));
+        return Result::ok(new Payload($model, true));
     }
 }

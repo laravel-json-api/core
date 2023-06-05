@@ -21,13 +21,12 @@ namespace LaravelJsonApi\Contracts\Store;
 
 interface ResourceBuilder extends Builder
 {
-
     /**
      * Store the resource using the supplied validated data.
      *
      * @param array $validatedData
      * @return object
-     *      the created or updated resource.
+     *      the created or updated model.
      */
     public function store(array $validatedData): object;
 }
