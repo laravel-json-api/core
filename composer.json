@@ -25,8 +25,10 @@
     "require": {
         "php": "^8.1",
         "ext-json": "*",
+        "illuminate/auth": "^10.0",
         "illuminate/contracts": "^10.0",
         "illuminate/http": "^10.0",
+        "illuminate/pipeline": "^10.0",
         "illuminate/support": "^10.0"
     },
     "require-dev": {

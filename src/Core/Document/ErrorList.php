@@ -197,9 +197,17 @@ class ErrorList implements Serializable, Countable, IteratorAggregate, Responsab
     }
 
     /**
+     * @return Error[]
+     */
+    public function all(): array
+    {
+        return $this->stack;
+    }
+
+    /**
      * @inheritDoc
      */
-    public function toArray()
+    public function toArray(): array
     {
         return collect($this->stack)->toArray();
     }

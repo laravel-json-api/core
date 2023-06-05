@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Schema;
 use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Server\Server;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Support\ContainerResolver;
 use LogicException;
 use RuntimeException;
@@ -88,16 +89,20 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
-    public function exists(string $resourceType): bool
+    public function exists(string|ResourceType $resourceType): bool
     {
+        $resourceType = (string) $resourceType;
+
         return isset($this->types[$resourceType]);
     }
 
     /**
      * @inheritDoc
      */
-    public function schemaFor(string $resourceType): Schema
+    public function schemaFor(string|ResourceType $resourceType): Schema
     {
+        $resourceType = (string) $resourceType;
+
         if (isset($this->types[$resourceType])) {
             return $this->resolve($this->types[$resourceType]);
         }
@@ -108,9 +113,19 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
+    public function modelClassFor(string|ResourceType $resourceType): string
+    {
+        return $this
+            ->schemaFor($resourceType)
+            ->model();
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function existsForModel($model): bool
     {
-        return !empty($this->modelClassFor($model));
+        return !empty($this->resolveModelClassFor($model));
     }
 
     /**
@@ -118,7 +133,7 @@ class Container implements ContainerContract
      */
     public function schemaForModel($model): Schema
     {
-        if ($class = $this->modelClassFor($model)) {
+        if ($class = $this->resolveModelClassFor($model)) {
             return $this->resolve(
                 $this->models[$class]
             );
@@ -144,7 +159,7 @@ class Container implements ContainerContract
      * @param string|object $model
      * @return string|null
      */
-    private function modelClassFor($model): ?string
+    private function resolveModelClassFor(string|object $model): ?string
     {
         $model = is_object($model) ? get_class($model) : $model;
         $model = $this->aliases[$model] ?? $model;
