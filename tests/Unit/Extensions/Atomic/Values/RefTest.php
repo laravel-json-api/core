@@ -23,7 +23,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class RefTest extends TestCase
@@ -143,7 +142,7 @@ class RefTest extends TestCase
      */
     public function testItMustHaveIdOrLid(): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Ref must have an id or lid.');
 
         new Ref(new ResourceType('posts'));
@@ -154,7 +153,7 @@ class RefTest extends TestCase
      */
     public function testItCannotHaveBothIdAndLid(): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Ref cannot have both an id and lid.');
 
         new Ref(
@@ -182,7 +181,7 @@ class RefTest extends TestCase
      */
     public function testItRejectsInvalidRelationship(string $value): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Relationship must be a non-empty string if provided.');
 
         new Ref(

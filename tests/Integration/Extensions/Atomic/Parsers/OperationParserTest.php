@@ -23,7 +23,6 @@ use Illuminate\Container\Container;
 use Illuminate\Pipeline\Pipeline;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class OperationParserTest extends TestCase
@@ -72,7 +71,7 @@ class OperationParserTest extends TestCase
      */
     public function testItIsIndeterminate(): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Indeterminate operation.');
         $this->parser->parse(['op' => 'blah!']);
     }

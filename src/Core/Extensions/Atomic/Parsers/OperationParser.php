@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
-use LaravelJsonApi\Core\Support\ContractException;
 use LaravelJsonApi\Core\Support\Contracts;
 use UnexpectedValueException;
 
@@ -57,7 +56,7 @@ class OperationParser
             ->send($operation)
             ->through($pipes)
             ->via('parse')
-            ->then(static fn() => throw new ContractException('Indeterminate operation.'));
+            ->then(static fn() => throw new \LogicException('Indeterminate operation.'));
 
         if ($parsed instanceof Operation) {
             return $parsed;

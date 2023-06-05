@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Results;
 
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class ResultTest extends TestCase
@@ -104,7 +103,7 @@ class ResultTest extends TestCase
      */
     public function testItHasIncorrectHasDataValue(): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Result data must be null when result has no data.');
 
         new Result(new \stdClass(), false);

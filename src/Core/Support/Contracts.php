@@ -29,7 +29,7 @@ final class Contracts
     public static function assert(bool $precondition, string $message = ''): void
     {
         if ($precondition === false) {
-            throw new ContractException($message);
+            throw new \LogicException($message);
         }
     }
 

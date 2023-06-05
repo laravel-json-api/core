@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Document\Input\Parsers;
 
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class ResourceObjectParserTest extends TestCase
@@ -149,7 +148,7 @@ class ResourceObjectParserTest extends TestCase
             ],
         ];
 
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Resource object array must contain a type.');
         $this->parser->parse($data);
     }

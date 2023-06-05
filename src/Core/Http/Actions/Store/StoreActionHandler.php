@@ -24,6 +24,7 @@ use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcher;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
+use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
@@ -91,14 +92,16 @@ class StoreActionHandler
             throw new RuntimeException('Expecting command result to have an object as data.');
         }
 
-        $query = $this->query($action, $command->data);
+        $result = $this->query($action, $command->data);
+        $payload = $result->payload();
 
-        if ($query->hasData === false) {
+        if ($payload->hasData === false) {
             throw new RuntimeException('Expecting query result to have data.');
         }
 
-        return DataResponse::make($query->data)
-            ->withMeta(array_merge($command->meta, $query->meta))
+        return DataResponse::make($payload->data)
+            ->withMeta(array_merge($command->meta, $payload->meta))
+            ->withQueryParameters($result->query())
             ->didCreate();
     }
 
@@ -129,10 +132,10 @@ class StoreActionHandler
      *
      * @param StoreAction $action
      * @param object $model
-     * @return Payload
+     * @return Result
      * @throws JsonApiException
      */
-    private function query(StoreAction $action, object $model): Payload
+    private function query(StoreAction $action, object $model): Result
     {
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->withModel($model)
@@ -143,7 +146,7 @@ class StoreActionHandler
         $result = $this->queries->dispatch($query);
 
         if ($result->didSucceed()) {
-            return $result->payload();
+            return $result;
         }
 
         throw new JsonApiException($result->errors());

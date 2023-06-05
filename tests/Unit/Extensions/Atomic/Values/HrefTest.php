@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Values;
 
 use LaravelJsonApi\Contracts\Support\Stringable;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class HrefTest extends TestCase
@@ -61,7 +60,7 @@ class HrefTest extends TestCase
      */
     public function testItIsInvalid(string $value): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         new Href($value);
     }
 }

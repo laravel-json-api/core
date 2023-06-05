@@ -77,17 +77,17 @@ class HooksImplementation implements StoreImplementation, ShowImplementation
     /**
      * @inheritDoc
      */
-    public function reading(Request $request, ?object $model): void
+    public function reading(Request $request, QueryParameters $query): void
     {
-        $this('reading', $request, $model);
+        $this('reading', $request, $query);
     }
 
     /**
      * @inheritDoc
      */
-    public function read(?object $model, Request $request): void
+    public function read(?object $model, Request $request, QueryParameters $query): void
     {
-        $this('read', $model, $request);
+        $this('read', $model, $request, $query);
     }
 
     /**
@@ -109,16 +109,16 @@ class HooksImplementation implements StoreImplementation, ShowImplementation
     /**
      * @inheritDoc
      */
-    public function creating(Request $request, QueryParameters $parameters): void
+    public function creating(Request $request, QueryParameters $query): void
     {
-        $this('creating', $request, $parameters);
+        $this('creating', $request, $query);
     }
 
     /**
      * @inheritDoc
      */
-    public function created(object $model, Request $request, QueryParameters $parameters): void
+    public function created(object $model, Request $request, QueryParameters $query): void
     {
-        $this('created', $request, $parameters);
+        $this('created', $request, $query);
     }
 }

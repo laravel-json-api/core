@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Results;
 
 use LaravelJsonApi\Core\Extensions\Atomic\Results\ListOfResults;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class ListOfResultsTest extends TestCase
@@ -67,7 +66,7 @@ class ListOfResultsTest extends TestCase
      */
     public function testItMustHaveAtLeastOneResult(): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         new ListOfResults();
     }
 }

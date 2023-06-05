@@ -23,7 +23,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class ResourceObjectTest extends TestCase
@@ -192,7 +191,7 @@ class ResourceObjectTest extends TestCase
      */
     public function testItCannotSetIdIfItAlreadyHasAnId(ResourceObject $resource): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Resource object already has an id.');
         $resource->withId('999');
     }

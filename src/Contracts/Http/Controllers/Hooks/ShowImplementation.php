@@ -21,22 +21,24 @@ namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
 
 interface ShowImplementation
 {
     /**
      * @param Request $request
-     * @param object|null $model
+     * @param QueryParameters $query
      * @return void
      * @throws HttpResponseException
      */
-    public function reading(Request $request, ?object $model): void;
+    public function reading(Request $request, QueryParameters $query): void;
 
     /**
      * @param object|null $model
      * @param Request $request
+     * @param QueryParameters $query
      * @return void
      * @throws HttpResponseException
      */
-    public function read(?object $model, Request $request): void;
+    public function read(?object $model, Request $request, QueryParameters $query): void;
 }

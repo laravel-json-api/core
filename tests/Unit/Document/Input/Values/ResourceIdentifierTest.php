@@ -23,7 +23,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceIdentifier;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class ResourceIdentifierTest extends TestCase
@@ -124,7 +123,7 @@ class ResourceIdentifierTest extends TestCase
      */
     public function testItCannotSetIdIfItAlreadyHasAnId(ResourceIdentifier $resource): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Resource identifier already has an id.');
         $resource->withId('999');
     }
@@ -134,7 +133,7 @@ class ResourceIdentifierTest extends TestCase
      */
     public function testItMustHaveAnIdOrLid(): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Resource identifier must have an id or lid.');
         new ResourceIdentifier(new ResourceType('posts'));
     }

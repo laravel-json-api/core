@@ -24,7 +24,6 @@ use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
-use LaravelJsonApi\Core\Support\ContractException;
 
 class Result implements ResultContract
 {
@@ -64,12 +63,12 @@ class Result implements ResultContract
      *
      * @param bool $success
      * @param Payload|null $payload
-     * @param QueryParameters|null $parameters
+     * @param QueryParameters|null $query
      */
     private function __construct(
         private readonly bool $success,
         private readonly ?Payload $payload = null,
-        private readonly ?QueryParameters $parameters = null,
+        private readonly ?QueryParameters $query = null,
     ) {
     }
 
@@ -82,19 +81,19 @@ class Result implements ResultContract
             return $this->payload;
         }
 
-        throw new ContractException('Cannot get payload from a failed query result.');
+        throw new \LogicException('Cannot get payload from a failed query result.');
     }
 
     /**
      * @return QueryParameters
      */
-    public function parameters(): QueryParameters
+    public function query(): QueryParameters
     {
-        if ($this->parameters !== null) {
-            return $this->parameters;
+        if ($this->query !== null) {
+            return $this->query;
         }
 
-        throw new ContractException('Cannot get payload from a failed query result.');
+        throw new \LogicException('Cannot get payload from a failed query result.');
     }
 
     /**

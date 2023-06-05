@@ -27,18 +27,18 @@ interface StoreImplementation extends SaveImplementation
 {
     /**
      * @param Request $request
-     * @param QueryParameters $parameters
+     * @param QueryParameters $query
      * @return void
      * @throws HttpResponseException
      */
-    public function creating(Request $request, QueryParameters $parameters): void;
+    public function creating(Request $request, QueryParameters $query): void;
 
     /**
      * @param object $model
      * @param Request $request
-     * @param QueryParameters $parameters
+     * @param QueryParameters $query
      * @return void
      * @throws HttpResponseException
      */
-    public function created(object $model, Request $request, QueryParameters $parameters): void;
+    public function created(object $model, Request $request, QueryParameters $query): void;
 }

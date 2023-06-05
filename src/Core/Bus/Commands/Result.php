@@ -23,7 +23,6 @@ use LaravelJsonApi\Contracts\Bus\Result as ResultContract;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
-use LaravelJsonApi\Core\Support\ContractException;
 
 class Result implements ResultContract
 {
@@ -76,7 +75,7 @@ class Result implements ResultContract
             return $this->payload;
         }
 
-        throw new ContractException('Cannot get payload from a failed command result.');
+        throw new \LogicException('Cannot get payload from a failed command result.');
     }
 
     /**

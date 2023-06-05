@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Http\Actions\Store;
 
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 use LaravelJsonApi\Core\Http\Actions\Action;
-use LaravelJsonApi\Core\Support\ContractException;
 
 class StoreAction extends Action
 {
@@ -53,6 +52,6 @@ class StoreAction extends Action
             return $this->operation;
         }
 
-        throw new ContractException('No store operation set on store action.');
+        throw new \LogicException('No store operation set on store action.');
     }
 }

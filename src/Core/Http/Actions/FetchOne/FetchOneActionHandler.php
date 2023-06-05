@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Http\Actions\FetchOne;
 use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
+use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Responses\DataResponse;
@@ -76,22 +77,24 @@ class FetchOneActionHandler
      */
     private function handle(FetchOneAction $action): DataResponse
     {
-        $payload = $this->query($action);
+        $result = $this->query($action);
+        $payload = $result->payload();
 
         if ($payload->hasData === false) {
             throw new RuntimeException('Expecting query result to have data.');
         }
 
         return DataResponse::make($payload->data)
-            ->withMeta($payload->meta);
+            ->withMeta($payload->meta)
+            ->withQueryParameters($result->query());
     }
 
     /**
      * @param FetchOneAction $action
-     * @return Payload
+     * @return Result
      * @throws JsonApiException
      */
-    private function query(FetchOneAction $action): Payload
+    private function query(FetchOneAction $action): Result
     {
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->maybeWithId($action->id())
@@ -102,7 +105,7 @@ class FetchOneActionHandler
         $result = $this->dispatcher->dispatch($query);
 
         if ($result->didSucceed()) {
-            return $result->payload();
+            return $result;
         }
 
         throw new JsonApiException($result->errors());

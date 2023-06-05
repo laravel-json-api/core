@@ -44,13 +44,13 @@ class TriggerShowHooks implements HandlesFetchOneQueries
             throw new RuntimeException('Show hooks require a request to be set on the query.');
         }
 
-        $hooks->reading($request, $query->model());
+        $hooks->reading($request, $query->validated());
 
         /** @var Result $result */
         $result = $next($query);
 
         if ($result->didSucceed()) {
-            $hooks->read($result->payload()->data, $request);
+            $hooks->read($result->payload()->data, $request, $query->validated());
         }
 
         return $result;

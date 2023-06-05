@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Tests\Unit\Document\Input\Values;
 
 use LaravelJsonApi\Contracts\Support\Stringable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class ResourceTypeTest extends TestCase
@@ -56,7 +55,7 @@ class ResourceTypeTest extends TestCase
      */
     public function testItIsInvalid(string $value): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Resource type must be a non-empty string.');
         new ResourceType($value);
     }

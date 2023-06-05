@@ -23,7 +23,6 @@ use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\ListOfOperations;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
-use LaravelJsonApi\Core\Support\ContractException;
 use PHPUnit\Framework\TestCase;
 
 class ListOfOperationsTest extends TestCase
@@ -70,7 +69,7 @@ class ListOfOperationsTest extends TestCase
      */
     public function testItCannotBeEmpty(): void
     {
-        $this->expectException(ContractException::class);
+        $this->expectException(\LogicException::class);
         new ListOfOperations();
     }
 }
