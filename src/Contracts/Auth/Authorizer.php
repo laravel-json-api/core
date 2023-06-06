@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Contracts\Auth;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 use Throwable;
 
 interface Authorizer
@@ -36,13 +37,14 @@ interface Authorizer
     public function index(Request $request, string $modelClass): bool;
 
     /**
-     * Authorize the store controller action.
+     * Authorize a JSON:API store operation.
      *
      * @param Request|null $request
+     * @param Store $operation
      * @param string $modelClass
      * @return bool
      */
-    public function store(?Request $request, string $modelClass): bool;
+    public function store(?Request $request, Store $operation, string $modelClass): bool;
 
     /**
      * Authorize the show controller action.

@@ -30,6 +30,7 @@ use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 use Throwable;
 
 class AuthorizeStoreCommand implements HandlesStoreCommands
@@ -56,6 +57,7 @@ class AuthorizeStoreCommand implements HandlesStoreCommands
         if ($command->mustAuthorize()) {
             $errors = $this->authorize(
                 $command->request(),
+                $command->operation(),
                 $command->type(),
             );
         }
@@ -69,14 +71,16 @@ class AuthorizeStoreCommand implements HandlesStoreCommands
 
     /**
      * @param Request|null $request
+     * @param Store $operation
      * @param ResourceType $type
      * @return ErrorList|Error|null
      */
-    private function authorize(?Request $request, ResourceType $type): ErrorList|Error|null
+    private function authorize(?Request $request, Store $operation, ResourceType $type): ErrorList|Error|null
     {
         $authorizer = $this->authorizerContainer->authorizerFor($type);
         $passes = $authorizer->store(
             $request,
+            $operation,
             $this->schemaContainer->modelClassFor($type),
         );
 

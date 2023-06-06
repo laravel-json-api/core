@@ -17,25 +17,23 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Tests\Unit\Bus\Commands\Store\Middleware;
+namespace LaravelJsonApi\Core\Tests\Unit\Bus\Queries\FetchOne\Middleware;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
-use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Core\Bus\Commands\Result;
-use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\AuthorizeStoreCommand;
-use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
+use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
+use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
+use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class AuthorizeStoreCommandTest extends TestCase
+class AuthorizeFetchOneQueryTest extends TestCase
 {
     /**
      * @var ResourceType
@@ -43,19 +41,14 @@ class AuthorizeStoreCommandTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var string
-     */
-    private string $modelClass;
-
-    /**
      * @var Authorizer&MockObject
      */
     private Authorizer&MockObject $authorizer;
 
     /**
-     * @var AuthorizeStoreCommand
+     * @var AuthorizeFetchOneQuery
      */
-    private AuthorizeStoreCommand $middleware;
+    private AuthorizeFetchOneQuery $middleware;
 
     /**
      * @return void
@@ -72,15 +65,8 @@ class AuthorizeStoreCommandTest extends TestCase
             ->with($this->identicalTo($this->type))
             ->willReturn($this->authorizer = $this->createMock(Authorizer::class));
 
-        $schemas = $this->createMock(SchemaContainer::class);
-        $schemas
-            ->method('modelClassFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($this->modelClass = 'App\Models\Post');
-
-        $this->middleware = new AuthorizeStoreCommand(
+        $this->middleware = new AuthorizeFetchOneQuery(
             $authorizers,
-            $schemas,
         );
     }
 
@@ -89,25 +75,28 @@ class AuthorizeStoreCommandTest extends TestCase
      */
     public function testItPassesAuthorizationWithRequest(): void
     {
-        $command = new StoreCommand(
-            $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
-        );
+        $request = $this->createMock(Request::class);
+
+        $query = FetchOneQuery::make($request, $this->type)
+            ->withModel($model = new \stdClass());
 
         $this->authorizer
             ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
+            ->method('show')
+            ->with($this->identicalTo($request), $this->identicalTo($model))
             ->willReturn(true);
 
         $this->authorizer
             ->expects($this->never())
             ->method('failed');
 
-        $expected = Result::ok();
+        $expected = Result::ok(
+            new Payload(null, true),
+            $this->createMock(QueryParameters::class),
+        );
 
-        $actual = $this->middleware->handle($command, function ($cmd) use ($command, $expected): Result {
-            $this->assertSame($command, $cmd);
+        $actual = $this->middleware->handle($query, function ($passed) use ($query, $expected): Result {
+            $this->assertSame($query, $passed);
             return $expected;
         });
 
@@ -119,25 +108,26 @@ class AuthorizeStoreCommandTest extends TestCase
      */
     public function testItPassesAuthorizationWithoutRequest(): void
     {
-        $command = new StoreCommand(
-            null,
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
-        );
+        $query = FetchOneQuery::make(null, $this->type)
+            ->withModel($model = new \stdClass());
 
         $this->authorizer
             ->expects($this->once())
-            ->method('store')
-            ->with(null, $this->identicalTo($op), $this->modelClass)
+            ->method('show')
+            ->with(null, $this->identicalTo($model))
             ->willReturn(true);
 
         $this->authorizer
             ->expects($this->never())
             ->method('failed');
 
-        $expected = Result::ok();
+        $expected = Result::ok(
+            new Payload(null, true),
+            $this->createMock(QueryParameters::class),
+        );
 
-        $actual = $this->middleware->handle($command, function ($cmd) use ($command, $expected): Result {
-            $this->assertSame($command, $cmd);
+        $actual = $this->middleware->handle($query, function ($passed) use ($query, $expected): Result {
+            $this->assertSame($query, $passed);
             return $expected;
         });
 
@@ -149,15 +139,15 @@ class AuthorizeStoreCommandTest extends TestCase
      */
     public function testItFailsAuthorizationWithException(): void
     {
-        $command = new StoreCommand(
-            $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
-        );
+        $request = $this->createMock(Request::class);
+
+        $query = FetchOneQuery::make($request, $this->type)
+            ->withModel($model = new \stdClass());
 
         $this->authorizer
             ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
+            ->method('show')
+            ->with($this->identicalTo($request), $this->identicalTo($model))
             ->willReturn(false);
 
         $this->authorizer
@@ -167,7 +157,7 @@ class AuthorizeStoreCommandTest extends TestCase
 
         try {
             $this->middleware->handle(
-                $command,
+                $query,
                 fn() => $this->fail('Expecting next middleware to not be called.'),
             );
             $this->fail('Middleware did not throw an exception.');
@@ -181,15 +171,15 @@ class AuthorizeStoreCommandTest extends TestCase
      */
     public function testItFailsAuthorizationWithErrorList(): void
     {
-        $command = new StoreCommand(
-            $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
-        );
+        $request = $this->createMock(Request::class);
+
+        $query = FetchOneQuery::make($request, $this->type)
+            ->withModel($model = new \stdClass());
 
         $this->authorizer
             ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
+            ->method('show')
+            ->with($this->identicalTo($request), $this->identicalTo($model))
             ->willReturn(false);
 
         $this->authorizer
@@ -198,7 +188,7 @@ class AuthorizeStoreCommandTest extends TestCase
             ->willReturn($expected = new ErrorList());
 
         $result = $this->middleware->handle(
-            $command,
+            $query,
             fn() => $this->fail('Expecting next middleware not to be called.'),
         );
 
@@ -211,15 +201,15 @@ class AuthorizeStoreCommandTest extends TestCase
      */
     public function testItFailsAuthorizationWithError(): void
     {
-        $command = new StoreCommand(
-            $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
-        );
+        $request = $this->createMock(Request::class);
+
+        $query = FetchOneQuery::make($request, $this->type)
+            ->withModel($model = new \stdClass());
 
         $this->authorizer
             ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
+            ->method('show')
+            ->with($this->identicalTo($request), $this->identicalTo($model))
             ->willReturn(false);
 
         $this->authorizer
@@ -228,7 +218,7 @@ class AuthorizeStoreCommandTest extends TestCase
             ->willReturn($expected = new Error());
 
         $result = $this->middleware->handle(
-            $command,
+            $query,
             fn() => $this->fail('Expecting next middleware not to be called.'),
         );
 
@@ -241,19 +231,23 @@ class AuthorizeStoreCommandTest extends TestCase
      */
     public function testItSkipsAuthorization(): void
     {
-        $command = StoreCommand::make(
-            $this->createMock(Request::class),
-            new Store(new Href('/posts'), new ResourceObject($this->type)),
-        )->skipAuthorization();
+        $request = $this->createMock(Request::class);
+
+        $query = FetchOneQuery::make($request, $this->type)
+            ->withModel(new \stdClass())
+            ->skipAuthorization();
 
         $this->authorizer
             ->expects($this->never())
             ->method($this->anything());
 
-        $expected = Result::ok();
+        $expected = Result::ok(
+            new Payload(null, true),
+            $this->createMock(QueryParameters::class),
+        );
 
-        $actual = $this->middleware->handle($command, function ($cmd) use ($command, $expected): Result {
-            $this->assertSame($command, $cmd);
+        $actual = $this->middleware->handle($query, function ($passed) use ($query, $expected): Result {
+            $this->assertSame($query, $passed);
             return $expected;
         });
 
