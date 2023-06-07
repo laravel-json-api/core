@@ -27,6 +27,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Http\Actions\Store\Middleware\AuthorizeStoreAction;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ValidateQueryParameters;
@@ -59,6 +60,7 @@ class StoreActionHandler
     public function execute(StoreAction $action): DataResponse
     {
         $pipes = [
+            AuthorizeStoreAction::class,
             CheckRequestJsonIsCompliant::class,
             ValidateQueryParameters::class,
             ParseStoreOperation::class,
@@ -116,7 +118,8 @@ class StoreActionHandler
     {
         $command = StoreCommand::make($action->request(), $action->operation())
             ->withQuery($action->query())
-            ->withHooks($action->hooks());
+            ->withHooks($action->hooks())
+            ->skipAuthorization();
 
         $result = $this->commands->dispatch($command);
 
@@ -139,9 +142,9 @@ class StoreActionHandler
     {
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->withModel($model)
-            ->skipAuthorization()
             ->withValidated($action->query())
-            ->withHooks($action->hooks());
+            ->withHooks($action->hooks())
+            ->skipAuthorization();
 
         $result = $this->queries->dispatch($query);
 

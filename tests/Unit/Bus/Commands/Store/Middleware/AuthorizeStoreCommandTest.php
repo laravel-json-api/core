@@ -19,14 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Bus\Commands\Store\Middleware;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Auth\Authorizer;
-use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
-use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizer;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\AuthorizeStoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
-use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
@@ -43,14 +42,9 @@ class AuthorizeStoreCommandTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var string
+     * @var ResourceAuthorizerFactory&MockObject
      */
-    private string $modelClass;
-
-    /**
-     * @var Authorizer&MockObject
-     */
-    private Authorizer&MockObject $authorizer;
+    private ResourceAuthorizerFactory&MockObject $authorizerFactory;
 
     /**
      * @var AuthorizeStoreCommand
@@ -66,21 +60,8 @@ class AuthorizeStoreCommandTest extends TestCase
 
         $this->type = new ResourceType('posts');
 
-        $authorizers = $this->createMock(AuthorizerContainer::class);
-        $authorizers
-            ->method('authorizerFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($this->authorizer = $this->createMock(Authorizer::class));
-
-        $schemas = $this->createMock(SchemaContainer::class);
-        $schemas
-            ->method('modelClassFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($this->modelClass = 'App\Models\Post');
-
         $this->middleware = new AuthorizeStoreCommand(
-            $authorizers,
-            $schemas,
+            $this->authorizerFactory = $this->createMock(ResourceAuthorizerFactory::class),
         );
     }
 
@@ -91,18 +72,10 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
+            new Store(new Href('/posts'), new ResourceObject($this->type)),
         );
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
-            ->willReturn(true);
-
-        $this->authorizer
-            ->expects($this->never())
-            ->method('failed');
+        $this->willAuthorize($request, null);
 
         $expected = Result::ok();
 
@@ -121,18 +94,10 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             null,
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
+            new Store(new Href('/posts'), new ResourceObject($this->type)),
         );
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('store')
-            ->with(null, $this->identicalTo($op), $this->modelClass)
-            ->willReturn(true);
-
-        $this->authorizer
-            ->expects($this->never())
-            ->method('failed');
+        $this->willAuthorize(null, null);
 
         $expected = Result::ok();
 
@@ -151,19 +116,13 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
+            new Store(new Href('/posts'), new ResourceObject($this->type)),
         );
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
-            ->willReturn(false);
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('failed')
-            ->willReturn($expected = new \LogicException('Failed!'));
+        $this->willAuthorizeAndThrow(
+            $request,
+            $expected = new AuthorizationException('Boom!'),
+        );
 
         try {
             $this->middleware->handle(
@@ -171,7 +130,7 @@ class AuthorizeStoreCommandTest extends TestCase
                 fn() => $this->fail('Expecting next middleware to not be called.'),
             );
             $this->fail('Middleware did not throw an exception.');
-        } catch (\LogicException $actual) {
+        } catch (AuthorizationException $actual) {
             $this->assertSame($expected, $actual);
         }
     }
@@ -183,19 +142,10 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
+            new Store(new Href('/posts'), new ResourceObject($this->type)),
         );
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
-            ->willReturn(false);
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('failed')
-            ->willReturn($expected = new ErrorList());
+        $this->willAuthorize($request, $expected = new ErrorList());
 
         $result = $this->middleware->handle(
             $command,
@@ -209,36 +159,6 @@ class AuthorizeStoreCommandTest extends TestCase
     /**
      * @return void
      */
-    public function testItFailsAuthorizationWithError(): void
-    {
-        $command = new StoreCommand(
-            $request = $this->createMock(Request::class),
-            $op = new Store(new Href('/posts'), new ResourceObject($this->type)),
-        );
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('store')
-            ->with($this->identicalTo($request), $this->identicalTo($op), $this->modelClass)
-            ->willReturn(false);
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('failed')
-            ->willReturn($expected = new Error());
-
-        $result = $this->middleware->handle(
-            $command,
-            fn() => $this->fail('Expecting next middleware not to be called.'),
-        );
-
-        $this->assertTrue($result->didFail());
-        $this->assertSame([$expected], $result->errors()->all());
-    }
-
-    /**
-     * @return void
-     */
     public function testItSkipsAuthorization(): void
     {
         $command = StoreCommand::make(
@@ -246,7 +166,7 @@ class AuthorizeStoreCommandTest extends TestCase
             new Store(new Href('/posts'), new ResourceObject($this->type)),
         )->skipAuthorization();
 
-        $this->authorizer
+        $this->authorizerFactory
             ->expects($this->never())
             ->method($this->anything());
 
@@ -258,5 +178,44 @@ class AuthorizeStoreCommandTest extends TestCase
         });
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param Request|null $request
+     * @param ErrorList|null $expected
+     * @return void
+     */
+    private function willAuthorize(?Request $request, ?ErrorList $expected): void
+    {
+        $this->authorizerFactory
+            ->expects($this->once())
+            ->method('make')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($authorizer = $this->createMock(ResourceAuthorizer::class));
+
+        $authorizer
+            ->expects($this->once())
+            ->method('store')
+            ->with($this->identicalTo($request))
+            ->willReturn($expected);
+    }
+
+    /**
+     * @param Request|null $request
+     * @return void
+     */
+    private function willAuthorizeAndThrow(?Request $request, AuthorizationException $expected): void
+    {
+        $this->authorizerFactory
+            ->expects($this->once())
+            ->method('make')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($authorizer = $this->createMock(ResourceAuthorizer::class));
+
+        $authorizer
+            ->expects($this->once())
+            ->method('store')
+            ->with($this->identicalTo($request))
+            ->willThrowException($expected);
     }
 }

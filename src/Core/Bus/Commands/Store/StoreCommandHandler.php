@@ -80,7 +80,7 @@ class StoreCommandHandler
         $model = $this->store
             ->create($command->type())
             ->withRequest($command->request())
-            ->store($command->validated());
+            ->store($command->safe());
 
         return Result::ok(new Payload($model, true));
     }

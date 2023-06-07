@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\ValidatedInput;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Query\QueryParameters;
@@ -48,9 +49,14 @@ abstract class Query
     private bool $validate = true;
 
     /**
+     * @var array|null
+     */
+    private ?array $validated = null;
+
+    /**
      * @var QueryParametersContract|null
      */
-    private ?QueryParametersContract $validated = null;
+    private ?QueryParametersContract $validatedParameters = null;
 
     /**
      * Query constructor
@@ -86,7 +92,7 @@ abstract class Query
     }
 
     /**
-     * Set the query parameters.
+     * Set the raw query parameters.
      *
      * @param array $params
      * @return $this
@@ -100,7 +106,7 @@ abstract class Query
     }
 
     /**
-     * Get the query parameters.
+     * Get the raw query parameters.
      *
      * @return array
      */
@@ -160,12 +166,16 @@ abstract class Query
      */
     public function withValidated(QueryParametersContract|array $data): static
     {
-        if (is_array($data)) {
-            $data = QueryParameters::fromArray($data);
+        $copy = clone $this;
+
+        if ($data instanceof QueryParametersContract) {
+            $copy->validated = $data->toQuery();
+            $copy->validatedParameters = $data;
+            return $copy;
         }
 
-        $copy = clone $this;
         $copy->validated = $data;
+        $copy->validatedParameters = null;
 
         return $copy;
     }
@@ -187,12 +197,34 @@ abstract class Query
     }
 
     /**
-     * @return QueryParametersContract
+     * @return array
      */
-    public function validated(): QueryParametersContract
+    public function validated(): array
     {
         Contracts::assert($this->validated !== null, 'No validated query parameters set.');
 
-        return $this->validated ?? new QueryParameters();
+        return $this->validated ?? [];
+    }
+
+    /**
+     * @return ValidatedInput
+     */
+    public function safe(): ValidatedInput
+    {
+        return new ValidatedInput($this->validated());
+    }
+
+    /**
+     * @return QueryParametersContract
+     */
+    public function toQueryParams(): QueryParametersContract
+    {
+        if ($this->validatedParameters) {
+            return $this->validatedParameters;
+        }
+
+        return $this->validatedParameters = QueryParameters::fromArray(
+            $this->validated(),
+        );
     }
 }

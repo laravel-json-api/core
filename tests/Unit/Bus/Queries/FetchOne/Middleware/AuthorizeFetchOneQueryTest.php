@@ -19,14 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Bus\Queries\FetchOne\Middleware;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Auth\Authorizer;
-use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizer;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
-use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
@@ -41,9 +41,9 @@ class AuthorizeFetchOneQueryTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var Authorizer&MockObject
+     * @var ResourceAuthorizerFactory&MockObject
      */
-    private Authorizer&MockObject $authorizer;
+    private ResourceAuthorizerFactory&MockObject $authorizerFactory;
 
     /**
      * @var AuthorizeFetchOneQuery
@@ -59,14 +59,8 @@ class AuthorizeFetchOneQueryTest extends TestCase
 
         $this->type = new ResourceType('posts');
 
-        $authorizers = $this->createMock(AuthorizerContainer::class);
-        $authorizers
-            ->method('authorizerFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($this->authorizer = $this->createMock(Authorizer::class));
-
         $this->middleware = new AuthorizeFetchOneQuery(
-            $authorizers,
+            $this->authorizerFactory = $this->createMock(ResourceAuthorizerFactory::class),
         );
     }
 
@@ -80,15 +74,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
         $query = FetchOneQuery::make($request, $this->type)
             ->withModel($model = new \stdClass());
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('show')
-            ->with($this->identicalTo($request), $this->identicalTo($model))
-            ->willReturn(true);
-
-        $this->authorizer
-            ->expects($this->never())
-            ->method('failed');
+        $this->willAuthorize($request, $model, null);
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -111,15 +97,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
         $query = FetchOneQuery::make(null, $this->type)
             ->withModel($model = new \stdClass());
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('show')
-            ->with(null, $this->identicalTo($model))
-            ->willReturn(true);
-
-        $this->authorizer
-            ->expects($this->never())
-            ->method('failed');
+        $this->willAuthorize(null, $model, null);
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -144,16 +122,11 @@ class AuthorizeFetchOneQueryTest extends TestCase
         $query = FetchOneQuery::make($request, $this->type)
             ->withModel($model = new \stdClass());
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('show')
-            ->with($this->identicalTo($request), $this->identicalTo($model))
-            ->willReturn(false);
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('failed')
-            ->willReturn($expected = new \LogicException('Failed!'));
+        $this->willAuthorizeAndThrow(
+            $request,
+            $model,
+            $expected = new AuthorizationException('Boom!'),
+        );
 
         try {
             $this->middleware->handle(
@@ -161,7 +134,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
                 fn() => $this->fail('Expecting next middleware to not be called.'),
             );
             $this->fail('Middleware did not throw an exception.');
-        } catch (\LogicException $actual) {
+        } catch (AuthorizationException $actual) {
             $this->assertSame($expected, $actual);
         }
     }
@@ -169,23 +142,14 @@ class AuthorizeFetchOneQueryTest extends TestCase
     /**
      * @return void
      */
-    public function testItFailsAuthorizationWithErrorList(): void
+    public function testItFailsAuthorizationWithErrors(): void
     {
         $request = $this->createMock(Request::class);
 
         $query = FetchOneQuery::make($request, $this->type)
             ->withModel($model = new \stdClass());
 
-        $this->authorizer
-            ->expects($this->once())
-            ->method('show')
-            ->with($this->identicalTo($request), $this->identicalTo($model))
-            ->willReturn(false);
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('failed')
-            ->willReturn($expected = new ErrorList());
+        $this->willAuthorize($request, $model, $expected = new ErrorList());
 
         $result = $this->middleware->handle(
             $query,
@@ -199,36 +163,6 @@ class AuthorizeFetchOneQueryTest extends TestCase
     /**
      * @return void
      */
-    public function testItFailsAuthorizationWithError(): void
-    {
-        $request = $this->createMock(Request::class);
-
-        $query = FetchOneQuery::make($request, $this->type)
-            ->withModel($model = new \stdClass());
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('show')
-            ->with($this->identicalTo($request), $this->identicalTo($model))
-            ->willReturn(false);
-
-        $this->authorizer
-            ->expects($this->once())
-            ->method('failed')
-            ->willReturn($expected = new Error());
-
-        $result = $this->middleware->handle(
-            $query,
-            fn() => $this->fail('Expecting next middleware not to be called.'),
-        );
-
-        $this->assertTrue($result->didFail());
-        $this->assertSame([$expected], $result->errors()->all());
-    }
-
-    /**
-     * @return void
-     */
     public function testItSkipsAuthorization(): void
     {
         $request = $this->createMock(Request::class);
@@ -237,7 +171,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
             ->withModel(new \stdClass())
             ->skipAuthorization();
 
-        $this->authorizer
+        $this->authorizerFactory
             ->expects($this->never())
             ->method($this->anything());
 
@@ -252,5 +186,51 @@ class AuthorizeFetchOneQueryTest extends TestCase
         });
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param Request|null $request
+     * @param object $model
+     * @param ErrorList|null $expected
+     * @return void
+     */
+    private function willAuthorize(?Request $request, object $model, ?ErrorList $expected): void
+    {
+        $this->authorizerFactory
+            ->expects($this->once())
+            ->method('make')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($authorizer = $this->createMock(ResourceAuthorizer::class));
+
+        $authorizer
+            ->expects($this->once())
+            ->method('show')
+            ->with($this->identicalTo($request), $this->identicalTo($model))
+            ->willReturn($expected);
+    }
+
+    /**
+     * @param Request|null $request
+     * @param object $model
+     * @param AuthorizationException $expected
+     * @return void
+     */
+    private function willAuthorizeAndThrow(
+        ?Request $request,
+        object $model,
+        AuthorizationException $expected,
+    ): void
+    {
+        $this->authorizerFactory
+            ->expects($this->once())
+            ->method('make')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($authorizer = $this->createMock(ResourceAuthorizer::class));
+
+        $authorizer
+            ->expects($this->once())
+            ->method('show')
+            ->with($this->identicalTo($request), $this->identicalTo($model))
+            ->willThrowException($expected);
     }
 }

@@ -19,14 +19,16 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Store;
 
+use Illuminate\Support\ValidatedInput;
+
 interface ResourceBuilder extends Builder
 {
     /**
      * Store the resource using the supplied validated data.
      *
-     * @param array $validatedData
+     * @param ValidatedInput $input
      * @return object
      *      the created or updated model.
      */
-    public function store(array $validatedData): object;
+    public function store(ValidatedInput $input): object;
 }

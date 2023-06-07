@@ -26,7 +26,6 @@ use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 use LaravelJsonApi\Core\JsonApiService;
 use LaravelJsonApi\Core\Store\LazyRelation;
 use LaravelJsonApi\Core\Support\Str;
@@ -65,7 +64,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function store(?Request $request, Store $operation, string $modelClass): bool
+    public function store(?Request $request, string $modelClass): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(
@@ -193,7 +192,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function failed(): \Throwable
+    public function failed(): never
     {
         if ($this->auth->guest()) {
             throw new AuthenticationException();

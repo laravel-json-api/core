@@ -20,25 +20,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Auth\Authorizer;
-use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\HandlesFetchOneQueries;
 use LaravelJsonApi\Core\Bus\Queries\Result;
-use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use Throwable;
 
 class AuthorizeFetchOneQuery implements HandlesFetchOneQueries
 {
     /**
      * AuthorizeFetchOneQuery constructor
      *
-     * @param AuthorizerContainer $authorizerContainer
+     * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(private readonly AuthorizerContainer $authorizerContainer)
+    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
     {
     }
 
@@ -50,11 +44,9 @@ class AuthorizeFetchOneQuery implements HandlesFetchOneQueries
         $errors = null;
 
         if ($query->mustAuthorize()) {
-            $errors = $this->authorize(
-                $query->request(),
-                $query->type(),
-                $query->modelOrFail(),
-            );
+            $errors = $this->authorizerFactory
+                ->make($query->type())
+                ->show($query->request(), $query->modelOrFail());
         }
 
         if ($errors) {
@@ -62,40 +54,5 @@ class AuthorizeFetchOneQuery implements HandlesFetchOneQueries
         }
 
         return $next($query);
-    }
-
-    /**
-     * @param Request|null $request
-     * @param ResourceType $type
-     * @param object $model
-     * @return ErrorList|Error|null
-     * @throws Throwable
-     */
-    public function authorize(?Request $request, ResourceType $type, object $model): ErrorList|Error|null
-    {
-        $authorizer = $this->authorizerContainer->authorizerFor($type);
-        $passes = $authorizer->show($request, $model);
-
-        if ($passes === false) {
-            return $this->failed($authorizer);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param Authorizer $authorizer
-     * @return ErrorList|Error
-     * @throws Throwable
-     */
-    private function failed(Authorizer $authorizer): ErrorList|Error
-    {
-        $exceptionOrErrors = $authorizer->failed();
-
-        if ($exceptionOrErrors instanceof Throwable) {
-            throw $exceptionOrErrors;
-        }
-
-        return $exceptionOrErrors;
     }
 }

@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Contracts\Spec;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
-interface ResourceDocumentValidator
+interface ResourceDocumentComplianceChecker
 {
     /**
      * Set the expected resource type and id in the document.

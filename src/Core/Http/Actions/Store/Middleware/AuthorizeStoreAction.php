@@ -20,20 +20,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Store\Middleware;
 
 use Closure;
-use LaravelJsonApi\Contracts\Spec\ResourceDocumentComplianceChecker;
-use LaravelJsonApi\Core\Exceptions\JsonApiException;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Http\Actions\Store\HandlesStoreActions;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreAction;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
-class CheckRequestJsonIsCompliant implements HandlesStoreActions
+class AuthorizeStoreAction implements HandlesStoreActions
 {
     /**
-     * CheckJsonApiSpecCompliance constructor
+     * AuthorizeStoreCommand constructor
      *
-     * @param ResourceDocumentComplianceChecker $complianceChecker
+     * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(private readonly ResourceDocumentComplianceChecker $complianceChecker)
+    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
     {
     }
 
@@ -42,13 +41,9 @@ class CheckRequestJsonIsCompliant implements HandlesStoreActions
      */
     public function handle(StoreAction $action, Closure $next): DataResponse
     {
-        $result = $this->complianceChecker
-            ->expects($action->type())
-            ->validate($action->request()->getContent());
-
-        if ($result->didFail()) {
-            throw new JsonApiException($result->errors());
-        }
+        $this->authorizerFactory
+            ->make($action->type())
+            ->storeOrFail($action->request());
 
         return $next($action);
     }

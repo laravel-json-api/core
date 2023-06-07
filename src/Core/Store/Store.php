@@ -20,9 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Store;
 
 use Illuminate\Support\Collection;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Contracts\Schema\Container;
-use LaravelJsonApi\Contracts\Store\CanSkipQueries;
 use LaravelJsonApi\Contracts\Store\CreatesResources;
 use LaravelJsonApi\Contracts\Store\DeletesResources;
 use LaravelJsonApi\Contracts\Store\ModifiesToMany;
@@ -108,24 +106,6 @@ class Store implements StoreContract
     {
         if ($repository = $this->resources($resourceType)) {
             return $repository->exists($resourceId);
-        }
-
-        return false;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function canSkipQuery(
-        ResourceType|string $resourceType,
-        object $model,
-        QueryParameters $parameters
-    ): bool
-    {
-        $repository = $this->resources($resourceType);
-
-        if ($repository instanceof CanSkipQueries) {
-            return $repository->canSkipQuery($model, $parameters);
         }
 
         return false;

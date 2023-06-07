@@ -144,4 +144,65 @@ class TriggerStoreHooksTest extends TestCase
         $this->assertSame($expected, $actual);
         $this->assertSame(['saving', 'creating', 'created', 'saved'], $sequence);
     }
+
+    /**
+     * @return void
+     */
+    public function testItDoesNotTriggerAfterHooksIfItFails(): void
+    {
+        $request = $this->createMock(Request::class);
+        $hooks = $this->createMock(StoreImplementation::class);
+        $query = $this->createMock(QueryParameters::class);
+        $sequence = [];
+
+        $operation = new Store(
+            new Href('/posts'),
+            new ResourceObject(new ResourceType('posts')),
+        );
+
+        $command = StoreCommand::make($request, $operation)
+            ->withHooks($hooks)
+            ->withQuery($query);
+
+        $hooks
+            ->expects($this->once())
+            ->method('saving')
+            ->willReturnCallback(function ($model, $req, $q) use (&$sequence, $request, $query): void {
+                $sequence[] = 'saving';
+                $this->assertNull($model);
+                $this->assertSame($request, $req);
+                $this->assertSame($query, $q);
+            });
+
+        $hooks
+            ->expects($this->once())
+            ->method('creating')
+            ->willReturnCallback(function ($req, $q) use (&$sequence, $request, $query): void {
+                $sequence[] = 'creating';
+                $this->assertSame($request, $req);
+                $this->assertSame($query, $q);
+            });
+
+        $hooks
+            ->expects($this->never())
+            ->method('created');
+
+        $hooks
+            ->expects($this->never())
+            ->method('saved');
+
+        $expected = Result::failed();
+
+        $actual = $this->middleware->handle(
+            $command,
+            function (StoreCommand $cmd) use ($command, $expected, &$sequence): Result {
+                $this->assertSame($command, $cmd);
+                $this->assertSame(['saving', 'creating'], $sequence);
+                return $expected;
+            },
+        );
+
+        $this->assertSame($expected, $actual);
+        $this->assertSame(['saving', 'creating'], $sequence);
+    }
 }

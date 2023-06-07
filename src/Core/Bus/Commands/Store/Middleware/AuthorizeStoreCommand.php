@@ -20,31 +20,20 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Store\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Auth\Authorizer;
-use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
-use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
-use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
-use Throwable;
 
 class AuthorizeStoreCommand implements HandlesStoreCommands
 {
     /**
      * AuthorizeStoreCommand constructor
      *
-     * @param AuthorizerContainer $authorizerContainer
-     * @param SchemaContainer $schemaContainer
+     * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(
-        private readonly AuthorizerContainer $authorizerContainer,
-        private readonly SchemaContainer $schemaContainer,
-    ) {
+    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
+    {
     }
 
     /**
@@ -55,11 +44,9 @@ class AuthorizeStoreCommand implements HandlesStoreCommands
         $errors = null;
 
         if ($command->mustAuthorize()) {
-            $errors = $this->authorize(
-                $command->request(),
-                $command->operation(),
-                $command->type(),
-            );
+            $errors = $this->authorizerFactory
+                ->make($command->type())
+                ->store($command->request());
         }
 
         if ($errors) {
@@ -67,43 +54,5 @@ class AuthorizeStoreCommand implements HandlesStoreCommands
         }
 
         return $next($command);
-    }
-
-    /**
-     * @param Request|null $request
-     * @param Store $operation
-     * @param ResourceType $type
-     * @return ErrorList|Error|null
-     */
-    private function authorize(?Request $request, Store $operation, ResourceType $type): ErrorList|Error|null
-    {
-        $authorizer = $this->authorizerContainer->authorizerFor($type);
-        $passes = $authorizer->store(
-            $request,
-            $operation,
-            $this->schemaContainer->modelClassFor($type),
-        );
-
-        if ($passes === false) {
-            return $this->failed($authorizer);
-        }
-
-        return null;
-    }
-
-    /**
-     * @param Authorizer $authorizer
-     * @return ErrorList|Error
-     * @throws Throwable
-     */
-    private function failed(Authorizer $authorizer): ErrorList|Error
-    {
-        $exceptionOrErrors = $authorizer->failed();
-
-        if ($exceptionOrErrors instanceof Throwable) {
-            throw $exceptionOrErrors;
-        }
-
-        return $exceptionOrErrors;
     }
 }

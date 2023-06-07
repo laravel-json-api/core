@@ -418,7 +418,7 @@ class QueryParameters implements QueryParametersContract, Arrayable
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     public function toQuery(): array
     {

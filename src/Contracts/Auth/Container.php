@@ -24,8 +24,10 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 interface Container
 {
     /**
-     * @param ResourceType $type
+     * Resolve the authorizer for the supplied resource type from the container.
+     *
+     * @param ResourceType|string $type
      * @return Authorizer
      */
-    public function authorizerFor(ResourceType $type): Authorizer;
+    public function authorizerFor(ResourceType|string $type): Authorizer;
 }

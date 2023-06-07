@@ -26,7 +26,6 @@ use LaravelJsonApi\Core\Query\SortFields;
 
 interface QueryParameters
 {
-
     /**
      * Get the JSON:API include paths.
      *
@@ -69,4 +68,10 @@ interface QueryParameters
      */
     public function unrecognisedParameters(): array;
 
+    /**
+     * Return parameters for an HTTP build query.
+     *
+     * @return array
+     */
+    public function toQuery(): array;
 }

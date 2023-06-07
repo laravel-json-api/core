@@ -20,10 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries;
 
 use LaravelJsonApi\Contracts\Bus\Result as ResultContract;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\QueryParameters;
 
 class Result implements ResultContract
 {
@@ -36,10 +37,13 @@ class Result implements ResultContract
      * Return a success result.
      *
      * @param Payload $payload
-     * @param QueryParameters $parameters
+     * @param QueryParametersContract $parameters
      * @return self
      */
-    public static function ok(Payload $payload, QueryParameters $parameters): self
+    public static function ok(
+        Payload $payload,
+        QueryParametersContract $parameters = new QueryParameters()
+    ): self
     {
         return new self(true, $payload, $parameters);
     }
@@ -50,7 +54,7 @@ class Result implements ResultContract
      * @param ErrorList|Error $errorOrErrors
      * @return self
      */
-    public static function failed(ErrorList|Error $errorOrErrors): self
+    public static function failed(ErrorList|Error $errorOrErrors = new ErrorList()): self
     {
         $result = new self(false);
         $result->errors = ErrorList::cast($errorOrErrors);
@@ -63,12 +67,12 @@ class Result implements ResultContract
      *
      * @param bool $success
      * @param Payload|null $payload
-     * @param QueryParameters|null $query
+     * @param QueryParametersContract|null $query
      */
     private function __construct(
         private readonly bool $success,
         private readonly ?Payload $payload = null,
-        private readonly ?QueryParameters $query = null,
+        private readonly ?QueryParametersContract $query = null,
     ) {
     }
 
@@ -85,9 +89,9 @@ class Result implements ResultContract
     }
 
     /**
-     * @return QueryParameters
+     * @return QueryParametersContract
      */
-    public function query(): QueryParameters
+    public function query(): QueryParametersContract
     {
         if ($this->query !== null) {
             return $this->query;

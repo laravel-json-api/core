@@ -48,7 +48,7 @@ class Result implements ResultContract
      * @param ErrorList|Error $errorOrErrors
      * @return self
      */
-    public static function failed(ErrorList|Error $errorOrErrors): self
+    public static function failed(ErrorList|Error $errorOrErrors = new ErrorList()): self
     {
         $result = new self(false, null);
         $result->errors = ErrorList::cast($errorOrErrors);

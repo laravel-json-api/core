@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Tests\Unit\Bus\Commands\Store;
 
 use Illuminate\Contracts\Pipeline\Pipeline;
 use Illuminate\Http\Request;
+use Illuminate\Support\ValidatedInput;
 use LaravelJsonApi\Contracts\Store\ResourceBuilder;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Core\Bus\Commands\Result;
@@ -135,7 +136,7 @@ class StoreCommandHandlerTest extends TestCase
         $builder
             ->expects($this->once())
             ->method('store')
-            ->with($this->identicalTo($validated))
+            ->with($this->equalTo(new ValidatedInput($validated)))
             ->willReturn($model = new \stdClass());
 
         $payload = $this->handler

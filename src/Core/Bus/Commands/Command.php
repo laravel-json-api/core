@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\ValidatedInput;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
@@ -178,5 +179,13 @@ abstract class Command
         Contracts::assert($this->validated !== null, 'No validated data set.');
 
         return $this->validated ?? [];
+    }
+
+    /**
+     * @return ValidatedInput
+     */
+    public function safe(): ValidatedInput
+    {
+        return new ValidatedInput($this->validated());
     }
 }

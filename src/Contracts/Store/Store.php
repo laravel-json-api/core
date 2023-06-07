@@ -17,7 +17,6 @@
 
 namespace LaravelJsonApi\Contracts\Store;
 
-use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Store\ModelKey;
@@ -56,20 +55,6 @@ interface Store
      * @return bool
      */
     public function exists(string $resourceType, string $resourceId): bool;
-
-    /**
-     * Can the provided model be returned for the supplied query parameters?
-     *
-     * @param ResourceType|string $resourceType
-     * @param object $model
-     * @param QueryParameters $parameters
-     * @return bool
-     */
-    public function canSkipQuery(
-        ResourceType|string $resourceType,
-        object $model,
-        QueryParameters $parameters,
-    ): bool;
 
     /**
      * Query all resources by JSON:API resource type.
