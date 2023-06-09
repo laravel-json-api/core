@@ -25,6 +25,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use RuntimeException;
 use UnexpectedValueException;
@@ -52,7 +53,7 @@ class FetchOneActionHandler
     public function execute(FetchOneAction $action): DataResponse
     {
         $pipes = [
-            // currently no middleware
+            ItAcceptsJsonApiResponses::class,
         ];
 
         $response = $this->pipeline

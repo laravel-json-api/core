@@ -27,6 +27,8 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
+use LaravelJsonApi\Core\Http\Actions\Middleware\ItHasJsonApiContent;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\AuthorizeStoreAction;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
@@ -60,6 +62,8 @@ class StoreActionHandler
     public function execute(StoreAction $action): DataResponse
     {
         $pipes = [
+            ItHasJsonApiContent::class,
+            ItAcceptsJsonApiResponses::class,
             AuthorizeStoreAction::class,
             CheckRequestJsonIsCompliant::class,
             ValidateQueryParameters::class,

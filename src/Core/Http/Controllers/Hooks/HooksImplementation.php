@@ -22,11 +22,11 @@ namespace LaravelJsonApi\Core\Http\Controllers\Hooks;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\Response;
 
 class HooksImplementation implements StoreImplementation, ShowImplementation
 {
@@ -54,6 +54,10 @@ class HooksImplementation implements StoreImplementation, ShowImplementation
         }
 
         $response = $this->target->$method(...$arguments);
+
+        if ($response === null) {
+            return;
+        }
 
         if ($response instanceof Responsable) {
             foreach ($arguments as $arg) {
@@ -119,6 +123,6 @@ class HooksImplementation implements StoreImplementation, ShowImplementation
      */
     public function created(object $model, Request $request, QueryParameters $query): void
     {
-        $this('created', $request, $query);
+        $this('created', $model, $request, $query);
     }
 }

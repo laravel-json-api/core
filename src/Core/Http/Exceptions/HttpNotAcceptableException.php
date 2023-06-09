@@ -17,22 +17,28 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Http\Actions\Store;
+namespace LaravelJsonApi\Core\Http\Exceptions;
 
-use Illuminate\Http\Exceptions\HttpResponseException;
-use LaravelJsonApi\Core\Responses\DataResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
-interface HandlesStoreActions
+class HttpNotAcceptableException extends HttpException
 {
     /**
-     * Handle a store action.
+     * HttpNotAcceptableException constructor.
      *
-     * @param StoreAction $action
-     * @param \Closure $next
-     * @return DataResponse
-     * @throws HttpExceptionInterface
-     * @throws HttpResponseException
+     * @param string $message
+     * @param Throwable|null $previous
+     * @param array $headers
+     * @param int $code
      */
-    public function handle(StoreAction $action, \Closure $next): DataResponse;
+    public function __construct(
+        string $message = '',
+        Throwable $previous = null,
+        array $headers = [],
+        int $code = 0
+    ) {
+        parent::__construct(Response::HTTP_NOT_ACCEPTABLE, $message, $previous, $headers, $code);
+    }
 }
