@@ -26,16 +26,15 @@ use LaravelJsonApi\Core\Query\IncludePaths;
 
 trait HasEncodingParameters
 {
-
     /**
      * @var IncludePaths|null
      */
-    private ?IncludePaths $includePaths = null;
+    public ?IncludePaths $includePaths = null;
 
     /**
      * @var FieldSets|null
      */
-    private ?FieldSets $fieldSets = null;
+    public ?FieldSets $fieldSets = null;
 
     /**
      * Set the response JSON:API query parameters.

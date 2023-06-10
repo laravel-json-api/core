@@ -58,4 +58,13 @@ class Href implements JsonSerializable, Stringable
     {
         return $this->value;
     }
+
+    /**
+     * @param Href $other
+     * @return bool
+     */
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
+    }
 }

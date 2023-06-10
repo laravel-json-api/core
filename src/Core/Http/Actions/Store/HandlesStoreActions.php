@@ -19,20 +19,17 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\Store;
 
-use Illuminate\Http\Exceptions\HttpResponseException;
+use Closure;
 use LaravelJsonApi\Core\Responses\DataResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 interface HandlesStoreActions
 {
     /**
      * Handle a store action.
      *
-     * @param StoreAction $action
-     * @param \Closure $next
+     * @param StoreActionInput $action
+     * @param Closure $next
      * @return DataResponse
-     * @throws HttpExceptionInterface
-     * @throws HttpResponseException
      */
-    public function handle(StoreAction $action, \Closure $next): DataResponse;
+    public function handle(StoreActionInput $action, Closure $next): DataResponse;
 }

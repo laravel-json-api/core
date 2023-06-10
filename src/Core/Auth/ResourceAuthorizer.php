@@ -26,6 +26,7 @@ use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class ResourceAuthorizer
 {
@@ -46,6 +47,8 @@ class ResourceAuthorizer
      *
      * @param Request|null $request
      * @return ErrorList|null
+     * @throws AuthorizationException
+     * @throws AuthenticationException
      */
     public function store(?Request $request): ?ErrorList
     {
@@ -62,7 +65,9 @@ class ResourceAuthorizer
      *
      * @param Request|null $request
      * @return void
-     * @throws JsonApiException
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
      */
     public function storeOrFail(?Request $request): void
     {
@@ -98,7 +103,7 @@ class ResourceAuthorizer
      * @return void
      * @throws AuthorizationException
      * @throws AuthenticationException
-     * @throws JsonApiException
+     * @throws HttpExceptionInterface
      */
     public function showOrFail(?Request $request, object $model): void
     {
@@ -111,6 +116,7 @@ class ResourceAuthorizer
      * @return ErrorList
      * @throws AuthorizationException
      * @throws AuthenticationException
+     * @throws HttpExceptionInterface
      */
     private function failed(): ErrorList
     {

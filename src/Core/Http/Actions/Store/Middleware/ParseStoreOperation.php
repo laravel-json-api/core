@@ -24,7 +24,7 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Http\Actions\Store\HandlesStoreActions;
-use LaravelJsonApi\Core\Http\Actions\Store\StoreAction;
+use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
 class ParseStoreOperation implements HandlesStoreActions
@@ -41,7 +41,7 @@ class ParseStoreOperation implements HandlesStoreActions
     /**
      * @inheritDoc
      */
-    public function handle(StoreAction $action, Closure $next): DataResponse
+    public function handle(StoreActionInput $action, Closure $next): DataResponse
     {
         $request = $action->request();
 
@@ -50,7 +50,11 @@ class ParseStoreOperation implements HandlesStoreActions
         );
 
         return $next($action->withOperation(
-            new Store(new Href($request->url()), $resource),
+            new Store(
+                new Href($request->url()),
+                $resource,
+                $request->json('meta') ?? [],
+            ),
         ));
     }
 }

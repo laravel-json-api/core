@@ -79,6 +79,15 @@ class HooksImplementation implements StoreImplementation, ShowImplementation
     }
 
     /**
+     * @param HooksImplementation $other
+     * @return bool
+     */
+    public function equals(self $other): bool
+    {
+        return $this->target === $other->target;
+    }
+
+    /**
      * @inheritDoc
      */
     public function reading(Request $request, QueryParameters $query): void

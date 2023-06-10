@@ -29,18 +29,11 @@ use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
-use function is_null;
 
 class DataResponse implements Responsable
 {
-
     use HasEncodingParameters;
     use IsResponsable;
-
-    /**
-     * @var Page|object|iterable|null
-     */
-    private $value;
 
     /**
      * @var bool|null
@@ -50,22 +43,21 @@ class DataResponse implements Responsable
     /**
      * Fluent constructor.
      *
-     * @param Page|object|iterable|null $value
+     * @param mixed|null $data
      * @return DataResponse
      */
-    public static function make($value): self
+    public static function make(mixed $data): self
     {
-        return new self($value);
+        return new self($data);
     }
 
     /**
      * DataResponse constructor.
      *
-     * @param Page|object|iterable|null $value
+     * @param mixed|null $data
      */
-    public function __construct($value)
+    public function __construct(public readonly mixed $data)
     {
-        $this->value = $value;
     }
 
     /**
@@ -94,7 +86,7 @@ class DataResponse implements Responsable
 
     /**
      * @param Request $request
-     * @return ResourceCollectionResponse|ResourceResponse
+     * @return Responsable
      */
     public function prepareResponse($request): Responsable
     {
@@ -126,32 +118,37 @@ class DataResponse implements Responsable
      * @param $request
      * @return PaginatedResourceResponse|ResourceCollectionResponse|ResourceResponse
      */
-    private function prepareDataResponse($request)
+    private function prepareDataResponse($request):
+    PaginatedResourceResponse|ResourceCollectionResponse|ResourceResponse
     {
-        if ($this->value instanceof Page) {
-            return new PaginatedResourceResponse($this->value);
+        if ($this->data instanceof Page) {
+            return new PaginatedResourceResponse($this->data);
         }
 
-        if (is_null($this->value)) {
+        if ($this->data === null) {
             return new ResourceResponse(null);
         }
 
-        if ($this->value instanceof JsonApiResource) {
-            return $this->value
+        if ($this->data instanceof JsonApiResource) {
+            return $this->data
                 ->prepareResponse($request)
                 ->withCreated($this->created);
         }
 
         $resources = $this->server()->resources();
 
-        if (is_object($this->value) && $resources->exists($this->value)) {
+        if (is_object($this->data) && $resources->exists($this->data)) {
             return $resources
-                ->create($this->value)
+                ->create($this->data)
                 ->prepareResponse($request)
                 ->withCreated($this->created);
         }
 
-        return (new ResourceCollection($this->value))->prepareResponse($request);
+        if (is_iterable($this->data)) {
+            return (new ResourceCollection($this->data))->prepareResponse($request);
+        }
+
+        throw new \LogicException('Unexpected data response value.');
     }
 
 }

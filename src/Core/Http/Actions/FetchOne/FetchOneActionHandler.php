@@ -24,7 +24,6 @@ use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use RuntimeException;
@@ -47,10 +46,10 @@ class FetchOneActionHandler
     /**
      * Execute the fetch one action.
      *
-     * @param FetchOneAction $action
+     * @param FetchOneActionInput $action
      * @return DataResponse
      */
-    public function execute(FetchOneAction $action): DataResponse
+    public function execute(FetchOneActionInput $action): DataResponse
     {
         $pipes = [
             ItAcceptsJsonApiResponses::class,
@@ -60,7 +59,7 @@ class FetchOneActionHandler
             ->send($action)
             ->through($pipes)
             ->via('handle')
-            ->through(fn (FetchOneAction $passed): DataResponse => $this->handle($passed));
+            ->then(fn (FetchOneActionInput $passed): DataResponse => $this->handle($passed));
 
         if ($response instanceof DataResponse) {
             return $response;
@@ -72,11 +71,11 @@ class FetchOneActionHandler
     /**
      * Handle the fetch one action.
      *
-     * @param FetchOneAction $action
+     * @param FetchOneActionInput $action
      * @return DataResponse
      * @throws JsonApiException
      */
-    private function handle(FetchOneAction $action): DataResponse
+    private function handle(FetchOneActionInput $action): DataResponse
     {
         $result = $this->query($action);
         $payload = $result->payload();
@@ -91,11 +90,11 @@ class FetchOneActionHandler
     }
 
     /**
-     * @param FetchOneAction $action
+     * @param FetchOneActionInput $action
      * @return Result
      * @throws JsonApiException
      */
-    private function query(FetchOneAction $action): Result
+    private function query(FetchOneActionInput $action): Result
     {
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->maybeWithId($action->id())

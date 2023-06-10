@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Commands;
 
-use LaravelJsonApi\Contracts\Bus\Result as ResultContract;
+use LaravelJsonApi\Contracts\Support\Result as ResultContract;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;

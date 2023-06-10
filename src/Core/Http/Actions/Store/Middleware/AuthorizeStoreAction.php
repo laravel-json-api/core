@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Core\Http\Actions\Store\Middleware;
 use Closure;
 use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Http\Actions\Store\HandlesStoreActions;
-use LaravelJsonApi\Core\Http\Actions\Store\StoreAction;
+use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
 class AuthorizeStoreAction implements HandlesStoreActions
@@ -39,7 +39,7 @@ class AuthorizeStoreAction implements HandlesStoreActions
     /**
      * @inheritDoc
      */
-    public function handle(StoreAction $action, Closure $next): DataResponse
+    public function handle(StoreActionInput $action, Closure $next): DataResponse
     {
         $this->authorizerFactory
             ->make($action->type())

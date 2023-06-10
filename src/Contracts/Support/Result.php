@@ -17,28 +17,28 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Spec;
+namespace LaravelJsonApi\Contracts\Support;
 
 use LaravelJsonApi\Core\Document\ErrorList;
 
-interface ComplianceResult
+interface Result
 {
     /**
-     * Did the input comply with the spec?
+     * Is this a success result?
      *
      * @return bool
      */
-    public function didPass(): bool;
+    public function didSucceed(): bool;
 
     /**
-     * Did the input fail compliance with the spec?
+     * Is this a failure result?
      *
      * @return bool
      */
     public function didFail(): bool;
 
     /**
-     * Get the compliance errors.
+     * Get the result errors.
      *
      * @return ErrorList
      */

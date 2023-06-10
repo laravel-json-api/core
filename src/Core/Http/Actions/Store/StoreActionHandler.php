@@ -32,7 +32,7 @@ use LaravelJsonApi\Core\Http\Actions\Middleware\ItHasJsonApiContent;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\AuthorizeStoreAction;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
-use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ValidateQueryParameters;
+use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateQueryOneParameters;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use RuntimeException;
 use UnexpectedValueException;
@@ -56,17 +56,17 @@ class StoreActionHandler
     /**
      * Execute a store action.
      *
-     * @param StoreAction $action
+     * @param StoreActionInput $action
      * @return DataResponse
      */
-    public function execute(StoreAction $action): DataResponse
+    public function execute(StoreActionInput $action): DataResponse
     {
         $pipes = [
             ItHasJsonApiContent::class,
             ItAcceptsJsonApiResponses::class,
             AuthorizeStoreAction::class,
             CheckRequestJsonIsCompliant::class,
-            ValidateQueryParameters::class,
+            ValidateQueryOneParameters::class,
             ParseStoreOperation::class,
         ];
 
@@ -74,7 +74,7 @@ class StoreActionHandler
             ->send($action)
             ->through($pipes)
             ->via('handle')
-            ->then(fn(StoreAction $passed): DataResponse => $this->handle($passed));
+            ->then(fn(StoreActionInput $passed): DataResponse => $this->handle($passed));
 
         if ($response instanceof DataResponse) {
             return $response;
@@ -86,11 +86,11 @@ class StoreActionHandler
     /**
      * Handle the store action.
      *
-     * @param StoreAction $action
+     * @param StoreActionInput $action
      * @return DataResponse
      * @throws JsonApiException
      */
-    private function handle(StoreAction $action): DataResponse
+    private function handle(StoreActionInput $action): DataResponse
     {
         $command = $this->dispatch($action);
 
@@ -114,11 +114,11 @@ class StoreActionHandler
     /**
      * Dispatch the store command.
      *
-     * @param StoreAction $action
+     * @param StoreActionInput $action
      * @return Payload
      * @throws JsonApiException
      */
-    private function dispatch(StoreAction $action): Payload
+    private function dispatch(StoreActionInput $action): Payload
     {
         $command = StoreCommand::make($action->request(), $action->operation())
             ->withQuery($action->query())
@@ -137,12 +137,12 @@ class StoreActionHandler
     /**
      * Execute the query for the store action.
      *
-     * @param StoreAction $action
+     * @param StoreActionInput $action
      * @param object $model
      * @return Result
      * @throws JsonApiException
      */
-    private function query(StoreAction $action, object $model): Result
+    private function query(StoreActionInput $action, object $model): Result
     {
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->withModel($model)

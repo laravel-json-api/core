@@ -19,15 +19,29 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\Store;
 
+use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
-use LaravelJsonApi\Core\Http\Actions\Action;
+use LaravelJsonApi\Core\Http\Actions\ActionInput;
 
-class StoreAction extends Action
+class StoreActionInput extends ActionInput
 {
     /**
      * @var Store|null
      */
     private ?Store $operation = null;
+
+    /**
+     * Fluent constructor
+     *
+     * @param Request $request
+     * @param ResourceType|string $type
+     * @return self
+     */
+    public static function make(Request $request, ResourceType|string $type): self
+    {
+        return new self($request, $type);
+    }
 
     /**
      * Return a new instance with the store operation set.

@@ -28,33 +28,32 @@ use function array_merge;
 
 trait IsResponsable
 {
-
     use ServerAware;
 
     /**
      * @var JsonApi|null
      */
-    private ?JsonApi $jsonApi = null;
+    public ?JsonApi $jsonApi = null;
 
     /**
      * @var Hash|null
      */
-    private ?Hash $meta = null;
+    public ?Hash $meta = null;
 
     /**
      * @var Links|null
      */
-    private ?Links $links = null;
+    public ?Links $links = null;
 
     /**
      * @var int
      */
-    private int $encodeOptions = 0;
+    public int $encodeOptions = 0;
 
     /**
      * @var array
      */
-    private array $headers = [];
+    public array $headers = [];
 
     /**
      * Add the top-level JSON:API member to the response.
@@ -62,7 +61,7 @@ trait IsResponsable
      * @param $jsonApi
      * @return $this
      */
-    public function withJsonApi($jsonApi): self
+    public function withJsonApi($jsonApi): static
     {
         $this->jsonApi = JsonApi::nullable($jsonApi);
 
@@ -87,7 +86,7 @@ trait IsResponsable
      * @param $meta
      * @return $this
      */
-    public function withMeta($meta): self
+    public function withMeta($meta): static
     {
         $this->meta = Hash::cast($meta);
 
@@ -112,7 +111,7 @@ trait IsResponsable
      * @param $links
      * @return $this
      */
-    public function withLinks($links): self
+    public function withLinks($links): static
     {
         $this->links = Links::cast($links);
 
@@ -137,7 +136,7 @@ trait IsResponsable
      * @param int $options
      * @return $this
      */
-    public function withEncodeOptions(int $options): self
+    public function withEncodeOptions(int $options): static
     {
         $this->encodeOptions = $options;
 
@@ -151,7 +150,7 @@ trait IsResponsable
      * @param string|null $value
      * @return $this
      */
-    public function withHeader(string $name, string $value = null): self
+    public function withHeader(string $name, string $value = null): static
     {
         $this->headers[$name] = $value;
 
@@ -164,7 +163,7 @@ trait IsResponsable
      * @param array $headers
      * @return $this
      */
-    public function withHeaders(array $headers): self
+    public function withHeaders(array $headers): static
     {
         $this->headers = $headers;
 
@@ -178,7 +177,7 @@ trait IsResponsable
     {
         return array_merge(
             ['Content-Type' => 'application/vnd.api+json'],
-            $this->headers ?: [],
+            $this->headers,
         );
     }
 

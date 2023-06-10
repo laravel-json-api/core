@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 use Closure;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Http\Actions\Action;
+use LaravelJsonApi\Core\Http\Actions\ActionInput;
 use LaravelJsonApi\Core\Http\Exceptions\HttpUnsupportedMediaTypeException;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
@@ -43,7 +43,7 @@ class ItHasJsonApiContent implements HandlesActions
     /**
      * @inheritDoc
      */
-    public function handle(Action $action, Closure $next): DataResponse
+    public function handle(ActionInput $action, Closure $next): DataResponse
     {
         if (!$this->isSupported($action->request())) {
             throw new HttpUnsupportedMediaTypeException(

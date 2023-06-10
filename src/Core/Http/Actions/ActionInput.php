@@ -25,7 +25,7 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Controllers\Hooks\HooksImplementation;
 use RuntimeException;
 
-class Action
+abstract class ActionInput
 {
     /**
      * @var ResourceType

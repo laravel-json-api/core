@@ -24,6 +24,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 interface Authorizer
 {
@@ -128,6 +129,7 @@ interface Authorizer
      * @return ErrorList|Error
      * @throws AuthenticationException
      * @throws AuthorizationException
+     * @throws HttpExceptionInterface
      */
     public function failed(): ErrorList|Error;
 }

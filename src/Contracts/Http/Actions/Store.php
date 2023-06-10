@@ -17,28 +17,36 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Spec;
+namespace LaravelJsonApi\Contracts\Http\Actions;
 
-use LaravelJsonApi\Contracts\Support\Result;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Responses\DataResponse;
 
-interface ResourceDocumentComplianceChecker
+interface Store extends Responsable
 {
     /**
-     * Set the expected resource type and id in the document.
+     * Set the JSON:API resource type for the action.
      *
      * @param ResourceType|string $type
-     * @param ResourceId|string|null $id
      * @return $this
      */
-    public function mustSee(ResourceType|string $type, ResourceId|string $id = null): static;
+    public function withType(ResourceType|string $type): static;
 
     /**
-     * Check whether the provided content passes compliance with the JSON:API spec.
+     * Set the object that implements controller hooks.
      *
-     * @param string $json
-     * @return Result
+     * @param object|null $target
+     * @return $this
      */
-    public function check(string $json): Result;
+    public function withHooks(?object $target): static;
+
+    /**
+     * Execute the action and return the JSON:API data response.
+     *
+     * @param Request $request
+     * @return DataResponse
+     */
+    public function execute(Request $request): DataResponse;
 }

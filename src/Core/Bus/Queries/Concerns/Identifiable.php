@@ -28,7 +28,7 @@ trait Identifiable
     /**
      * @var ResourceId|null
      */
-    private ?ResourceId $id;
+    private ?ResourceId $id = null;
 
     /**
      * @var object|null

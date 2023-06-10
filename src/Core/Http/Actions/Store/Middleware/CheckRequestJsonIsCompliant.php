@@ -23,7 +23,7 @@ use Closure;
 use LaravelJsonApi\Contracts\Spec\ResourceDocumentComplianceChecker;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Http\Actions\Store\HandlesStoreActions;
-use LaravelJsonApi\Core\Http\Actions\Store\StoreAction;
+use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
 class CheckRequestJsonIsCompliant implements HandlesStoreActions
@@ -40,11 +40,11 @@ class CheckRequestJsonIsCompliant implements HandlesStoreActions
     /**
      * @inheritDoc
      */
-    public function handle(StoreAction $action, Closure $next): DataResponse
+    public function handle(StoreActionInput $action, Closure $next): DataResponse
     {
         $result = $this->complianceChecker
-            ->expects($action->type())
-            ->validate($action->request()->getContent());
+            ->mustSee($action->type())
+            ->check($action->request()->getContent());
 
         if ($result->didFail()) {
             throw new JsonApiException($result->errors());
