@@ -26,11 +26,11 @@ interface Store
     /**
      * Get a model by JSON:API resource type and id.
      *
-     * @param string $resourceType
-     * @param string $resourceId
+     * @param ResourceType|string $resourceType
+     * @param ResourceId|string $resourceId
      * @return object|null
      */
-    public function find(string $resourceType, string $resourceId): ?object;
+    public function find(ResourceType|string $resourceType, ResourceId|string $resourceId): ?object;
 
     /**
      * Find the supplied model or throw a runtime exception if it does not exist.

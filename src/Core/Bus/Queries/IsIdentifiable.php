@@ -38,11 +38,26 @@ interface IsIdentifiable
     public function withId(ResourceId|string $id): static;
 
     /**
-     * Get the model for the query.
+     * Get the model for the query, if there is one.
+     *
+     * @return object|null
+     */
+    public function model(): ?object;
+
+    /**
+     * Get the model for the query, or fail if there isn't one.
      *
      * @return object
      */
     public function modelOrFail(): object;
+
+    /**
+     * Return a new instance with the model set.
+     *
+     * @param object|null $model
+     * @return static
+     */
+    public function withModel(?object $model): static;
 
     /**
      * @return ModelKey|null

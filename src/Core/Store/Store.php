@@ -64,10 +64,10 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function find(string $resourceType, string $resourceId): ?object
+    public function find(ResourceType|string $resourceType, ResourceId|string $resourceId): ?object
     {
         if ($repository = $this->resources($resourceType)) {
-            return $repository->find($resourceId);
+            return $repository->find((string) $resourceId);
         }
 
         return null;
