@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\Concerns;
 
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Store\ModelKey;
 use RuntimeException;
 
 trait Identifiable
@@ -36,11 +35,6 @@ trait Identifiable
     private ?object $model = null;
 
     /**
-     * @var ModelKey|null
-     */
-    private ?ModelKey $modelKey = null;
-
-    /**
      * @return ResourceId|null
      */
     public function id(): ?ResourceId
@@ -49,19 +43,15 @@ trait Identifiable
     }
 
     /**
-     * @return ResourceId|ModelKey
+     * @return ResourceId
      */
-    public function idOrKey(): ResourceId|ModelKey
+    public function idOrFail(): ResourceId
     {
         if ($this->id !== null) {
             return $this->id;
         }
 
-        if ($this->modelKey !== null) {
-            return $this->modelKey;
-        }
-
-        throw new RuntimeException('Expecting a resource id or model key to be set on the query.');
+        throw new RuntimeException('Expecting a resource id to be set on the query.');
     }
 
     /**
@@ -133,27 +123,5 @@ trait Identifiable
         }
 
         throw new RuntimeException('Expecting a model to be set on the query.');
-    }
-
-    /**
-     * Return a new instance with the model key set.
-     *
-     * @param ModelKey|string|int|null $key
-     * @return static
-     */
-    public function withModelKey(ModelKey|string|int|null $key): static
-    {
-        $copy = clone $this;
-        $copy->modelKey = ModelKey::nullable($key);
-
-        return $copy;
-    }
-
-    /**
-     * @return ModelKey|null
-     */
-    public function modelKey(): ?ModelKey
-    {
-        return $this->modelKey;
     }
 }

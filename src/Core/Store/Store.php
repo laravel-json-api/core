@@ -128,22 +128,15 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function queryOne(
-        ResourceType|string $resourceType,
-        ResourceId|string|ModelKey $idOrKey
-    ): QueryOneBuilder
+    public function queryOne(ResourceType|string $type, ResourceId|string $id): QueryOneBuilder
     {
-        if (is_string($idOrKey)) {
-            $idOrKey = new ResourceId($idOrKey);
-        }
-
-        $repository = $this->resources($resourceType);
+        $repository = $this->resources($type);
 
         if ($repository instanceof QueriesOne) {
-            return $repository->queryOne($idOrKey);
+            return $repository->queryOne((string) $id);
         }
 
-        throw new LogicException("Querying one {$resourceType} resource is not supported.");
+        throw new LogicException("Querying one {$type} resource is not supported.");
     }
 
     /**

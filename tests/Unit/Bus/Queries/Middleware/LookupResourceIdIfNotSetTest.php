@@ -29,7 +29,6 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
-use LaravelJsonApi\Core\Store\ModelKey;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -128,41 +127,19 @@ class LookupResourceIdIfNotSetTest extends TestCase
     }
 
     /**
-     * @return void
-     */
-    public function testItSkipsQueryWithModelKey(): void
-    {
-        $query = $this->createQuery(modelKey: 999);
-
-        $this->factory
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $actual = $this->middleware->handle($query, function ($passed) use ($query): Result {
-            $this->assertSame($query, $passed);
-            return $this->expected;
-        });
-
-        $this->assertSame($this->expected, $actual);
-    }
-
-    /**
      * @param string $type
      * @param string|null $id
-     * @param string|int|null $modelKey
      * @param object $model
      * @return MockObject&Query
      */
     private function createQuery(
         string $type = 'posts',
         string $id = null,
-        string|int $modelKey = null,
         object $model = new \stdClass(),
     ): Query&MockObject {
         $query = $this->createMock(FetchOneQuery::class);
         $query->method('type')->willReturn(new ResourceType($type));
         $query->method('id')->willReturn(ResourceId::nullable($id));
-        $query->method('modelKey')->willReturn(ModelKey::nullable($modelKey));
         $query->method('modelOrFail')->willReturn($model);
 
         return $query;

@@ -99,7 +99,6 @@ class FetchOneActionHandler
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->maybeWithId($action->id())
             ->withModel($action->model())
-            ->withModelKey($action->modelKey())
             ->withHooks($action->hooks());
 
         $result = $this->dispatcher->dispatch($query);

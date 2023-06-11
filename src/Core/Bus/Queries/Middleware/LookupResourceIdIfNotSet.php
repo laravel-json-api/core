@@ -46,7 +46,7 @@ class LookupResourceIdIfNotSet
      */
     public function handle(Query&IsIdentifiable $query, Closure $next): Result
     {
-        if ($query->id() === null && $query->modelKey() === null) {
+        if ($query->id() === null) {
             $resource = $this->resources
                 ->createResource($query->modelOrFail());
 

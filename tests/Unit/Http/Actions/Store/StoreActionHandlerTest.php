@@ -134,7 +134,6 @@ class StoreActionHandlerTest extends TestCase
                     $this->assertSame($type, $query->type());
                     $this->assertSame($model, $query->model());
                     $this->assertNull($query->id());
-                    $this->assertNull($query->modelKey());
                     $this->assertSame($queryParams, $query->toQueryParams());
                     // hooks must be null, otherwise we trigger the "reading" and "read" hooks
                     $this->assertNull($query->hooks());

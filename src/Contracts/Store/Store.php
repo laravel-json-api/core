@@ -19,7 +19,6 @@ namespace LaravelJsonApi\Contracts\Store;
 
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Store\ModelKey;
 
 interface Store
 {
@@ -67,15 +66,12 @@ interface Store
     /**
      * Query one resource by JSON:API resource type.
      *
-     * @param ResourceType|string $resourceType
-     * @param ResourceId|string|ModelKey $idOrKey
+     * @param ResourceType|string $type
+     * @param ResourceId|string $id
      *      string is interpreted as the resource id, not a model key.
      * @return QueryOneBuilder
      */
-    public function queryOne(
-        ResourceType|string $resourceType,
-        ResourceId|string|ModelKey $idOrKey
-    ): QueryOneBuilder;
+    public function queryOne(ResourceType|string $type, ResourceId|string $id): QueryOneBuilder;
 
     /**
      * Query a to-one relationship.

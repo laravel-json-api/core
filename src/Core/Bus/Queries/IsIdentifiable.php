@@ -20,14 +20,22 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries;
 
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Store\ModelKey;
 
 interface IsIdentifiable
 {
     /**
+     * Get the resource id for the query.
+     *
      * @return ResourceId|null
      */
     public function id(): ?ResourceId;
+
+    /**
+     * Get the resource id for the query, or fail if there isn't one.
+     *
+     * @return ResourceId
+     */
+    public function idOrFail(): ResourceId;
 
     /**
      * Return a new instance with the resource id set.
@@ -58,9 +66,4 @@ interface IsIdentifiable
      * @return static
      */
     public function withModel(?object $model): static;
-
-    /**
-     * @return ModelKey|null
-     */
-    public function modelKey(): ?ModelKey;
 }

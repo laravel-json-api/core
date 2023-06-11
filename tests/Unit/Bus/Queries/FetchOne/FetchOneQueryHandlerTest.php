@@ -35,7 +35,6 @@ use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Store\ModelKey;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -70,42 +69,18 @@ class FetchOneQueryHandlerTest extends TestCase
     }
 
     /**
-     * @return array<string,array<Closure>>
-     */
-    public function scenarioProvider(): array
-    {
-        return [
-            'resource id' => [
-                static function (FetchOneQuery $query): array {
-                    $query = $query->withId($id = new ResourceId('123'));
-                    return [$query, $id];
-                },
-            ],
-            'model key' => [
-                static function (FetchOneQuery $query): array {
-                    $query = $query->withModelKey($id = new ModelKey('456'));
-                    return [$query, $id];
-                },
-            ],
-        ];
-    }
-
-    /**
-     * @param Closure $scenario
      * @return void
-     * @dataProvider scenarioProvider
      */
-    public function test(Closure $scenario): void
+    public function test(): void
     {
         $original = new FetchOneQuery(
             $request = $this->createMock(Request::class),
             $type = new ResourceType('comments'),
         );
 
-        [$passed, $id] = $scenario(
-            FetchOneQuery::make($request, $type)
-                ->withValidated($validated = ['include' => 'user'])
-        );
+        $passed = FetchOneQuery::make($request, $type)
+            ->withValidated($validated = ['include' => 'user'])
+            ->withId($id = new ResourceId('123'));
 
         $sequence = [];
 

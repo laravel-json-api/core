@@ -84,7 +84,7 @@ class FetchOneQueryHandler
         $params = $query->toQueryParams();
 
         $model = $this->store
-            ->queryOne($query->type(), $query->idOrKey())
+            ->queryOne($query->type(), $query->idOrFail())
             ->withQuery($params)
             ->first();
 
