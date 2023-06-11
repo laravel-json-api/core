@@ -26,7 +26,7 @@ use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Auth\Container as AuthContainer;
 use LaravelJsonApi\Contracts\Http\Actions\FetchOne as FetchOneContract;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactory;
+use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Store\QueryOneBuilder;
@@ -307,13 +307,13 @@ class FetchOneTest extends TestCase
     private function willLookupResourceId(object $model, string $type, string $id): void
     {
         $this->container->instance(
-            ResourceFactory::class,
-            $factory = $this->createMock(ResourceFactory::class),
+            ResourceContainer::class,
+            $resources = $this->createMock(ResourceContainer::class),
         );
 
-        $factory
+        $resources
             ->expects($this->once())
-            ->method('createResource')
+            ->method('create')
             ->with($this->identicalTo($model))
             ->willReturn($resource = $this->createMock(JsonApiResource::class));
 
@@ -337,11 +337,11 @@ class FetchOneTest extends TestCase
     private function willNotLookupResourceId(): void
     {
         $this->container->instance(
-            ResourceFactory::class,
-            $factory = $this->createMock(ResourceFactory::class),
+            ResourceContainer::class,
+            $resources = $this->createMock(ResourceContainer::class),
         );
 
-        $factory
+        $resources
             ->expects($this->never())
             ->method($this->anything());
     }

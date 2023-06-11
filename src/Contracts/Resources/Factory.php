@@ -23,7 +23,6 @@ use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 interface Factory
 {
-
     /**
      * Can the factory create a resource for the supplied model?
      *

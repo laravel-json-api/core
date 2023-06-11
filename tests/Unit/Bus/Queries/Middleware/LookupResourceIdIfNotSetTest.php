@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Bus\Queries\Middleware;
 
 use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Contracts\Resources\Factory;
+use LaravelJsonApi\Contracts\Resources\Container;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Query;
@@ -35,9 +35,9 @@ use PHPUnit\Framework\TestCase;
 class LookupResourceIdIfNotSetTest extends TestCase
 {
     /**
-     * @var MockObject&Factory
+     * @var MockObject&Container
      */
-    private Factory&MockObject $factory;
+    private Container&MockObject $resources;
 
     /**
      * @var LookupResourceIdIfNotSet
@@ -57,7 +57,7 @@ class LookupResourceIdIfNotSetTest extends TestCase
         parent::setUp();
 
         $this->middleware = new LookupResourceIdIfNotSet(
-            $this->factory = $this->createMock(Factory::class),
+            $this->resources = $this->createMock(Container::class),
         );
 
         $this->expected = Result::ok(
@@ -114,7 +114,7 @@ class LookupResourceIdIfNotSetTest extends TestCase
     {
         $query = $this->createQuery(id: '999');
 
-        $this->factory
+        $this->resources
             ->expects($this->never())
             ->method($this->anything());
 
@@ -157,9 +157,9 @@ class LookupResourceIdIfNotSetTest extends TestCase
         $resource->method('type')->willReturn($type);
         $resource->method('id')->willReturn($id);
 
-        $this->factory
+        $this->resources
             ->expects($this->once())
-            ->method('createResource')
+            ->method('create')
             ->with($this->identicalTo($model))
             ->willReturn($resource);
     }

@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\Middleware;
 
 use Closure;
-use LaravelJsonApi\Contracts\Resources\Factory as ResourceFactory;
+use LaravelJsonApi\Contracts\Resources\Container;
 use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query;
 use LaravelJsonApi\Core\Bus\Queries\Result;
@@ -31,9 +31,9 @@ class LookupResourceIdIfNotSet
     /**
      * LookupResourceIdIfNotSet constructor
      *
-     * @param ResourceFactory $resources
+     * @param Container $resources
      */
-    public function __construct(private readonly ResourceFactory $resources)
+    public function __construct(private readonly Container $resources)
     {
     }
 
@@ -48,7 +48,7 @@ class LookupResourceIdIfNotSet
     {
         if ($query->id() === null) {
             $resource = $this->resources
-                ->createResource($query->modelOrFail());
+                ->create($query->modelOrFail());
 
             if ($query->type()->value !== $resource->type()) {
                 throw new RuntimeException(sprintf(

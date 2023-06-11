@@ -24,7 +24,6 @@ use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 interface Container
 {
-
     /**
      * Resolve the value to a resource object or a cursor of resource objects.
      *
@@ -43,7 +42,7 @@ interface Container
     public function exists(object $model): bool;
 
     /**
-     * Create a resource object for the supplied models.
+     * Create a resource object for the supplied model.
      *
      * @param object $model
      * @return JsonApiResource

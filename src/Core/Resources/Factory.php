@@ -24,7 +24,6 @@ use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Schema\Schema;
 use LogicException;
 use Throwable;
-use function get_class;
 use function sprintf;
 
 class Factory implements FactoryContract
@@ -67,7 +66,7 @@ class Factory implements FactoryContract
         } catch (Throwable $ex) {
             throw new LogicException(sprintf(
                 'Failed to build a JSON:API resource for model %s.',
-                get_class($model),
+                $model::class,
             ), 0, $ex);
         }
     }
