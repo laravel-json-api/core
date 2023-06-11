@@ -41,6 +41,14 @@ interface Container
     public function schemaFor(string|ResourceType $resourceType): Schema;
 
     /**
+     * Get the schema class for a JSON:API resource type.
+     *
+     * @param ResourceType|string $type
+     * @return string
+     */
+    public function schemaClassFor(ResourceType|string $type): string;
+
+    /**
      * Get a schema for the provided model class.
      *
      * @param string|object $model

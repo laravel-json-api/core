@@ -48,13 +48,6 @@ interface Schema extends Traversable
     public static function resource(): string;
 
     /**
-     * Get the fully-qualified class name of the authorizer.
-     *
-     * @return string
-     */
-    public static function authorizer(): string;
-
-    /**
      * Get a repository for the resource.
      *
      * Schemas MUST return a repository if the resource type is retrievable

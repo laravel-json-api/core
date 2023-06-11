@@ -17,6 +17,7 @@
 
 namespace LaravelJsonApi\Contracts\Server;
 
+use LaravelJsonApi\Contracts\Auth\Container as AuthContainer;
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
@@ -53,6 +54,13 @@ interface Server
      * @return ResourceContainer
      */
     public function resources(): ResourceContainer;
+
+    /**
+     * Get the server's authorizers.
+     *
+     * @return AuthContainer
+     */
+    public function authorizers(): AuthContainer;
 
     /**
      * Get the server's store.

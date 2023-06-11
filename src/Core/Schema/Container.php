@@ -101,10 +101,20 @@ class Container implements ContainerContract
      */
     public function schemaFor(string|ResourceType $resourceType): Schema
     {
-        $resourceType = (string) $resourceType;
+        return $this->resolve(
+            $this->schemaClassFor($resourceType),
+        );
+    }
 
-        if (isset($this->types[$resourceType])) {
-            return $this->resolve($this->types[$resourceType]);
+    /**
+     * @inheritDoc
+     */
+    public function schemaClassFor(string|ResourceType $type): string
+    {
+        $type = (string) $type;
+
+        if (isset($this->types[$type])) {
+            return $this->types[$type];
         }
 
         throw new LogicException("No schema for JSON:API resource type {$resourceType}.");

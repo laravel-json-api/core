@@ -32,7 +32,6 @@ use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Contracts\Schema\Sortable;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Contracts\Store\Repository;
-use LaravelJsonApi\Core\Auth\AuthorizerResolver;
 use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LaravelJsonApi\Core\Support\Arr;
 use LaravelJsonApi\Core\Support\Str;
@@ -104,11 +103,6 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     private static $resourceResolver;
 
     /**
-     * @var callable|null
-     */
-    private static $authorizerResolver;
-
-    /**
      * Get the resource fields.
      *
      * @return iterable
@@ -165,27 +159,6 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     public static function resource(): string
     {
         $resolver = static::$resourceResolver ?: new ResourceResolver();
-
-        return $resolver(static::class);
-    }
-
-    /**
-     * Specify the callback to use to guess the authorizer class from the schema class.
-     *
-     * @param callable $resolver
-     * @return void
-     */
-    public static function guessAuthorizerUsing(callable $resolver): void
-    {
-        static::$authorizerResolver = $resolver;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function authorizer(): string
-    {
-        $resolver = static::$authorizerResolver ?: new AuthorizerResolver();
 
         return $resolver(static::class);
     }

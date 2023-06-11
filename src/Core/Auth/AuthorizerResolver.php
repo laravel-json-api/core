@@ -19,13 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Auth;
 
-use InvalidArgumentException;
 use LaravelJsonApi\Core\Support\Str;
 use function class_exists;
 
 final class AuthorizerResolver
 {
-
     /**
      * The default authorizer.
      *
@@ -47,6 +45,8 @@ final class AuthorizerResolver
      */
     public static function register(string $schemaClass, string $authorizerClass): void
     {
+        assert(class_exists($authorizerClass), 'Expecting an authorizer class that exists.');
+
         self::$cache[$schemaClass] = $authorizerClass;
     }
 
@@ -58,12 +58,18 @@ final class AuthorizerResolver
      */
     public static function useDefault(string $authorizerClass): void
     {
-        if (class_exists($authorizerClass)) {
-            self::$defaultAuthorizer = $authorizerClass;
-            return;
-        }
+        assert(class_exists($authorizerClass), 'Expecting a default authorizer class that exists.');
 
-        throw new InvalidArgumentException('Expecting a default authorizer class that exists.');
+        self::$defaultAuthorizer = $authorizerClass;
+    }
+
+    /**
+     * @return void
+     */
+    public static function reset(): void
+    {
+        self::$cache = [];
+        self::$defaultAuthorizer = Authorizer::class;
     }
 
     /**

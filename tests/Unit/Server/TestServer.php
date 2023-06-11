@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Server;
 
-use LaravelJsonApi\Core\Server\Server as ServerContract;
+use LaravelJsonApi\Core\Server\Server as BaseServer;
 
-class TestServer extends ServerContract
+class TestServer extends BaseServer
 {
 
     /**

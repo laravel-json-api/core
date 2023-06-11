@@ -25,12 +25,14 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use LaravelJsonApi\Contracts\Auth\Container as AuthContainerContract;
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Encoder\Factory as EncoderFactory;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Core\Auth\Container as AuthContainer;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
@@ -67,6 +69,11 @@ abstract class Server implements ServerContract
      * @var ResourceContainerContract|null
      */
     private ?ResourceContainerContract $resources = null;
+
+    /**
+     * @var AuthContainerContract|null
+     */
+    private ?AuthContainerContract $authorizers = null;
 
     /**
      * Get the server's list of schemas.
@@ -134,6 +141,21 @@ abstract class Server implements ServerContract
 
         return $this->resources = new ResourceContainer(
             new ResourceFactory($this->schemas()),
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function authorizers(): AuthContainerContract
+    {
+        if ($this->authorizers) {
+            return $this->authorizers;
+        }
+
+        return $this->authorizers = new AuthContainer(
+            $this->app->container(),
+            $this->schemas(),
         );
     }
 
