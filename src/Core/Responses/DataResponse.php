@@ -38,7 +38,7 @@ class DataResponse implements Responsable
     /**
      * @var bool|null
      */
-    private ?bool $created = null;
+    public ?bool $created = null;
 
     /**
      * Fluent constructor.

@@ -147,7 +147,6 @@ class StoreActionHandler
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->withModel($model)
             ->withValidated($action->query())
-            ->withHooks($action->hooks())
             ->skipAuthorization();
 
         $result = $this->queries->dispatch($query);

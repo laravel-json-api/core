@@ -19,11 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Integration\Extensions\Atomic\Parsers;
 
-use Illuminate\Container\Container;
-use Illuminate\Pipeline\Pipeline;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
-use PHPUnit\Framework\TestCase;
+use LaravelJsonApi\Core\Tests\Integration\TestCase;
 
 class OperationParserTest extends TestCase
 {
@@ -38,9 +36,7 @@ class OperationParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->parser = new OperationParser(
-            new Pipeline(new Container()),
-        );
+        $this->parser = $this->container->make(OperationParser::class);
     }
 
     /**
