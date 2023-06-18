@@ -21,8 +21,6 @@ namespace LaravelJsonApi\Core\Bus\Queries;
 
 use Illuminate\Contracts\Container\Container;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as DispatcherContract;
-use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
-use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQueryHandler;
 use RuntimeException;
 
 class Dispatcher implements DispatcherContract
@@ -64,7 +62,8 @@ class Dispatcher implements DispatcherContract
     private function handlerFor(string $queryClass): string
     {
         return match ($queryClass) {
-            FetchOneQuery::class => FetchOneQueryHandler::class,
+            FetchMany\FetchManyQuery::class => FetchMany\FetchManyQueryHandler::class,
+            FetchOne\FetchOneQuery::class => FetchOne\FetchOneQueryHandler::class,
             default => throw new RuntimeException('Unexpected query class: ' . $queryClass),
         };
     }

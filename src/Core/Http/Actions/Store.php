@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Actions\Store as StoreActionContract;
+use LaravelJsonApi\Contracts\Http\Actions\Store as StoreContract;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionHandler;
@@ -28,7 +28,7 @@ use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class Store implements StoreActionContract
+class Store implements StoreContract
 {
     /**
      * @var ResourceType|null

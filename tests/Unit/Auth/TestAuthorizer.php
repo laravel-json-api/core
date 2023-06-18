@@ -28,7 +28,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function index(Request $request, string $modelClass): bool
+    public function index(?Request $request, string $modelClass): bool
     {
         // TODO: Implement index() method.
     }

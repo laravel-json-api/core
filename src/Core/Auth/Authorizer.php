@@ -49,7 +49,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function index(Request $request, string $modelClass): bool
+    public function index(?Request $request, string $modelClass): bool
     {
         if ($this->mustAuthorize()) {
             return $this->gate->check(

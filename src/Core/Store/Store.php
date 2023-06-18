@@ -23,6 +23,8 @@ use Illuminate\Support\Collection;
 use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Store\CreatesResources;
 use LaravelJsonApi\Contracts\Store\DeletesResources;
+use LaravelJsonApi\Contracts\Store\HasPagination;
+use LaravelJsonApi\Contracts\Store\HasSingularFilters;
 use LaravelJsonApi\Contracts\Store\ModifiesToMany;
 use LaravelJsonApi\Contracts\Store\ModifiesToOne;
 use LaravelJsonApi\Contracts\Store\QueriesAll;
@@ -114,15 +116,15 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function queryAll(string $resourceType): QueryManyBuilder
+    public function queryAll(ResourceType|string $type): QueryManyBuilder&HasPagination&HasSingularFilters
     {
-        $repository = $this->resources($resourceType);
+        $repository = $this->resources($type);
 
         if ($repository instanceof QueriesAll) {
             return new QueryAllHandler($repository->queryAll());
         }
 
-        throw new LogicException("Querying all {$resourceType} resources is not supported.");
+        throw new LogicException("Querying all {$type} resources is not supported.");
     }
 
     /**

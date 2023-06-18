@@ -17,22 +17,23 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Http\Actions\FetchMany;
 
-interface Factory
+use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Http\Actions\ActionInput;
+
+class FetchManyActionInput extends ActionInput
 {
     /**
-     * @return QueryManyValidator
+     * Fluent constructor.
+     *
+     * @param Request $request
+     * @param ResourceType|string $type
+     * @return self
      */
-    public function queryMany(): QueryManyValidator;
-
-    /**
-     * @return QueryOneValidator
-     */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public static function make(Request $request, ResourceType|string $type): self
+    {
+        return new self($request, $type);
+    }
 }

@@ -20,31 +20,20 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Actions\FetchOne as FetchOneContract;
+use LaravelJsonApi\Contracts\Http\Actions\FetchMany as FetchManyContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Http\Actions\FetchOne\FetchOneActionHandler;
-use LaravelJsonApi\Core\Http\Actions\FetchOne\FetchOneActionInput;
+use LaravelJsonApi\Core\Http\Actions\FetchMany\FetchManyActionHandler;
+use LaravelJsonApi\Core\Http\Actions\FetchMany\FetchManyActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class FetchOne implements FetchOneContract
+class FetchMany implements FetchManyContract
 {
     /**
      * @var ResourceType|null
      */
     private ?ResourceType $type = null;
-
-    /**
-     * @var ResourceId|null
-     */
-    private ?ResourceId $id = null;
-
-    /**
-     * @var object|null
-     */
-    private ?object $model = null;
 
     /**
      * @var object|null
@@ -55,11 +44,11 @@ class FetchOne implements FetchOneContract
      * FetchOne constructor
      *
      * @param Route $route
-     * @param FetchOneActionHandler $handler
+     * @param FetchManyActionHandler $handler
      */
     public function __construct(
         private readonly Route $route,
-        private readonly FetchOneActionHandler $handler,
+        private readonly FetchManyActionHandler $handler,
     ) {
     }
 
@@ -69,23 +58,6 @@ class FetchOne implements FetchOneContract
     public function withType(string|ResourceType $type): static
     {
         $this->type = ResourceType::cast($type);
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withIdOrModel(object|string $idOrModel): static
-    {
-        if (is_string($idOrModel) || $idOrModel instanceof ResourceId) {
-            $this->id = ResourceId::cast($idOrModel);
-            $this->model = null;
-            return $this;
-        }
-
-        $this->id = null;
-        $this->model = $idOrModel;
 
         return $this;
     }
@@ -107,14 +79,11 @@ class FetchOne implements FetchOneContract
     {
         $type = $this->type ?? $this->route->resourceType();
 
-        $input = FetchOneActionInput::make($request, $type)
-            ->maybeWithId($this->id)
-            ->withModel($this->model)
+        $input = FetchManyActionInput::make($request, $type)
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);
     }
-
 
     /**
      * @inheritDoc

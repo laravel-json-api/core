@@ -58,10 +58,10 @@ interface Store
     /**
      * Query all resources by JSON:API resource type.
      *
-     * @param string $resourceType
-     * @return QueryManyBuilder|HasPagination|HasSingularFilters
+     * @param ResourceType|string $type
+     * @return QueryManyBuilder&HasPagination&HasSingularFilters
      */
-    public function queryAll(string $resourceType): QueryManyBuilder;
+    public function queryAll(ResourceType|string $type): QueryManyBuilder&HasPagination&HasSingularFilters;
 
     /**
      * Query one resource by JSON:API resource type.

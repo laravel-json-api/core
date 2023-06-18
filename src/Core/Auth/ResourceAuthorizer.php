@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Core\Auth;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
@@ -43,12 +42,48 @@ class ResourceAuthorizer
     }
 
     /**
+     * Authorize a JSON:API index query.
+     *
+     * @param Request|null $request
+     * @return ErrorList|null
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws HttpExceptionInterface
+     */
+    public function index(?Request $request): ?ErrorList
+    {
+        $passes = $this->authorizer->index(
+            $request,
+            $this->modelClass,
+        );
+
+        return $passes ? null : $this->failed();
+    }
+
+    /**
+     * Authorize a JSON:API index query or fail.
+     *
+     * @param Request|null $request
+     * @return void
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws HttpExceptionInterface
+     */
+    public function indexOrFail(?Request $request): void
+    {
+        if ($errors = $this->index($request)) {
+            throw new JsonApiException($errors);
+        }
+    }
+
+    /**
      * Authorize a JSON:API store operation.
      *
      * @param Request|null $request
      * @return ErrorList|null
      * @throws AuthorizationException
      * @throws AuthenticationException
+     * @throws HttpExceptionInterface
      */
     public function store(?Request $request): ?ErrorList
     {
@@ -84,6 +119,7 @@ class ResourceAuthorizer
      * @return ErrorList|null
      * @throws AuthorizationException
      * @throws AuthenticationException
+     * @throws HttpExceptionInterface
      */
     public function show(?Request $request, object $model): ?ErrorList
     {

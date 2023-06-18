@@ -19,10 +19,12 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Http\Controllers\Hooks;
 
+use ArrayObject;
 use Closure;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
@@ -60,6 +62,16 @@ class HooksImplementationTest extends TestCase
     public function withoutHooksProvider(): array
     {
         return [
+            'searching' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->searching($request, $query);
+                },
+            ],
+            'searched' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->searched([], $request, $query);
+                },
+            ],
             'reading' => [
                 static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
                     $impl->reading($request, $query);
@@ -98,11 +110,225 @@ class HooksImplementationTest extends TestCase
      * @return void
      * @dataProvider withoutHooksProvider
      */
-    public function testItDoesNotInvokeReadingHook(Closure $scenario): void
+    public function testItDoesNotInvokeMissingHook(Closure $scenario): void
     {
         $implementation = new HooksImplementation(new class {});
         $scenario($implementation, $this->request, $this->query);
         $this->assertTrue(true);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesSearchingMethod(): void
+    {
+        $target = new class {
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function searching(Request $request, QueryParameters $query): void
+            {
+                $this->request = $request;
+                $this->query = $query;
+            }
+        };
+
+        $implementation = new HooksImplementation($target);
+        $implementation->searching($this->request, $this->query);
+
+        $this->assertInstanceOf(IndexImplementation::class, $implementation);
+        $this->assertSame($this->request, $target->request);
+        $this->assertSame($this->query, $target->query);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesSearchingMethodAndThrowsResponse(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function searching(Request $request, QueryParameters $query): Response
+            {
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->response;
+            }
+        };
+
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->searching($this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesSearchingMethodAndThrowsResponseFromResponsable(): void
+    {
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function searching(Request $request, QueryParameters $query): Responsable
+            {
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->result;
+            }
+        };
+
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->searching($this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesSearchedMethod(): void
+    {
+        $models = new ArrayObject();
+
+        $target = new class() {
+            public mixed $models = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function searched(mixed $models, Request $request, QueryParameters $query): void
+            {
+                $this->models = $models;
+                $this->request = $request;
+                $this->query = $query;
+            }
+        };
+
+        $implementation = new HooksImplementation($target);
+        $implementation->searched($models, $this->request, $this->query);
+
+        $this->assertSame($models, $target->models);
+        $this->assertSame($this->request, $target->request);
+        $this->assertSame($this->query, $target->query);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesSearchedMethodAndThrowsResponse(): void
+    {
+        $models = new ArrayObject();
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public mixed $models = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function searched(mixed $models, Request $request, QueryParameters $query): Response
+            {
+                $this->models = $models;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->response;
+            }
+        };
+
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->searched($models, $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($models, $target->models);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesSearchedMethodAndThrowsResponseFromResponsable(): void
+    {
+        $models = new ArrayObject();
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public mixed $models = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function searched(mixed $models, Request $request, QueryParameters $query): Responsable
+            {
+                $this->models = $models;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->result;
+            }
+        };
+
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->searched($models, $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($models, $target->models);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
     }
 
     /**

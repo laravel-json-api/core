@@ -31,11 +31,11 @@ interface Authorizer
     /**
      * Authorize the index controller action.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param string $modelClass
      * @return bool
      */
-    public function index(Request $request, string $modelClass): bool;
+    public function index(?Request $request, string $modelClass): bool;
 
     /**
      * Authorize a JSON:API store operation.

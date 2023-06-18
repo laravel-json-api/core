@@ -17,22 +17,19 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Bus\Queries\FetchMany;
 
-interface Factory
+use Closure;
+use LaravelJsonApi\Core\Bus\Queries\Result;
+
+interface HandlesFetchManyQueries
 {
     /**
-     * @return QueryManyValidator
+     * Handle a "fetch many" query.
+     *
+     * @param FetchManyQuery $query
+     * @param Closure $next
+     * @return Result
      */
-    public function queryMany(): QueryManyValidator;
-
-    /**
-     * @return QueryOneValidator
-     */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function handle(FetchManyQuery $query, Closure $next): Result;
 }

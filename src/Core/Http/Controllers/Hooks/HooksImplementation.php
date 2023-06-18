@@ -22,13 +22,17 @@ namespace LaravelJsonApi\Core\Http\Controllers\Hooks;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
-class HooksImplementation implements StoreImplementation, ShowImplementation
+class HooksImplementation implements
+    IndexImplementation,
+    StoreImplementation,
+    ShowImplementation
 {
     /**
      * HooksImplementation constructor
@@ -85,6 +89,22 @@ class HooksImplementation implements StoreImplementation, ShowImplementation
     public function equals(self $other): bool
     {
         return $this->target === $other->target;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function searching(Request $request, QueryParameters $query): void
+    {
+        $this('searching', $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function searched(mixed $data, Request $request, QueryParameters $query): void
+    {
+        $this('searched', $data, $request, $query);
     }
 
     /**

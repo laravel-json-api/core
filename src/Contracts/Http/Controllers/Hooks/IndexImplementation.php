@@ -17,22 +17,25 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
-interface Factory
+use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Query\QueryParameters;
+
+interface IndexImplementation
 {
     /**
-     * @return QueryManyValidator
+     * @param Request $request
+     * @param QueryParameters $query
+     * @return void
      */
-    public function queryMany(): QueryManyValidator;
+    public function searching(Request $request, QueryParameters $query): void;
 
     /**
-     * @return QueryOneValidator
+     * @param mixed $data
+     * @param Request $request
+     * @param QueryParameters $query
+     * @return void
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
+    public function searched(mixed $data, Request $request, QueryParameters $query): void;
 }
