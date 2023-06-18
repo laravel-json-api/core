@@ -37,14 +37,9 @@ class FetchOne implements FetchOneContract
     private ?ResourceType $type = null;
 
     /**
-     * @var ResourceId|null
+     * @var object|string|null
      */
-    private ?ResourceId $id = null;
-
-    /**
-     * @var object|null
-     */
-    private ?object $model = null;
+    private object|string|null $idOrModel = null;
 
     /**
      * @var object|null
@@ -78,14 +73,7 @@ class FetchOne implements FetchOneContract
      */
     public function withIdOrModel(object|string $idOrModel): static
     {
-        if (is_string($idOrModel) || $idOrModel instanceof ResourceId) {
-            $this->id = ResourceId::cast($idOrModel);
-            $this->model = null;
-            return $this;
-        }
-
-        $this->id = null;
-        $this->model = $idOrModel;
+        $this->idOrModel = $idOrModel;
 
         return $this;
     }
@@ -108,8 +96,7 @@ class FetchOne implements FetchOneContract
         $type = $this->type ?? $this->route->resourceType();
 
         $input = FetchOneActionInput::make($request, $type)
-            ->maybeWithId($this->id)
-            ->withModel($this->model)
+            ->withIdOrModel($this->idOrModel ?? $this->route->modelOrResourceId())
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);

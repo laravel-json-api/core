@@ -88,7 +88,7 @@ trait Identifiable
 
 
     /**
-     * Set the model for the query, if known.
+     * Return a new instance with the model set, if known.
      *
      * @param object|null $model
      * @return static
@@ -99,6 +99,21 @@ trait Identifiable
         $copy->model = $model;
 
         return $copy;
+    }
+
+    /**
+     * Return a new instance with the id or model set.
+     *
+     * @param object|string $idOrModel
+     * @return $this
+     */
+    public function withIdOrModel(object|string $idOrModel): static
+    {
+        if ($idOrModel instanceof ResourceId || is_string($idOrModel)) {
+            return $this->withId($idOrModel);
+        }
+
+        return $this->withModel($idOrModel);
     }
 
     /**

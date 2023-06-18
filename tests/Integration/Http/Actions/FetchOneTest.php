@@ -102,6 +102,7 @@ class FetchOneTest extends TestCase
     public function testItFetchesOneById(): void
     {
         $this->route->method('resourceType')->willReturn('posts');
+        $this->route->method('modelOrResourceId')->willReturn('123');
 
         $this->willNegotiateContent();
         $this->willFindModel('posts', '123', $authModel = new stdClass());
@@ -114,7 +115,6 @@ class FetchOneTest extends TestCase
         $model = $this->willQueryOne('posts', '123', $queryParams);
 
         $response = $this->action
-            ->withIdOrModel('123')
             ->withHooks($this->withHooks($model, $queryParams))
             ->execute($this->request);
 
@@ -137,7 +137,7 @@ class FetchOneTest extends TestCase
     {
         $this->route
             ->expects($this->never())
-            ->method('resourceType');
+            ->method($this->anything());
 
         $authModel = new stdClass();
 
