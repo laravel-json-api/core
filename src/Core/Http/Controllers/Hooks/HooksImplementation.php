@@ -24,15 +24,18 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Core\Support\Str;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 
 class HooksImplementation implements
     IndexImplementation,
     StoreImplementation,
-    ShowImplementation
+    ShowImplementation,
+    ShowRelatedImplementation
 {
     /**
      * HooksImplementation constructor
@@ -153,5 +156,31 @@ class HooksImplementation implements
     public function created(object $model, Request $request, QueryParameters $query): void
     {
         $this('created', $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function readingRelated(object $model, string $field, Request $request, QueryParameters $query): void
+    {
+        $method = 'readingRelated' . Str::classify($field);
+
+        $this($method, $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function readRelated(
+        ?object $model,
+        string $field,
+        mixed $related,
+        Request $request,
+        QueryParameters $query
+    ): void
+    {
+        $method = 'readRelated' . Str::classify($field);
+
+        $this($method, $model, $related, $request, $query);
     }
 }

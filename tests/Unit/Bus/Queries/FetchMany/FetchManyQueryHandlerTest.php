@@ -76,7 +76,7 @@ class FetchManyQueryHandlerTest extends TestCase
         );
 
         $passed = FetchManyQuery::make($request, $type)
-            ->withValidated($validated = ['include' => 'user']);
+            ->withValidated($validated = ['include' => 'user', 'page' => ['number' => 2]]);
 
         $sequence = [];
 
@@ -136,6 +136,7 @@ class FetchManyQueryHandlerTest extends TestCase
         $builder
             ->expects($this->once())
             ->method('firstOrPaginate')
+            ->with($this->identicalTo($validated['page']))
             ->willReturn($models = [new \stdClass()]);
 
         $payload = $this->handler

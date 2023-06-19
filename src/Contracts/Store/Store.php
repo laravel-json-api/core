@@ -68,7 +68,6 @@ interface Store
      *
      * @param ResourceType|string $type
      * @param ResourceId|string $id
-     *      string is interpreted as the resource id, not a model key.
      * @return QueryOneBuilder
      */
     public function queryOne(ResourceType|string $type, ResourceId|string $id): QueryOneBuilder;
@@ -76,22 +75,26 @@ interface Store
     /**
      * Query a to-one relationship.
      *
-     * @param string $resourceType
-     * @param object|string $modelOrResourceId
+     * @param ResourceType|string $type
+     * @param ResourceId|string $id
      * @param string $fieldName
      * @return QueryOneBuilder
      */
-    public function queryToOne(string $resourceType, $modelOrResourceId, string $fieldName): QueryOneBuilder;
+    public function queryToOne(ResourceType|string $type, ResourceId|string $id, string $fieldName): QueryOneBuilder;
 
     /**
      * Query a to-many relationship.
      *
-     * @param string $resourceType
-     * @param object|string $modelOrResourceId
+     * @param ResourceType|string $type
+     * @param ResourceId|string $id
      * @param string $fieldName
-     * @return QueryManyBuilder|HasPagination
+     * @return QueryManyBuilder&HasPagination
      */
-    public function queryToMany(string $resourceType, $modelOrResourceId, string $fieldName): QueryManyBuilder;
+    public function queryToMany(
+        ResourceType|string $type,
+        ResourceId|string $id,
+        string $fieldName
+    ): QueryManyBuilder&HasPagination;
 
     /**
      * Create a new resource.

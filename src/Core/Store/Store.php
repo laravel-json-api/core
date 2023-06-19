@@ -144,31 +144,35 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function queryToOne(string $resourceType, $modelOrResourceId, string $fieldName): QueryOneBuilder
+    public function queryToOne(ResourceType|string $type, ResourceId|string $id, string $fieldName): QueryOneBuilder
     {
-        $repository = $this->resources($resourceType);
+        $repository = $this->resources($type);
 
         if ($repository instanceof QueriesToOne) {
-            return $repository->queryToOne($modelOrResourceId, $fieldName);
+            return $repository->queryToOne((string) $id, $fieldName);
         }
 
-        throw new LogicException("Querying to-one relationships on a {$resourceType} resource is not supported.");
+        throw new LogicException("Querying to-one relationships on a {$type} resource is not supported.");
     }
 
     /**
      * @inheritDoc
      */
-    public function queryToMany(string $resourceType, $modelOrResourceId, string $fieldName): QueryManyBuilder
+    public function queryToMany(
+        ResourceType|string $type,
+        ResourceId|string $id,
+        string $fieldName,
+    ): QueryManyBuilder&HasPagination
     {
-        $repository = $this->resources($resourceType);
+        $repository = $this->resources($type);
 
         if ($repository instanceof QueriesToMany) {
             return new QueryManyHandler(
-                $repository->queryToMany($modelOrResourceId, $fieldName)
+                $repository->queryToMany((string) $id, $fieldName)
             );
         }
 
-        throw new LogicException("Querying to-many relationships on a {$resourceType} resource is not supported.");
+        throw new LogicException("Querying to-many relationships on a {$type} resource is not supported.");
     }
 
     /**

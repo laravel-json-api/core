@@ -149,6 +149,46 @@ class ResourceAuthorizer
     }
 
     /**
+     * Authorize a JSON:API show related query.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @param string $fieldName
+     * @return ErrorList|null
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function showRelated(?Request $request, object $model, string $fieldName): ?ErrorList
+    {
+        $passes = $this->authorizer->showRelated(
+            $request,
+            $model,
+            $fieldName,
+        );
+
+        return $passes ? null : $this->failed();
+    }
+
+    /**
+     * Authorize a JSON:API show related query, or fail.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @param string $fieldName
+     * @return void
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function showRelatedOrFail(?Request $request, object $model, string $fieldName): void
+    {
+        if ($errors = $this->showRelated($request, $model, $fieldName)) {
+            throw new JsonApiException($errors);
+        }
+    }
+
+    /**
      * @return ErrorList
      * @throws AuthorizationException
      * @throws AuthenticationException
