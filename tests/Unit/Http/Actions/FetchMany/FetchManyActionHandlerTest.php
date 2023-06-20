@@ -37,15 +37,16 @@ use LaravelJsonApi\Core\Http\Controllers\Hooks\HooksImplementation;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FetchManyActionHandlerTest extends TestCase
 {
     /**
-     * @var Pipeline&MockObject
+     * @var PipelineFactory&MockObject
      */
-    private Pipeline&MockObject $pipeline;
+    private PipelineFactory&MockObject $pipelineFactory;
 
     /**
      * @var MockObject&Dispatcher
@@ -65,7 +66,7 @@ class FetchManyActionHandlerTest extends TestCase
         parent::setUp();
 
         $this->handler = new FetchManyActionHandler(
-            $this->pipeline = $this->createMock(Pipeline::class),
+            $this->pipelineFactory = $this->createMock(PipelineFactory::class),
             $this->dispatcher = $this->createMock(Dispatcher::class),
         );
     }
@@ -178,40 +179,37 @@ class FetchManyActionHandlerTest extends TestCase
 
         $sequence = [];
 
-        $this->pipeline
+        $this->pipelineFactory
             ->expects($this->once())
-            ->method('send')
+            ->method('pipe')
             ->with($this->identicalTo($original))
-            ->willReturnCallback(function () use (&$sequence): Pipeline {
-                $sequence[] = 'send';
-                return $this->pipeline;
-            });
+            ->willReturn($pipeline = $this->createMock(Pipeline::class));
 
-        $this->pipeline
+        $pipeline
             ->expects($this->once())
             ->method('through')
-            ->willReturnCallback(function (array $actual) use (&$sequence): Pipeline {
+            ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
                     ItAcceptsJsonApiResponses::class,
                 ], $actual);
-                return $this->pipeline;
+                return $pipeline;
             });
 
-        $this->pipeline
+        $pipeline
             ->expects($this->once())
             ->method('via')
             ->with('handle')
-            ->willReturnCallback(function () use (&$sequence): Pipeline {
+            ->willReturnCallback(function () use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'via';
-                return $this->pipeline;
+                return $pipeline;
             });
 
-        $this->pipeline
+        $pipeline
             ->expects($this->once())
             ->method('then')
             ->willReturnCallback(function (Closure $fn) use ($passed, &$sequence): DataResponse {
-                $this->assertSame(['send', 'through', 'via'], $sequence);
+                $this->assertSame(['through', 'via'], $sequence);
                 return $fn($passed);
             });
 

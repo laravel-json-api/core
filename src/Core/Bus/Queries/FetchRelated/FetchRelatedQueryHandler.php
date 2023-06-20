@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Queries\FetchRelated;
 
-use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Schema\Container;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\AuthorizeFetchRelatedQuery;
@@ -29,6 +28,7 @@ use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfAuthorizing;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use UnexpectedValueException;
 
 class FetchRelatedQueryHandler
@@ -36,12 +36,12 @@ class FetchRelatedQueryHandler
     /**
      * FetchRelatedQueryHandler constructor
      *
-     * @param Pipeline $pipeline
+     * @param PipelineFactory $pipelines
      * @param Store $store
      * @param Container $schemas
      */
     public function __construct(
-        private readonly Pipeline $pipeline,
+        private readonly PipelineFactory $pipelines,
         private readonly Store $store,
         private readonly Container $schemas,
     ) {
@@ -63,8 +63,8 @@ class FetchRelatedQueryHandler
             TriggerShowRelatedHooks::class,
         ];
 
-        $result = $this->pipeline
-            ->send($query)
+        $result = $this->pipelines
+            ->pipe($query)
             ->through($pipes)
             ->via('handle')
             ->then(fn (FetchRelatedQuery $q): Result => $this->handle($q));

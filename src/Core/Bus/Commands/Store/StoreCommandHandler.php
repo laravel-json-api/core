@@ -19,13 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Commands\Store;
 
-use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\AuthorizeStoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\TriggerStoreHooks;
 use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\ValidateStoreCommand;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use UnexpectedValueException;
 
 class StoreCommandHandler
@@ -33,11 +33,11 @@ class StoreCommandHandler
     /**
      * StoreCommandHandler constructor
      *
-     * @param Pipeline $pipeline
+     * @param PipelineFactory $pipelines
      * @param Store $store
      */
     public function __construct(
-        private readonly Pipeline $pipeline,
+        private readonly PipelineFactory $pipelines,
         private readonly Store $store,
     ) {
     }
@@ -56,8 +56,8 @@ class StoreCommandHandler
             TriggerStoreHooks::class,
         ];
 
-        $result = $this->pipeline
-            ->send($command)
+        $result = $this->pipelines
+            ->pipe($command)
             ->through($pipes)
             ->via('handle')
             ->then(fn (StoreCommand $cmd): Result => $this->handle($cmd));

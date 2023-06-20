@@ -21,9 +21,7 @@ namespace LaravelJsonApi\Core\Tests\Integration;
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\Container as ContainerContract;
-use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcherContract;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcherContract;
 use LaravelJsonApi\Core\Bus\Commands\Dispatcher as CommandDispatcher;
@@ -47,7 +45,6 @@ class TestCase extends BaseTestCase
 
         /** Laravel */
         $this->container->instance(ContainerContract::class, $this->container);
-        $this->container->bind(PipelineContract::class, fn() => new Pipeline($this->container));
         $this->container->bind(Translator::class, function () {
             $translator = $this->createMock(Translator::class);
             $translator->method('get')->willReturnCallback(fn (string $value) => $value);

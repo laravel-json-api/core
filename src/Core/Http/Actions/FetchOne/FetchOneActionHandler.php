@@ -19,13 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\FetchOne;
 
-use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -34,11 +34,11 @@ class FetchOneActionHandler
     /**
      * FetchOneActionHandler constructor
      *
-     * @param Pipeline $pipeline
+     * @param PipelineFactory $pipelines
      * @param Dispatcher $dispatcher
      */
     public function __construct(
-        private readonly Pipeline $pipeline,
+        private readonly PipelineFactory $pipelines,
         private readonly Dispatcher $dispatcher
     ) {
     }
@@ -55,8 +55,8 @@ class FetchOneActionHandler
             ItAcceptsJsonApiResponses::class,
         ];
 
-        $response = $this->pipeline
-            ->send($action)
+        $response = $this->pipelines
+            ->pipe($action)
             ->through($pipes)
             ->via('handle')
             ->then(fn (FetchOneActionInput $passed): DataResponse => $this->handle($passed));

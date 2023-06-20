@@ -19,13 +19,13 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Queries\FetchMany;
 
-use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\AuthorizeFetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\TriggerIndexHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\ValidateFetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use UnexpectedValueException;
 
 class FetchManyQueryHandler
@@ -33,11 +33,11 @@ class FetchManyQueryHandler
     /**
      * FetchManyQueryHandler constructor
      *
-     * @param Pipeline $pipeline
+     * @param PipelineFactory $pipelines
      * @param Store $store
      */
     public function __construct(
-        private readonly Pipeline $pipeline,
+        private readonly PipelineFactory $pipelines,
         private readonly Store $store,
     ) {
     }
@@ -56,8 +56,8 @@ class FetchManyQueryHandler
             TriggerIndexHooks::class,
         ];
 
-        $result = $this->pipeline
-            ->send($query)
+        $result = $this->pipelines
+            ->pipe($query)
             ->through($pipes)
             ->via('handle')
             ->then(fn (FetchManyQuery $q): Result => $this->handle($q));

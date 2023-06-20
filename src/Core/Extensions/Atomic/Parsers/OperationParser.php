@@ -19,9 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
-use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
 use LaravelJsonApi\Core\Support\Contracts;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use UnexpectedValueException;
 
 class OperationParser
@@ -29,9 +29,9 @@ class OperationParser
     /**
      * OperationParser constructor
      *
-     * @param Pipeline $pipeline
+     * @param PipelineFactory $pipelines
      */
-    public function __construct(private readonly Pipeline $pipeline)
+    public function __construct(private readonly PipelineFactory $pipelines)
     {
     }
 
@@ -52,8 +52,8 @@ class OperationParser
             StoreParser::class,
         ];
 
-        $parsed = $this->pipeline
-            ->send($operation)
+        $parsed = $this->pipelines
+            ->pipe($operation)
             ->through($pipes)
             ->via('parse')
             ->then(static fn() => throw new \LogicException('Indeterminate operation.'));

@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Queries\FetchOne;
 
-use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
@@ -28,6 +27,7 @@ use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfAuthorizing;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use UnexpectedValueException;
 
 class FetchOneQueryHandler
@@ -35,11 +35,11 @@ class FetchOneQueryHandler
     /**
      * FetchOneQueryHandler constructor
      *
-     * @param Pipeline $pipeline
+     * @param PipelineFactory $pipelines
      * @param Store $store
      */
     public function __construct(
-        private readonly Pipeline $pipeline,
+        private readonly PipelineFactory $pipelines,
         private readonly Store $store,
     ) {
     }
@@ -60,8 +60,8 @@ class FetchOneQueryHandler
             TriggerShowHooks::class,
         ];
 
-        $result = $this->pipeline
-            ->send($query)
+        $result = $this->pipelines
+            ->pipe($query)
             ->through($pipes)
             ->via('handle')
             ->then(fn (FetchOneQuery $q): Result => $this->handle($q));

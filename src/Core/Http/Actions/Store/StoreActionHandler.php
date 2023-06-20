@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\Store;
 
-use Illuminate\Contracts\Pipeline\Pipeline;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcher;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
@@ -29,11 +28,12 @@ use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItHasJsonApiContent;
+use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateQueryOneParameters;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\AuthorizeStoreAction;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
-use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateQueryOneParameters;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Support\PipelineFactory;
 use RuntimeException;
 use UnexpectedValueException;
 
@@ -42,12 +42,12 @@ class StoreActionHandler
     /**
      * StoreActionHandler constructor
      *
-     * @param Pipeline $pipeline
+     * @param PipelineFactory $pipelines
      * @param CommandDispatcher $commands
      * @param QueryDispatcher $queries
      */
     public function __construct(
-        private readonly Pipeline $pipeline,
+        private readonly PipelineFactory $pipelines,
         private readonly CommandDispatcher $commands,
         private readonly QueryDispatcher $queries,
     ) {
@@ -70,8 +70,8 @@ class StoreActionHandler
             ParseStoreOperation::class,
         ];
 
-        $response = $this->pipeline
-            ->send($action)
+        $response = $this->pipelines
+            ->pipe($action)
             ->through($pipes)
             ->via('handle')
             ->then(fn(StoreActionInput $passed): DataResponse => $this->handle($passed));
