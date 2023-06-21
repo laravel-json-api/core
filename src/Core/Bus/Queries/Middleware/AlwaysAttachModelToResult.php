@@ -20,25 +20,12 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\Middleware;
 
 use Closure;
-use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query;
 use LaravelJsonApi\Core\Bus\Queries\Result;
-use LaravelJsonApi\Core\Document\Error;
-use RuntimeException;
-use Symfony\Component\HttpFoundation\Response;
 
-class LookupModelIfAuthorizing
+class AlwaysAttachModelToResult
 {
-    /**
-     * LookupModelForAuthorization constructor
-     *
-     * @param Store $store
-     */
-    public function __construct(private readonly Store $store)
-    {
-    }
-
     /**
      * Handle an identifiable query.
      *
@@ -48,21 +35,11 @@ class LookupModelIfAuthorizing
      */
     public function handle(Query&IsIdentifiable $query, Closure $next): Result
     {
-        if ($query->mustAuthorize() && $query->model() === null) {
-            $model = $this->store->find(
-                $query->type(),
-                $query->id() ?? throw new RuntimeException('Expecting a resource id to be set.'),
-            );
+        $model = $query->modelOrFail();
 
-            if ($model === null) {
-                return Result::failed(
-                    Error::make()->setStatus(Response::HTTP_NOT_FOUND)
-                );
-            }
+        /** @var Result $result */
+        $result = $next($query);
 
-            $query = $query->withModel($model);
-        }
-
-        return $next($query);
+        return $result->withModel($model);
     }
 }

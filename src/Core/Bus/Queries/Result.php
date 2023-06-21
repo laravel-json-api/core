@@ -25,9 +25,15 @@ use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Query\QueryParameters;
+use LogicException;
 
 class Result implements ResultContract
 {
+    /**
+     * @var object|null
+     */
+    private ?object $model = null;
+
     /**
      * @var ErrorList|null
      */
@@ -85,7 +91,7 @@ class Result implements ResultContract
             return $this->payload;
         }
 
-        throw new \LogicException('Cannot get payload from a failed query result.');
+        throw new LogicException('Cannot get payload from a failed query result.');
     }
 
     /**
@@ -97,7 +103,37 @@ class Result implements ResultContract
             return $this->query;
         }
 
-        throw new \LogicException('Cannot get payload from a failed query result.');
+        throw new LogicException('Cannot get payload from a failed query result.');
+    }
+
+    /**
+     * Return a new result instance with the model set.
+     *
+     * @param object|null $model
+     * @return $this
+     */
+    public function withModel(?object $model): self
+    {
+        $copy = clone $this;
+        $copy->model = $model;
+
+        return $copy;
+    }
+
+    /**
+     * @return object|null
+     */
+    public function model(): ?object
+    {
+        return $this->model;
+    }
+
+    /**
+     * @return object
+     */
+    public function modelOrFail(): object
+    {
+        return $this->model ?? throw new LogicException('No model set on result object.');
     }
 
     /**

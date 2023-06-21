@@ -30,7 +30,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQueryHandler;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\ValidateFetchOneQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfAuthorizing;
+use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
@@ -97,7 +97,7 @@ class FetchOneQueryHandlerTest extends TestCase
             ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
-                    LookupModelIfAuthorizing::class,
+                    LookupModelIfRequired::class,
                     AuthorizeFetchOneQuery::class,
                     ValidateFetchOneQuery::class,
                     LookupResourceIdIfNotSet::class,

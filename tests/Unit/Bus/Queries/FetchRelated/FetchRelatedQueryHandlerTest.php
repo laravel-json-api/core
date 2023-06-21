@@ -33,7 +33,8 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelated\FetchRelatedQueryHandler;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\AuthorizeFetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\TriggerShowRelatedHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\ValidateFetchRelatedQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfAuthorizing;
+use LaravelJsonApi\Core\Bus\Queries\Middleware\AlwaysAttachModelToResult;
+use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
@@ -195,11 +196,12 @@ class FetchRelatedQueryHandlerTest extends TestCase
             ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
-                    LookupModelIfAuthorizing::class,
+                    LookupModelIfRequired::class,
                     AuthorizeFetchRelatedQuery::class,
                     ValidateFetchRelatedQuery::class,
                     LookupResourceIdIfNotSet::class,
                     TriggerShowRelatedHooks::class,
+                    AlwaysAttachModelToResult::class,
                 ], $actual);
                 return $pipeline;
             });
