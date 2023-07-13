@@ -53,6 +53,16 @@ trait MatchesIds
     }
 
     /**
+     * Mark the ID field as a ULID.
+     *
+     * @return $this
+     */
+    public function ulid(): self
+    {
+        return $this->matchAs('[0-7][0-9A-HJKMNP-TV-Z]{25}');
+    }
+
+    /**
      * Set the pattern for the ID field.
      *
      * @param string $pattern
