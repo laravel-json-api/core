@@ -20,11 +20,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Http\Actions\ActionInput;
 use LaravelJsonApi\Core\Http\Exceptions\HttpNotAcceptableException;
-use LaravelJsonApi\Core\Responses\DataResponse;
 
 class ItAcceptsJsonApiResponses implements HandlesActions
 {
@@ -43,7 +43,7 @@ class ItAcceptsJsonApiResponses implements HandlesActions
     /**
      * @inheritDoc
      */
-    public function handle(ActionInput $action, Closure $next): DataResponse
+    public function handle(ActionInput $action, Closure $next): Responsable
     {
         if (!$this->isAcceptable($action->request())) {
             $message = $this->translator->get(

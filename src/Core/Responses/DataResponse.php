@@ -29,6 +29,7 @@ use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedResourceResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class DataResponse implements Responsable
 {
@@ -44,7 +45,7 @@ class DataResponse implements Responsable
      * Fluent constructor.
      *
      * @param mixed|null $data
-     * @return DataResponse
+     * @return self
      */
     public static function make(mixed $data): self
     {
@@ -88,7 +89,7 @@ class DataResponse implements Responsable
      * @param Request $request
      * @return Responsable
      */
-    public function prepareResponse($request): Responsable
+    public function prepareResponse(Request $request): Responsable
     {
         return $this
             ->prepareDataResponse($request)
@@ -105,7 +106,7 @@ class DataResponse implements Responsable
     /**
      * @inheritDoc
      */
-    public function toResponse($request)
+    public function toResponse($request): Response
     {
         return $this
             ->prepareResponse($request)
@@ -115,10 +116,10 @@ class DataResponse implements Responsable
     /**
      * Convert the data member to a response class.
      *
-     * @param $request
+     * @param Request $request
      * @return PaginatedResourceResponse|ResourceCollectionResponse|ResourceResponse
      */
-    private function prepareDataResponse($request):
+    private function prepareDataResponse(Request $request):
     PaginatedResourceResponse|ResourceCollectionResponse|ResourceResponse
     {
         if ($this->data instanceof Page) {

@@ -17,29 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Queries\Middleware;
+namespace LaravelJsonApi\Core\Http\Actions\FetchRelated;
 
-use Closure;
-use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
-use LaravelJsonApi\Core\Bus\Queries\Query;
-use LaravelJsonApi\Core\Bus\Queries\Result;
+use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Bus\Queries\Concerns\Relatable;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Http\Actions\ActionInput;
 
-class AlwaysAttachModelToResult
+class FetchRelatedActionInput extends ActionInput
 {
+    use Relatable;
+
     /**
-     * Handle an identifiable query.
+     * Fluent constructor.
      *
-     * @param IsIdentifiable&Query $query
-     * @param Closure $next
-     * @return Result
+     * @param Request $request
+     * @param ResourceType|string $type
+     * @return self
      */
-    public function handle(Query&IsIdentifiable $query, Closure $next): Result
+    public static function make(Request $request, ResourceType|string $type): self
     {
-        $model = $query->modelOrFail();
-
-        /** @var Result $result */
-        $result = $next($query);
-
-        return $result->withModel($model);
+        return new self($request, $type);
     }
 }

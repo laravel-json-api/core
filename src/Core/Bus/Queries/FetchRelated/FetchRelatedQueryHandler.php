@@ -24,7 +24,6 @@ use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\AuthorizeFetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\TriggerShowRelatedHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\ValidateFetchRelatedQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\AlwaysAttachModelToResult;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
@@ -62,7 +61,6 @@ class FetchRelatedQueryHandler
             ValidateFetchRelatedQuery::class,
             LookupResourceIdIfNotSet::class,
             TriggerShowRelatedHooks::class,
-            AlwaysAttachModelToResult::class,
         ];
 
         $result = $this->pipelines
@@ -105,9 +103,7 @@ class FetchRelatedQueryHandler
                 ->getOrPaginate($params->page());
         }
 
-        return Result::ok(
-            new Payload($related, true),
-            $params,
-        );
+        return Result::ok(new Payload($related, true), $params)
+            ->withRelatedTo($query->modelOrFail(), $fieldName);
     }
 }

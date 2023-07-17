@@ -32,7 +32,12 @@ class Result implements ResultContract
     /**
      * @var object|null
      */
-    private ?object $model = null;
+    private ?object $relatedTo = null;
+
+    /**
+     * @var string|null
+     */
+    private ?string $fieldName = null;
 
     /**
      * @var ErrorList|null
@@ -107,33 +112,44 @@ class Result implements ResultContract
     }
 
     /**
-     * Return a new result instance with the model set.
+     * Return a new result instance that relates to the provided model and relation field name.
      *
-     * @param object|null $model
-     * @return $this
+     * For relationship results, the result will relate to the model via the provided
+     * relationship field name. These need to be set on relationship results as JSON:API
+     * relationship responses need both the model and field name to properly render the
+     * JSON:API document.
+     *
+     * @param object $model
+     * @param string $fieldName
+     * @return self
      */
-    public function withModel(?object $model): self
+    public function withRelatedTo(object $model, string $fieldName): self
     {
         $copy = clone $this;
-        $copy->model = $model;
+        $copy->relatedTo = $model;
+        $copy->fieldName = $fieldName;
 
         return $copy;
     }
 
     /**
-     * @return object|null
+     * Return the model the result relates to.
+     *
+     * @return object
      */
-    public function model(): ?object
+    public function relatesTo(): object
     {
-        return $this->model;
+        return $this->relatedTo ?? throw new LogicException('Result is not a relationship result.');
     }
 
     /**
-     * @return object
+     * Return the relationship field name that the result relates to.
+     *
+     * @return string
      */
-    public function modelOrFail(): object
+    public function fieldName(): string
     {
-        return $this->model ?? throw new LogicException('No model set on result object.');
+        return $this->fieldName ?? throw new LogicException('Result is not a relationship result.');
     }
 
     /**

@@ -33,7 +33,6 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelated\FetchRelatedQueryHandler;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\AuthorizeFetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\TriggerShowRelatedHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\ValidateFetchRelatedQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\AlwaysAttachModelToResult;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
@@ -92,6 +91,7 @@ class FetchRelatedQueryHandlerTest extends TestCase
         );
 
         $passed = FetchRelatedQuery::make($request, $type)
+            ->withModel($model = new \stdClass())
             ->withFieldName($fieldName = 'createdBy')
             ->withValidated($validated = ['include' => 'profile'])
             ->withId($id = new ResourceId('123'));
@@ -116,14 +116,15 @@ class FetchRelatedQueryHandlerTest extends TestCase
         $builder
             ->expects($this->once())
             ->method('first')
-            ->willReturn($model = new \stdClass());
+            ->willReturn($related = new \stdClass());
 
-        $payload = $this->handler
-            ->execute($original)
-            ->payload();
+        $result = $this->handler->execute($original);
+        $payload = $result->payload();
 
+        $this->assertSame($model, $result->relatesTo());
+        $this->assertSame($fieldName, $result->fieldName());
         $this->assertTrue($payload->hasData);
-        $this->assertSame($model, $payload->data);
+        $this->assertSame($related, $payload->data);
         $this->assertEmpty($payload->meta);
     }
 
@@ -139,6 +140,7 @@ class FetchRelatedQueryHandlerTest extends TestCase
         );
 
         $passed = FetchRelatedQuery::make($request, $type)
+            ->withModel($model = new \stdClass())
             ->withFieldName($fieldName = 'tags')
             ->withValidated($validated = ['include' => 'parent', 'page' => ['number' => 2]])
             ->withId($id = new ResourceId('123'));
@@ -164,14 +166,15 @@ class FetchRelatedQueryHandlerTest extends TestCase
             ->expects($this->once())
             ->method('getOrPaginate')
             ->with($this->identicalTo($validated['page']))
-            ->willReturn($models = [new \stdClass()]);
+            ->willReturn($related = [new \stdClass()]);
 
-        $payload = $this->handler
-            ->execute($original)
-            ->payload();
+        $result = $this->handler->execute($original);
+        $payload = $result->payload();
 
+        $this->assertSame($model, $result->relatesTo());
+        $this->assertSame($fieldName, $result->fieldName());
         $this->assertTrue($payload->hasData);
-        $this->assertSame($models, $payload->data);
+        $this->assertSame($related, $payload->data);
         $this->assertEmpty($payload->meta);
     }
 
@@ -201,7 +204,6 @@ class FetchRelatedQueryHandlerTest extends TestCase
                     ValidateFetchRelatedQuery::class,
                     LookupResourceIdIfNotSet::class,
                     TriggerShowRelatedHooks::class,
-                    AlwaysAttachModelToResult::class,
                 ], $actual);
                 return $pipeline;
             });

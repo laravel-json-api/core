@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Core\Http\Actions\ActionInput;
-use LaravelJsonApi\Core\Responses\DataResponse;
 
 interface HandlesActions
 {
@@ -30,7 +30,7 @@ interface HandlesActions
      *
      * @param ActionInput $action
      * @param Closure $next
-     * @return DataResponse
+     * @return Responsable
      */
-    public function handle(ActionInput $action, Closure $next): DataResponse;
+    public function handle(ActionInput $action, Closure $next): Responsable;
 }

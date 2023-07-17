@@ -20,12 +20,12 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Http\Actions\ActionInput;
 use LaravelJsonApi\Core\Query\QueryParameters;
-use LaravelJsonApi\Core\Responses\DataResponse;
 
 class ValidateQueryOneParameters implements HandlesActions
 {
@@ -44,7 +44,7 @@ class ValidateQueryOneParameters implements HandlesActions
     /**
      * @inheritDoc
      */
-    public function handle(ActionInput $action, Closure $next): DataResponse
+    public function handle(ActionInput $action, Closure $next): Responsable
     {
         $validator = $this->validatorContainer
             ->validatorsFor($action->type())
