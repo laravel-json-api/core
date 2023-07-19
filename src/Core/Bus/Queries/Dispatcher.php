@@ -65,6 +65,7 @@ class Dispatcher implements DispatcherContract
             FetchMany\FetchManyQuery::class => FetchMany\FetchManyQueryHandler::class,
             FetchOne\FetchOneQuery::class => FetchOne\FetchOneQueryHandler::class,
             FetchRelated\FetchRelatedQuery::class => FetchRelated\FetchRelatedQueryHandler::class,
+            FetchRelationship\FetchRelationshipQuery::class => FetchRelationship\FetchRelationshipQueryHandler::class,
             default => throw new RuntimeException('Unexpected query class: ' . $queryClass),
         };
     }

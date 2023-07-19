@@ -39,14 +39,14 @@ class RelatedResponse implements Responsable
     /**
      * Fluent constructor.
      *
-     * @param object $resource
+     * @param object $model
      * @param string $fieldName
      * @param mixed $related
      * @return self
      */
-    public static function make(object $resource, string $fieldName, mixed $related): self
+    public static function make(object $model, string $fieldName, mixed $related): self
     {
-        return new self($resource, $fieldName, $related);
+        return new self($model, $fieldName, $related);
     }
 
     /**

@@ -26,66 +26,48 @@ use LaravelJsonApi\Core\Responses\Concerns\HasEncodingParameters;
 use LaravelJsonApi\Core\Responses\Concerns\HasRelationshipMeta;
 use LaravelJsonApi\Core\Responses\Concerns\IsResponsable;
 use LaravelJsonApi\Core\Responses\Internal\PaginatedIdentifierResponse;
-use LaravelJsonApi\Core\Responses\Internal\ResourceCollectionResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceIdentifierCollectionResponse;
 use LaravelJsonApi\Core\Responses\Internal\ResourceIdentifierResponse;
-use LaravelJsonApi\Core\Responses\Internal\ResourceResponse;
-use function is_null;
+use Symfony\Component\HttpFoundation\Response;
 
 class RelationshipResponse implements Responsable
 {
-
     use HasEncodingParameters;
     use HasRelationshipMeta;
     use IsResponsable;
 
     /**
-     * @var object
-     */
-    private object $resource;
-
-    /**
-     * @var string
-     */
-    private string $fieldName;
-
-    /**
-     * @var Page|iterable|null
-     */
-    private $related;
-
-    /**
      * Fluent constructor.
      *
-     * @param object $resource
+     * @param object $model
      * @param string $fieldName
-     * @param Page|iterable|null $related
+     * @param mixed $related
      * @return static
      */
-    public static function make(object $resource, string $fieldName, $related): self
+    public static function make(object $model, string $fieldName, mixed $related): self
     {
-        return new self($resource, $fieldName, $related);
+        return new self($model, $fieldName, $related);
     }
 
     /**
      * RelationshipResponse constructor.
      *
-     * @param object $resource
+     * @param object $model
      * @param string $fieldName
-     * @param Page|iterable|null $related
+     * @param mixed $related
      */
-    public function __construct(object $resource, string $fieldName, $related)
-    {
-        $this->resource = $resource;
-        $this->fieldName = $fieldName;
-        $this->related = $related;
+    public function __construct(
+        public readonly object $model,
+        public readonly string $fieldName,
+        public readonly mixed $related
+    ) {
     }
 
     /**
      * @param Request $request
-     * @return ResourceCollectionResponse|ResourceResponse
+     * @return Responsable
      */
-    public function prepareResponse($request): Responsable
+    public function prepareResponse(Request $request): Responsable
     {
         return $this
             ->prepareDataResponse($request)
@@ -103,7 +85,7 @@ class RelationshipResponse implements Responsable
     /**
      * @inheritDoc
      */
-    public function toResponse($request)
+    public function toResponse($request): Response
     {
         return $this
             ->prepareResponse($request)
@@ -113,15 +95,16 @@ class RelationshipResponse implements Responsable
     /**
      * Convert the data member to a response class.
      *
-     * @param $request
+     * @param Request $request
      * @return ResourceIdentifierResponse|ResourceIdentifierCollectionResponse|PaginatedIdentifierResponse
      */
-    private function prepareDataResponse($request)
+    private function prepareDataResponse(Request $request):
+    ResourceIdentifierResponse|ResourceIdentifierCollectionResponse|PaginatedIdentifierResponse
     {
         $resources = $this->server()->resources();
-        $resource = $resources->cast($this->resource);
+        $resource = $resources->cast($this->model);
 
-        if (is_null($this->related)) {
+        if ($this->related === null) {
             return new ResourceIdentifierResponse(
                 $resource,
                 $this->fieldName,

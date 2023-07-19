@@ -27,6 +27,7 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Http\Controllers\Hooks\HooksImplementation;
@@ -101,6 +102,26 @@ class HooksImplementationTest extends TestCase
             'created' => [
                 static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
                     $impl->created(new stdClass(), $request, $query);
+                },
+            ],
+            'readingRelated' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->readingRelated(new stdClass(), 'comments', $request, $query);
+                },
+            ],
+            'readRelated' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->readRelated(new stdClass(), 'comments', [], $request, $query);
+                },
+            ],
+            'readingRelationship' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->readingRelationship(new stdClass(), 'comments', $request, $query);
+                },
+            ],
+            'readRelationship' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->readRelationship(new stdClass(), 'comments', [], $request, $query);
                 },
             ],
         ];
@@ -803,6 +824,272 @@ class HooksImplementationTest extends TestCase
 
         try {
             $implementation->readRelated($model, 'tags', $related, $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($related, $target->related);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesReadingRelationshipMethod(): void
+    {
+        $target = new class {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function readingBlogPosts(
+                stdClass $model,
+                Request $request,
+                QueryParameters $query,
+            ): void
+            {
+                $this->model = $model;
+                $this->request = $request;
+                $this->query = $query;
+            }
+        };
+
+        $model = new stdClass();
+
+        $implementation = new HooksImplementation($target);
+        $implementation->readingRelationship($model, 'blog-posts', $this->request, $this->query);
+
+        $this->assertInstanceOf(ShowRelationshipImplementation::class, $implementation);
+        $this->assertSame($model, $target->model);
+        $this->assertSame($this->request, $target->request);
+        $this->assertSame($this->query, $target->query);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesReadingRelationshipMethodAndThrowsResponse(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function readingComments(
+                stdClass $model,
+                Request $request,
+                QueryParameters $query,
+            ): Response
+            {
+                $this->model = $model;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->response;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->readingRelationship($model, 'comments', $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesReadingRelationshipMethodAndThrowsResponseFromResponsable(): void
+    {
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function readingTags(
+                stdClass $model,
+                Request $request,
+                QueryParameters $query,
+            ): Responsable
+            {
+                $this->model = $model;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->result;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->readingRelationship($model, 'tags', $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesReadRelationshipMethod(): void
+    {
+        $target = new class {
+            public ?stdClass $model = null;
+            public ?ArrayObject $related = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function readBlogPosts(
+                stdClass $model,
+                ArrayObject $related,
+                Request $request,
+                QueryParameters $query,
+            ): void
+            {
+                $this->model = $model;
+                $this->related = $related;
+                $this->request = $request;
+                $this->query = $query;
+            }
+        };
+
+        $model = new stdClass();
+        $related = new ArrayObject();
+
+        $implementation = new HooksImplementation($target);
+        $implementation->readRelationship($model, 'blog-posts', $related, $this->request, $this->query);
+
+        $this->assertSame($model, $target->model);
+        $this->assertSame($related, $target->related);
+        $this->assertSame($this->request, $target->request);
+        $this->assertSame($this->query, $target->query);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesReadRelationshipMethodAndThrowsResponse(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public ?stdClass $model = null;
+            public ?ArrayObject $related = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function readComments(
+                stdClass $model,
+                ArrayObject $related,
+                Request $request,
+                QueryParameters $query,
+            ): Response
+            {
+                $this->model = $model;
+                $this->related = $related;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->response;
+            }
+        };
+
+        $model = new stdClass();
+        $related = new ArrayObject();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->readRelationship($model, 'comments', $related, $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($related, $target->related);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesReadRelationshipMethodAndThrowsResponseFromResponsable(): void
+    {
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public ?stdClass $model = null;
+            public ?ArrayObject $related = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function readTags(
+                stdClass $model,
+                ArrayObject $related,
+                Request $request,
+                QueryParameters $query,
+            ): Responsable
+            {
+                $this->model = $model;
+                $this->related = $related;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->result;
+            }
+        };
+
+        $model = new stdClass();
+        $related = new ArrayObject();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->readRelationship($model, 'tags', $related, $this->request, $this->query);
             $this->fail('No exception thrown.');
         } catch (HttpResponseException $ex) {
             $this->assertSame($model, $target->model);

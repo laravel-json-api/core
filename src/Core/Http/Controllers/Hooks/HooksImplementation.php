@@ -25,6 +25,7 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Support\Str;
@@ -35,7 +36,8 @@ class HooksImplementation implements
     IndexImplementation,
     StoreImplementation,
     ShowImplementation,
-    ShowRelatedImplementation
+    ShowRelatedImplementation,
+    ShowRelationshipImplementation
 {
     /**
      * HooksImplementation constructor
@@ -180,6 +182,32 @@ class HooksImplementation implements
     ): void
     {
         $method = 'readRelated' . Str::classify($field);
+
+        $this($method, $model, $related, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function readingRelationship(object $model, string $field, Request $request, QueryParameters $query,): void
+    {
+        $method = 'reading' . Str::classify($field);
+
+        $this($method, $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function readRelationship(
+        ?object $model,
+        string $field,
+        mixed $related,
+        Request $request,
+        QueryParameters $query,
+    ): void
+    {
+        $method = 'read' . Str::classify($field);
 
         $this($method, $model, $related, $request, $query);
     }
