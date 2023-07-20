@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+
+- [#12](https://github.com/laravel-json-api/core/pull/12) Add `ulid()` method to the matches ids trait.
+
+### Fixed
+
+- [#10](https://github.com/laravel-json-api/core/pull/10) Use correct resolver for resource type.
+
 ## [3.1.0] - 2023-03-12
 
 ### Added
