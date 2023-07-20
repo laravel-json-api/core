@@ -59,7 +59,7 @@ trait MatchesIds
      */
     public function ulid(): self
     {
-        return $this->matchAs('[0-7][0-9A-HJKMNP-TV-Z]{25}');
+        return $this->matchAs('[0-7][0-9a-hjkmnp-tv-zA-HJKMNP-TV-Z]{25}');
     }
 
     /**
