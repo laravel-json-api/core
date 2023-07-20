@@ -125,7 +125,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
      */
     public static function type(): string
     {
-        $resolver = static::$resourceResolver ?: new TypeResolver();
+        $resolver = static::$resourceTypeResolver ?: new TypeResolver();
 
         return $resolver(static::class);
     }
