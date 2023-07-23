@@ -22,23 +22,24 @@ namespace LaravelJsonApi\Core\Extensions\Atomic\Operations;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
 
-class Store extends Operation
+class Update extends Operation
 {
     /**
-     * Store constructor
+     * Update constructor
      *
-     * @param Href $target
+     * @param Ref|Href|null $target
      * @param ResourceObject $data
      * @param array $meta
      */
     public function __construct(
-        Href $target,
+        Ref|Href|null $target,
         public readonly ResourceObject $data,
         array $meta = []
     ) {
         parent::__construct(
-            op: OpCodeEnum::Add,
+            op: OpCodeEnum::Update,
             target: $target,
             meta: $meta,
         );
@@ -47,7 +48,7 @@ class Store extends Operation
     /**
      * @return bool
      */
-    public function isCreating(): bool
+    public function isUpdating(): bool
     {
         return true;
     }
@@ -57,11 +58,13 @@ class Store extends Operation
      */
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'op' => $this->op->value,
-            'href' => $this->href()->value,
+            'href' => $this->href()?->value,
+            'ref' => $this->ref()?->toArray(),
             'data' => $this->data->toArray(),
-        ];
+            'meta' => empty($this->meta) ? null : $this->meta,
+        ], static fn (mixed $value) => $value !== null);
     }
 
     /**
@@ -69,10 +72,12 @@ class Store extends Operation
      */
     public function jsonSerialize(): array
     {
-        return [
+        return array_filter([
             'op' => $this->op,
-            'href' => $this->target,
+            'href' => $this->href(),
+            'ref' => $this->ref(),
             'data' => $this->data,
-        ];
+            'meta' => empty($this->meta) ? null : $this->meta,
+        ], static fn (mixed $value) => $value !== null);
     }
 }

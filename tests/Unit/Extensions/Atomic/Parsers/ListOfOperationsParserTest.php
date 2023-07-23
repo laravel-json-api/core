@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Parsers;
 
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\ListOfOperationsParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
 use PHPUnit\Framework\TestCase;
@@ -39,7 +39,7 @@ class ListOfOperationsParserTest extends TestCase
 
         $sequence = [
             [$ops[0], $a = $this->createMock(Operation::class)],
-            [$ops[1], $b = $this->createMock(Store::class)],
+            [$ops[1], $b = $this->createMock(Create::class)],
         ];
 
         $operationParser = $this->createMock(OperationParser::class);

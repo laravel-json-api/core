@@ -19,48 +19,47 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
-use Closure;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 
-class StoreParser implements ParsesOperationFromArray
+class UpdateParser implements ParsesOperationFromArray
 {
     /**
-     * StoreParser constructor
+     * UpdateParser constructor
      *
+     * @param HrefOrRefParser $targetParser
      * @param ResourceObjectParser $resourceParser
      */
-    public function __construct(private readonly ResourceObjectParser $resourceParser)
-    {
+    public function __construct(
+        private readonly HrefOrRefParser $targetParser,
+        private readonly ResourceObjectParser $resourceParser
+    ) {
     }
 
     /**
      * @inheritDoc
      */
-    public function parse(array $operation, Closure $next): Operation
+    public function parse(array $operation): ?Update
     {
-        if ($this->isStore($operation)) {
-            return new Store(
-                new Href($operation['href']),
+        if ($this->isUpdate($operation)) {
+            return new Update(
+                $this->targetParser->nullable($operation),
                 $this->resourceParser->parse($operation['data']),
                 $operation['meta'] ?? [],
             );
         }
 
-        return $next($operation);
+        return null;
     }
 
     /**
      * @param array $operation
      * @return bool
      */
-    private function isStore(array $operation): bool
+    private function isUpdate(array $operation): bool
     {
-        return $operation['op'] === OpCodeEnum::Add->value &&
-            !empty($operation['href'] ?? null) &&
+        return $operation['op'] === OpCodeEnum::Update->value &&
             (is_array($operation['data'] ?? null) && isset($operation['data']['type']));
     }
 }

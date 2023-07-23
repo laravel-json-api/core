@@ -22,19 +22,19 @@ namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Operations;
 use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 use PHPUnit\Framework\TestCase;
 
-class StoreTest extends TestCase
+class CreateTest extends TestCase
 {
     /**
-     * @return void
+     * @return Create
      */
-    public function test(): Store
+    public function testItHasHref(): Create
     {
-        $op = new Store(
+        $op = new Create(
             $href = new Href('/posts'),
             $resource = new ResourceObject(
                 type: new ResourceType('posts'),
@@ -47,6 +47,7 @@ class StoreTest extends TestCase
         $this->assertSame($href, $op->href());
         $this->assertNull($op->ref());
         $this->assertSame($resource, $op->data);
+        $this->assertEmpty($op->meta);
         $this->assertTrue($op->isCreating());
         $this->assertFalse($op->isUpdating());
         $this->assertTrue($op->isCreatingOrUpdating());
@@ -61,11 +62,35 @@ class StoreTest extends TestCase
     }
 
     /**
-     * @param Store $op
-     * @return void
-     * @depends test
+     * @return Create
      */
-    public function testItIsArrayable(Store $op): void
+    public function testItIsMissingHrefWithMeta(): Create
+    {
+        $op = new Create(
+            null,
+            $resource = new ResourceObject(
+                type: new ResourceType('posts'),
+                attributes: ['title' => 'Hello World!']
+            ),
+            $meta = ['foo' => 'bar'],
+        );
+
+        $this->assertSame(OpCodeEnum::Add, $op->op);
+        $this->assertNull($op->target);
+        $this->assertNull($op->href());
+        $this->assertNull($op->ref());
+        $this->assertSame($resource, $op->data);
+        $this->assertSame($meta, $op->meta);
+
+        return $op;
+    }
+
+    /**
+     * @param Create $op
+     * @return void
+     * @depends testItHasHref
+     */
+    public function testItIsArrayableWithHref(Create $op): void
     {
         $expected = [
             'op' => $op->op->value,
@@ -78,16 +103,52 @@ class StoreTest extends TestCase
     }
 
     /**
-     * @param Store $op
+     * @param Create $op
      * @return void
-     * @depends test
+     * @depends testItIsMissingHrefWithMeta
      */
-    public function testItIsJsonSerializable(Store $op): void
+    public function testItIsArrayableWithoutHrefAndWithMeta(Create $op): void
+    {
+        $expected = [
+            'op' => $op->op->value,
+            'data' => $op->data->toArray(),
+            'meta' => $op->meta,
+        ];
+
+        $this->assertInstanceOf(Arrayable::class, $op);
+        $this->assertSame($expected, $op->toArray());
+    }
+
+    /**
+     * @param Create $op
+     * @return void
+     * @depends testItHasHref
+     */
+    public function testItIsJsonSerializableWithHref(Create $op): void
     {
         $expected = [
             'op' => $op->op,
             'href' => $op->href(),
             'data' => $op->data,
+        ];
+
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['atomic:operations' => [$expected]]),
+            json_encode(['atomic:operations' => [$op]]),
+        );
+    }
+
+    /**
+     * @param Create $op
+     * @return void
+     * @depends testItIsMissingHrefWithMeta
+     */
+    public function testItIsJsonSerializableWithoutHrefAndWithMeta(Create $op): void
+    {
+        $expected = [
+            'op' => $op->op,
+            'data' => $op->data,
+            'meta' => $op->meta,
         ];
 
         $this->assertJsonStringEqualsJsonString(

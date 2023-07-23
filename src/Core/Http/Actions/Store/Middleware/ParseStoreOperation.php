@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Http\Actions\Store\Middleware;
 
 use Closure;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Http\Actions\Store\HandlesStoreActions;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
@@ -50,7 +50,7 @@ class ParseStoreOperation implements HandlesStoreActions
         );
 
         return $next($action->withOperation(
-            new Store(
+            new Create(
                 new Href($request->url()),
                 $resource,
                 $request->json('meta') ?? [],

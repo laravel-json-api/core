@@ -45,7 +45,7 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store as StoreOperation;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create as StoreOperation;
 use LaravelJsonApi\Core\Http\Actions\Store;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;

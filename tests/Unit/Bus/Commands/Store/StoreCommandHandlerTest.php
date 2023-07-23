@@ -32,7 +32,7 @@ use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommandHandler;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Support\PipelineFactory;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -75,7 +75,7 @@ class StoreCommandHandlerTest extends TestCase
     {
         $original = new StoreCommand(
             $request = $this->createMock(Request::class),
-            $operation = new Store(new Href('/posts'), new ResourceObject(new ResourceType('posts'))),
+            $operation = new Create(new Href('/posts'), new ResourceObject(new ResourceType('posts'))),
         );
 
         $passed = StoreCommand::make($request, $operation)

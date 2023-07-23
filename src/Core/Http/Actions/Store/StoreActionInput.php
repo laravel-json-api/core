@@ -21,15 +21,15 @@ namespace LaravelJsonApi\Core\Http\Actions\Store;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Http\Actions\ActionInput;
 
 class StoreActionInput extends ActionInput
 {
     /**
-     * @var Store|null
+     * @var Create|null
      */
-    private ?Store $operation = null;
+    private ?Create $operation = null;
 
     /**
      * Fluent constructor
@@ -46,10 +46,10 @@ class StoreActionInput extends ActionInput
     /**
      * Return a new instance with the store operation set.
      *
-     * @param Store $operation
+     * @param Create $operation
      * @return $this
      */
-    public function withOperation(Store $operation): self
+    public function withOperation(Create $operation): self
     {
         $copy = clone $this;
         $copy->operation = $operation;
@@ -58,9 +58,9 @@ class StoreActionInput extends ActionInput
     }
 
     /**
-     * @return Store
+     * @return Create
      */
-    public function operation(): Store
+    public function operation(): Create
     {
         if ($this->operation) {
             return $this->operation;

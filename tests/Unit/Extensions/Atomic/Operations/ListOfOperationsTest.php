@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Operations;
 use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\ListOfOperations;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use PHPUnit\Framework\TestCase;
 
 class ListOfOperationsTest extends TestCase
@@ -34,7 +34,7 @@ class ListOfOperationsTest extends TestCase
     {
         $ops = new ListOfOperations(
             $a = $this->createMock(Operation::class),
-            $b = $this->createMock(Store::class),
+            $b = $this->createMock(Create::class),
         );
 
         $a->method('toArray')->willReturn(['a' => 1]);

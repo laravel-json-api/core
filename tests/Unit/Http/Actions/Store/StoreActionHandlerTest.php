@@ -33,7 +33,7 @@ use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
@@ -101,7 +101,7 @@ class StoreActionHandlerTest extends TestCase
         $queryParams->method('sparseFieldSets')->willReturn($fields = new FieldSets());
 
         $passed = StoreActionInput::make($request, $type)
-            ->withOperation($op = new Store(new Href('/posts'), new ResourceObject($type)))
+            ->withOperation($op = new Create(new Href('/posts'), new ResourceObject($type)))
             ->withQuery($queryParams)
             ->withHooks($hooks = new \stdClass());
 
@@ -162,7 +162,7 @@ class StoreActionHandlerTest extends TestCase
         $type = new ResourceType('comments2');
 
         $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Store(new Href('/posts'), new ResourceObject($type)))
+            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
@@ -206,7 +206,7 @@ class StoreActionHandlerTest extends TestCase
         $type = new ResourceType('comments2');
 
         $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Store(new Href('/posts'), new ResourceObject($type)))
+            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
@@ -235,7 +235,7 @@ class StoreActionHandlerTest extends TestCase
         $type = new ResourceType('comments2');
 
         $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Store(new Href('/posts'), new ResourceObject($type)))
+            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
@@ -267,7 +267,7 @@ class StoreActionHandlerTest extends TestCase
         $type = new ResourceType('comments2');
 
         $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Store(new Href('/posts'), new ResourceObject($type)))
+            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);

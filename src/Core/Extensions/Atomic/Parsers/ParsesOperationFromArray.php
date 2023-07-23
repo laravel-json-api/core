@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
-use Closure;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
 
 interface ParsesOperationFromArray
@@ -28,8 +27,7 @@ interface ParsesOperationFromArray
      * Parse an operation from an array.
      *
      * @param array $operation
-     * @param Closure $next
-     * @return Operation
+     * @return Operation|null
      */
-    public function parse(array $operation, Closure $next): Operation;
+    public function parse(array $operation): ?Operation;
 }

@@ -27,7 +27,7 @@ use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\TriggerStoreHooks;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use PHPUnit\Framework\TestCase;
@@ -55,7 +55,7 @@ class TriggerStoreHooksTest extends TestCase
     {
         $command = new StoreCommand(
             $this->createMock(Request::class),
-            new Store(new Href('/posts'), new ResourceObject(new ResourceType('posts'))),
+            new Create(new Href('/posts'), new ResourceObject(new ResourceType('posts'))),
         );
 
         $expected = Result::ok();
@@ -82,7 +82,7 @@ class TriggerStoreHooksTest extends TestCase
         $model = new \stdClass();
         $sequence = [];
 
-        $operation = new Store(
+        $operation = new Create(
             new Href('/posts'),
             new ResourceObject(new ResourceType('posts')),
         );
@@ -155,7 +155,7 @@ class TriggerStoreHooksTest extends TestCase
         $query = $this->createMock(QueryParameters::class);
         $sequence = [];
 
-        $operation = new Store(
+        $operation = new Create(
             new Href('/posts'),
             new ResourceObject(new ResourceType('posts')),
         );

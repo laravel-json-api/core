@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Core\Bus\Commands\Store;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Bus\Commands\Command;
 
 class StoreCommand extends Command
@@ -36,10 +36,10 @@ class StoreCommand extends Command
      * Fluent constructor.
      *
      * @param Request|null $request
-     * @param Store $operation
+     * @param Create $operation
      * @return self
      */
-    public static function make(?Request $request, Store $operation): self
+    public static function make(?Request $request, Create $operation): self
     {
         return new self($request, $operation);
     }
@@ -48,11 +48,11 @@ class StoreCommand extends Command
      * StoreCommand constructor
      *
      * @param Request|null $request
-     * @param Store $operation
+     * @param Create $operation
      */
     public function __construct(
         ?Request $request,
-        private readonly Store $operation
+        private readonly Create $operation
     ) {
         parent::__construct($request);
     }
@@ -68,7 +68,7 @@ class StoreCommand extends Command
     /**
      * @inheritDoc
      */
-    public function operation(): Store
+    public function operation(): Create
     {
         return $this->operation;
     }

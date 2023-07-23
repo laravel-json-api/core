@@ -19,7 +19,9 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Integration\Extensions\Atomic\Parsers;
 
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 
@@ -42,7 +44,7 @@ class OperationParserTest extends TestCase
     /**
      * @return void
      */
-    public function testItParsesStoreOperation(): void
+    public function testItParsesStoreOperationWithHref(): void
     {
         $op = $this->parser->parse($json = [
             'op' => 'add',
@@ -55,7 +57,147 @@ class OperationParserTest extends TestCase
             ],
         ]);
 
-        $this->assertInstanceOf(Store::class, $op);
+        $this->assertInstanceOf(Create::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * Check "href" is not compulsory for a store operation.
+     *
+     * @return void
+     */
+    public function testItParsesStoreOperationWithoutHref(): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'add',
+            'data' => [
+                'type' => 'posts',
+                'attributes' => [
+                    'title' => 'Hello World!',
+                ],
+            ],
+            'meta' => ['foo' => 'bar'],
+        ]);
+
+        $this->assertInstanceOf(Create::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testItParsesUpdateOperationWithRef(): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'update',
+            'ref' => [
+                'type' => 'posts',
+                'id' => '123',
+            ],
+            'data' => [
+                'type' => 'posts',
+                'id' => '123',
+                'attributes' => [
+                    'title' => 'Hello World',
+                ],
+            ],
+            'meta' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertInstanceOf(Update::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testItParsesUpdateOperationWithHref(): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'update',
+            'href' => '/posts/123',
+            'data' => [
+                'type' => 'posts',
+                'id' => '123',
+                'attributes' => [
+                    'title' => 'Hello World',
+                ],
+            ],
+        ]);
+
+        $this->assertInstanceOf(Update::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testItParsesUpdateOperationWithoutTarget(): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'update',
+            'data' => [
+                'type' => 'posts',
+                'id' => '123',
+                'attributes' => [
+                    'title' => 'Hello World',
+                ],
+            ],
+        ]);
+
+        $this->assertInstanceOf(Update::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testItParsesDeleteOperationWithHref(): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'remove',
+            'href' => '/posts/123',
+            'meta' => ['foo' => 'bar'],
+        ]);
+
+        $this->assertInstanceOf(Delete::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testItParsesDeleteOperationWithRef(): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'remove',
+            'ref' => [
+                'type' => 'posts',
+                'id' => '123',
+            ],
+        ]);
+
+        $this->assertInstanceOf(Delete::class, $op);
         $this->assertJsonStringEqualsJsonString(
             json_encode($json),
             json_encode($op),
@@ -67,8 +209,8 @@ class OperationParserTest extends TestCase
      */
     public function testItIsIndeterminate(): void
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Indeterminate operation.');
+        $this->expectException(\AssertionError::class);
+        $this->expectExceptionMessage('Operation array must have a valid op code.');
         $this->parser->parse(['op' => 'blah!']);
     }
 }

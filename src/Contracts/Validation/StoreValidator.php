@@ -21,24 +21,24 @@ namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Store;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 
 interface StoreValidator
 {
     /**
      * Extract validation data from the store operation.
      *
-     * @param Store $operation
+     * @param Create $operation
      * @return array
      */
-    public function extract(Store $operation): array;
+    public function extract(Create $operation): array;
 
     /**
      * Make a validator for the store operation.
      *
      * @param Request|null $request
-     * @param Store $operation
+     * @param Create $operation
      * @return Validator
      */
-    public function make(?Request $request, Store $operation): Validator;
+    public function make(?Request $request, Create $operation): Validator;
 }

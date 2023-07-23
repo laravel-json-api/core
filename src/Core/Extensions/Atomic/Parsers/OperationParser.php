@@ -20,18 +20,15 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
-use LaravelJsonApi\Core\Support\Contracts;
-use LaravelJsonApi\Core\Support\PipelineFactory;
-use UnexpectedValueException;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use RuntimeException;
 
 class OperationParser
 {
     /**
-     * OperationParser constructor
-     *
-     * @param PipelineFactory $pipelines
+     * @param ParsesOperationContainer $parsers
      */
-    public function __construct(private readonly PipelineFactory $pipelines)
+    public function __construct(private readonly ParsesOperationContainer $parsers)
     {
     }
 
@@ -43,25 +40,18 @@ class OperationParser
      */
     public function parse(array $operation): Operation
     {
-        Contracts::assert(
-            !empty($operation['op'] ?? null),
-            'Operation array must have an op code.',
-        );
+        $op = OpCodeEnum::tryFrom($operation['op'] ?? null);
 
-        $pipes = [
-            StoreParser::class,
-        ];
+        assert($op !== null, 'Operation array must have a valid op code.');
 
-        $parsed = $this->pipelines
-            ->pipe($operation)
-            ->through($pipes)
-            ->via('parse')
-            ->then(static fn() => throw new \LogicException('Indeterminate operation.'));
+        foreach ($this->parsers->cursor($op) as $parser) {
+            $parsed = $parser->parse($operation);
 
-        if ($parsed instanceof Operation) {
-            return $parsed;
+            if ($parsed !== null) {
+                return $parsed;
+            }
         }
 
-        throw new UnexpectedValueException('Pipeline did not return an operation object.');
+        throw new RuntimeException('Unexpected operation array - could not parse to an atomic operation.');
     }
 }
