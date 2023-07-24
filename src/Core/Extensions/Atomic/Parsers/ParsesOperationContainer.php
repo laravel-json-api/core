@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use Generator;
+use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierParser;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 use RuntimeException;
@@ -47,6 +48,11 @@ class ParsesOperationContainer
     private ?ResourceObjectParser $resourceObjectParser = null;
 
     /**
+     * @var ResourceIdentifierParser|null
+     */
+    private ?ResourceIdentifierParser $identifierParser = null;
+
+    /**
      * @param OpCodeEnum $op
      * @return Generator<int,ParsesOperationFromArray>
      */
@@ -58,6 +64,7 @@ class ParsesOperationContainer
             ],
             OpCodeEnum::Update => [
                 UpdateParser::class,
+                UpdateToOneParser::class,
             ],
             OpCodeEnum::Remove => [
                 DeleteParser::class,
@@ -82,6 +89,10 @@ class ParsesOperationContainer
                 $this->getResourceObjectParser(),
             ),
             DeleteParser::class => new DeleteParser($this->getTargetParser()),
+            UpdateToOneParser::class => new UpdateToOneParser(
+                $this->getTargetParser(),
+                $this->getResourceIdentifierParser(),
+            ),
             default => throw new RuntimeException('Unexpected operation parser class: ' . $parser),
         };
     }
@@ -120,5 +131,17 @@ class ParsesOperationContainer
         }
 
         return $this->resourceObjectParser = new ResourceObjectParser();
+    }
+
+    /**
+     * @return ResourceIdentifierParser
+     */
+    private function getResourceIdentifierParser(): ResourceIdentifierParser
+    {
+        if ($this->identifierParser) {
+            return $this->identifierParser;
+        }
+
+        return $this->identifierParser = new ResourceIdentifierParser();
     }
 }

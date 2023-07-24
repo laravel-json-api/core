@@ -26,6 +26,17 @@ use LaravelJsonApi\Core\Support\Contracts;
 class Href implements JsonSerializable, Stringable
 {
     /**
+     * Fluent constructor.
+     *
+     * @param string $value
+     * @return static
+     */
+    public static function make(string $value): self
+    {
+        return new self($value);
+    }
+
+    /**
      * Href constructor
      *
      * @param string $value
@@ -49,6 +60,26 @@ class Href implements JsonSerializable, Stringable
     public function toString(): string
     {
         return $this->value;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRelationshipName(): ?string
+    {
+        if (1 === preg_match('/relationships\/([a-zA-Z0-9_\-]+)$/', $this->value, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRelationshipName(): bool
+    {
+        return $this->getRelationshipName() !== null;
     }
 
     /**

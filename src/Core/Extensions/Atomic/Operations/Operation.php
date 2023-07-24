@@ -112,7 +112,11 @@ abstract class Operation implements JsonSerializable, Arrayable
      */
     public function getFieldName(): ?string
     {
-        return $this->ref()?->relationship;
+        if ($ref = $this->ref()) {
+            return $ref->relationship;
+        }
+
+        return $this->href()?->getRelationshipName();
     }
 
     /**

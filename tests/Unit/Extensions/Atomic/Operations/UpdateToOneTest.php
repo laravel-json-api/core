@@ -1,0 +1,173 @@
+<?php
+/*
+ * Copyright 2023 Cloud Creativity Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+declare(strict_types=1);
+
+namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Operations;
+
+use Illuminate\Contracts\Support\Arrayable;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceIdentifier;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
+use PHPUnit\Framework\TestCase;
+
+class UpdateToOneTest extends TestCase
+{
+    /**
+     * @return UpdateToOne
+     */
+    public function testItHasHref(): UpdateToOne
+    {
+        $op = new UpdateToOne(
+            $href = new Href('/posts/123/relationships/author'),
+            $identifier = new ResourceIdentifier(
+                type: new ResourceType('users'),
+                id: new ResourceId('456'),
+            ),
+        );
+
+        $this->assertSame(OpCodeEnum::Update, $op->op);
+        $this->assertSame($href, $op->target);
+        $this->assertSame($href, $op->href());
+        $this->assertNull($op->ref());
+        $this->assertSame($identifier, $op->data);
+        $this->assertEmpty($op->meta);
+        $this->assertFalse($op->isCreating());
+        $this->assertFalse($op->isUpdating());
+        $this->assertFalse($op->isCreatingOrUpdating());
+        $this->assertFalse($op->isDeleting());
+        $this->assertSame('author', $op->getFieldName());
+        $this->assertTrue($op->isUpdatingRelationship());
+        $this->assertFalse($op->isAttachingRelationship());
+        $this->assertFalse($op->isDetachingRelationship());
+        $this->assertTrue($op->isModifyingRelationship());
+
+        return $op;
+    }
+
+    /**
+     * @return UpdateToOne
+     */
+    public function testItHasRef(): UpdateToOne
+    {
+        $op = new UpdateToOne(
+            $ref = new Ref(
+                type: new ResourceType('posts'),
+                id: new ResourceId('123'),
+                relationship: 'author',
+            ),
+            null,
+            $meta = ['foo' => 'bar'],
+        );
+
+        $this->assertSame(OpCodeEnum::Update, $op->op);
+        $this->assertSame($ref, $op->target);
+        $this->assertNull($op->href());
+        $this->assertSame($ref, $op->ref());
+        $this->assertNull($op->data);
+        $this->assertSame($meta, $op->meta);
+        $this->assertFalse($op->isCreating());
+        $this->assertFalse($op->isUpdating());
+        $this->assertFalse($op->isCreatingOrUpdating());
+        $this->assertFalse($op->isDeleting());
+        $this->assertSame('author', $op->getFieldName());
+        $this->assertTrue($op->isUpdatingRelationship());
+        $this->assertFalse($op->isAttachingRelationship());
+        $this->assertFalse($op->isDetachingRelationship());
+        $this->assertTrue($op->isModifyingRelationship());
+
+        return $op;
+    }
+
+    /**
+     * @param UpdateToOne $op
+     * @return void
+     * @depends testItHasHref
+     */
+    public function testItIsArrayableWithHref(UpdateToOne $op): void
+    {
+        $expected = [
+            'op' => $op->op->value,
+            'href' => $op->href()->value,
+            'data' => $op->data->toArray(),
+        ];
+
+        $this->assertInstanceOf(Arrayable::class, $op);
+        $this->assertSame($expected, $op->toArray());
+    }
+
+    /**
+     * @param UpdateToOne $op
+     * @return void
+     * @depends testItHasRef
+     */
+    public function testItIsArrayableWithRef(UpdateToOne $op): void
+    {
+        $expected = [
+            'op' => $op->op->value,
+            'ref' => $op->ref()->toArray(),
+            'data' => null,
+            'meta' => $op->meta,
+        ];
+
+        $this->assertInstanceOf(Arrayable::class, $op);
+        $this->assertSame($expected, $op->toArray());
+    }
+
+    /**
+     * @param UpdateToOne $op
+     * @return void
+     * @depends testItHasHref
+     */
+    public function testItIsJsonSerializableWithHref(UpdateToOne $op): void
+    {
+        $expected = [
+            'op' => $op->op,
+            'href' => $op->href(),
+            'data' => $op->data,
+        ];
+
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['atomic:operations' => [$expected]]),
+            json_encode(['atomic:operations' => [$op]]),
+        );
+    }
+
+    /**
+     * @param UpdateToOne $op
+     * @return void
+     * @depends testItHasRef
+     */
+    public function testItIsJsonSerializableWithRef(UpdateToOne $op): void
+    {
+        $expected = [
+            'op' => $op->op,
+            'ref' => $op->ref(),
+            'data' => $op->data,
+            'meta' => $op->meta,
+        ];
+
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(['atomic:operations' => [$expected]]),
+            json_encode(['atomic:operations' => [$op]]),
+        );
+    }
+}

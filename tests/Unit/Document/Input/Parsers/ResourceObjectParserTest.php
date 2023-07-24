@@ -148,7 +148,7 @@ class ResourceObjectParserTest extends TestCase
             ],
         ];
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(\AssertionError::class);
         $this->expectExceptionMessage('Resource object array must contain a type.');
         $this->parser->parse($data);
     }

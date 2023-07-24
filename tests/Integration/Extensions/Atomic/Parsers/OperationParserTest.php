@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Tests\Integration\Extensions\Atomic\Parsers;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 
@@ -198,6 +199,72 @@ class OperationParserTest extends TestCase
         ]);
 
         $this->assertInstanceOf(Delete::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public static function toOneProvider(): array
+    {
+        return [
+            'null' => [null],
+            'id' => [
+                ['type' => 'author', 'id' => '123'],
+            ],
+            'lid' => [
+                ['type' => 'author', 'lid' => '70abaf04-5d06-41e4-8e1a-1dd40ca0b830'],
+            ],
+        ];
+    }
+
+    /**
+     * @param array|null $data
+     * @return void
+     * @dataProvider toOneProvider
+     */
+    public function testItParsesUpdateToOneOperationWithHref(?array $data): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'update',
+            'href' => '/posts/123/relationships/author',
+            'data' => $data,
+            'meta' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertInstanceOf(UpdateToOne::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @param array|null $data
+     * @return void
+     * @dataProvider toOneProvider
+     */
+    public function testItParsesUpdateToOneOperationWithRef(?array $data): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => 'update',
+            'ref' => [
+                'type' => 'posts',
+                'id' => '123',
+                'relationship' => 'author',
+            ],
+            'data' => $data,
+            'meta' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertInstanceOf(UpdateToOne::class, $op);
         $this->assertJsonStringEqualsJsonString(
             json_encode($json),
             json_encode($op),

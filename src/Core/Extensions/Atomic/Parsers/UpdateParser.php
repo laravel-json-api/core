@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 
 class UpdateParser implements ParsesOperationFromArray
@@ -59,7 +60,18 @@ class UpdateParser implements ParsesOperationFromArray
      */
     private function isUpdate(array $operation): bool
     {
-        return $operation['op'] === OpCodeEnum::Update->value &&
-            (is_array($operation['data'] ?? null) && isset($operation['data']['type']));
+        if ($operation['op'] !== OpCodeEnum::Update->value) {
+            return false;
+        }
+
+        if (isset($operation['ref']) && isset($operation['ref']['relationship'])) {
+            return false;
+        }
+
+        if (isset($operation['href']) && Href::make($operation['href'])->hasRelationshipName()) {
+            return false;
+        }
+
+        return is_array($operation['data'] ?? null) && isset($operation['data']['type']);
     }
 }
