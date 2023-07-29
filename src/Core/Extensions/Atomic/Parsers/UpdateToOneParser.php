@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 
 class UpdateToOneParser implements ParsesOperationFromArray
@@ -68,15 +67,8 @@ class UpdateToOneParser implements ParsesOperationFromArray
             return false;
         }
 
-        $hasTarget = false;
-
-        if (isset($operation['ref']) && isset($operation['ref']['relationship'])) {
-            $hasTarget = true;
-        } else if (isset($operation['href']) && Href::make($operation['href'])->hasRelationshipName()) {
-            $hasTarget = true;
-        }
-
-        return $hasTarget && $this->isIdentifier($operation['data']);
+        return $this->targetParser->hasRelationship($operation) &&
+            $this->isIdentifier($operation['data']);
     }
 
     /**

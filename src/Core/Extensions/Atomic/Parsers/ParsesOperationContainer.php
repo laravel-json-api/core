@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use Generator;
+use LaravelJsonApi\Core\Document\Input\Parsers\ListOfResourceIdentifiersParser;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierParser;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
@@ -61,13 +62,16 @@ class ParsesOperationContainer
         $parsers = match ($op) {
             OpCodeEnum::Add => [
                 CreateParser::class,
+                UpdateToManyParser::class,
             ],
             OpCodeEnum::Update => [
                 UpdateParser::class,
                 UpdateToOneParser::class,
+                UpdateToManyParser::class,
             ],
             OpCodeEnum::Remove => [
                 DeleteParser::class,
+                UpdateToManyParser::class,
             ],
         };
 
@@ -92,6 +96,10 @@ class ParsesOperationContainer
             UpdateToOneParser::class => new UpdateToOneParser(
                 $this->getTargetParser(),
                 $this->getResourceIdentifierParser(),
+            ),
+            UpdateToManyParser::class => new UpdateToManyParser(
+                $this->getTargetParser(),
+                new ListOfResourceIdentifiersParser($this->getResourceIdentifierParser()),
             ),
             default => throw new RuntimeException('Unexpected operation parser class: ' . $parser),
         };

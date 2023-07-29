@@ -19,33 +19,35 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
-use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
+use LaravelJsonApi\Core\Document\Input\Parsers\ListOfResourceIdentifiersParser;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 
-class UpdateParser implements ParsesOperationFromArray
+class UpdateToManyParser implements ParsesOperationFromArray
 {
     /**
-     * UpdateParser constructor
+     * UpdateToManyParser constructor
      *
      * @param HrefOrRefParser $targetParser
-     * @param ResourceObjectParser $resourceParser
+     * @param ListOfResourceIdentifiersParser $identifiersParser
      */
     public function __construct(
         private readonly HrefOrRefParser $targetParser,
-        private readonly ResourceObjectParser $resourceParser
+        private readonly ListOfResourceIdentifiersParser $identifiersParser,
     ) {
     }
 
     /**
      * @inheritDoc
      */
-    public function parse(array $operation): ?Update
+    public function parse(array $operation): ?Operation
     {
-        if ($this->isUpdate($operation)) {
-            return new Update(
-                $this->targetParser->nullable($operation),
-                $this->resourceParser->parse($operation['data']),
+        if ($this->isUpdateToMany($operation)) {
+            return new UpdateToMany(
+                OpCodeEnum::from($operation['op']),
+                $this->targetParser->parse($operation),
+                $this->identifiersParser->parse($operation['data']),
                 $operation['meta'] ?? [],
             );
         }
@@ -57,16 +59,14 @@ class UpdateParser implements ParsesOperationFromArray
      * @param array $operation
      * @return bool
      */
-    private function isUpdate(array $operation): bool
+    private function isUpdateToMany(array $operation): bool
     {
-        if ($operation['op'] !== OpCodeEnum::Update->value) {
+        $data = $operation['data'] ?? null;
+
+        if (!is_array($data) || !array_is_list($data)) {
             return false;
         }
 
-        if ($this->targetParser->hasRelationship($operation)) {
-            return false;
-        }
-
-        return is_array($operation['data'] ?? null) && isset($operation['data']['type']);
+        return $this->targetParser->hasRelationship($operation);
     }
 }

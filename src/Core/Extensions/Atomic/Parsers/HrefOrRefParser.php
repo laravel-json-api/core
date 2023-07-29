@@ -67,4 +67,23 @@ class HrefOrRefParser
 
         return null;
     }
+
+    /**
+     * If parsed, will the operation target a relationship via the ref or href?
+     *
+     * @param array $operation
+     * @return bool
+     */
+    public function hasRelationship(array $operation): bool
+    {
+        if (isset($operation['ref']['relationship'])) {
+            return true;
+        }
+
+        if (isset($operation['href']) && Href::make($operation['href'])->hasRelationshipName()) {
+            return true;
+        }
+
+        return false;
+    }
 }

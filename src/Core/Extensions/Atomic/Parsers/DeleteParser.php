@@ -54,7 +54,14 @@ class DeleteParser implements ParsesOperationFromArray
      */
     private function isDelete(array $operation): bool
     {
-        return $operation['op'] === OpCodeEnum::Remove->value &&
-            (isset($operation['href']) || isset($operation['ref']));
+        if ($operation['op'] !== OpCodeEnum::Remove->value) {
+            return false;
+        }
+
+        if (!isset($operation['ref']) && !isset($operation['href'])) {
+            return false;
+        }
+
+        return !$this->targetParser->hasRelationship($operation);
     }
 }

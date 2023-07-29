@@ -22,8 +22,10 @@ namespace LaravelJsonApi\Core\Tests\Integration\Extensions\Atomic\Parsers;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 
 class OperationParserTest extends TestCase
@@ -265,6 +267,96 @@ class OperationParserTest extends TestCase
         ]);
 
         $this->assertInstanceOf(UpdateToOne::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function toManyProvider(): array
+    {
+        return [
+            'add' => [OpCodeEnum::Add],
+            'update' => [OpCodeEnum::Update],
+            'remove' => [OpCodeEnum::Remove],
+        ];
+    }
+
+    /**
+     * @param OpCodeEnum $code
+     * @return void
+     * @dataProvider toManyProvider
+     */
+    public function testItParsesUpdateToManyOperationWithHref(OpCodeEnum $code): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => $code->value,
+            'href' => '/posts/123/relationships/tags',
+            'data' => [
+                ['type' => 'tags', 'id' => '123'],
+                ['type' => 'tags', 'lid' => 'a262c07e-032e-4ad9-bb15-2db73a09cef0'],
+            ],
+            'meta' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertInstanceOf(UpdateToMany::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @param OpCodeEnum $code
+     * @return void
+     * @dataProvider toManyProvider
+     */
+    public function testItParsesUpdateToManyOperationWithRef(OpCodeEnum $code): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => $code->value,
+            'ref' => [
+                'type' => 'posts',
+                'id' => '999',
+                'relationship' => 'tags',
+            ],
+            'data' => [
+                ['type' => 'tags', 'id' => '123'],
+                ['type' => 'tags', 'lid' => 'a262c07e-032e-4ad9-bb15-2db73a09cef0'],
+            ],
+            'meta' => [
+                'foo' => 'bar',
+            ],
+        ]);
+
+        $this->assertInstanceOf(UpdateToMany::class, $op);
+        $this->assertJsonStringEqualsJsonString(
+            json_encode($json),
+            json_encode($op),
+        );
+    }
+
+    /**
+     * @return void
+     */
+    public function testItParsesUpdateToManyOperationWithEmptyIdentifiers(): void
+    {
+        $op = $this->parser->parse($json = [
+            'op' => OpCodeEnum::Update->value,
+            'ref' => [
+                'type' => 'posts',
+                'id' => '999',
+                'relationship' => 'tags',
+            ],
+            'data' => [],
+        ]);
+
+        $this->assertInstanceOf(UpdateToMany::class, $op);
         $this->assertJsonStringEqualsJsonString(
             json_encode($json),
             json_encode($op),
