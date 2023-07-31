@@ -63,13 +63,6 @@ abstract class Command
     abstract public function operation(): Operation;
 
     /**
-     * Get the hooks implementation.
-     *
-     * @return object|null
-     */
-    abstract public function hooks(): ?object;
-
-    /**
      * Command constructor
      *
      * @param Request|null $request
