@@ -17,27 +17,38 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Bus\Commands;
 
-interface Factory
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+
+interface IsIdentifiable
 {
     /**
-     * @return QueryManyValidator
+     * Get the resource id for the command.
+     *
+     * @return ResourceId
      */
-    public function queryMany(): QueryManyValidator;
+    public function id(): ResourceId;
 
     /**
-     * @return QueryOneValidator
+     * Get the model for the command, if there is one.
+     *
+     * @return object|null
      */
-    public function queryOne(): QueryOneValidator;
+    public function model(): ?object;
 
     /**
-     * @return StoreValidator
+     * Get the model for the command, or fail if there isn't one.
+     *
+     * @return object
      */
-    public function store(): StoreValidator;
+    public function modelOrFail(): object;
 
     /**
-     * @return UpdateValidator
+     * Return a new instance with the model set.
+     *
+     * @param object|null $model
+     * @return static
      */
-    public function update(): UpdateValidator;
+    public function withModel(?object $model): static;
 }

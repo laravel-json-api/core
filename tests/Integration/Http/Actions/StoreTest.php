@@ -335,11 +335,6 @@ class StoreTest extends TestCase
                 default => throw new \RuntimeException('Unexpected JSON key: ' . $key),
             });
 
-        $this->request
-            ->expects($this->once())
-            ->method('url')
-            ->willReturn('/api/v1/' . $type);
-
         $parser
             ->expects($this->once())
             ->method('parse')

@@ -17,20 +17,20 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands\Store\Middleware;
+namespace LaravelJsonApi\Core\Bus\Commands\Update\Middleware;
 
 use Closure;
 use LaravelJsonApi\Core\Bus\Commands\Result;
-use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
-use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
+use LaravelJsonApi\Core\Bus\Commands\Update\HandlesUpdateCommands;
+use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
 use RuntimeException;
 
-class TriggerStoreHooks implements HandlesStoreCommands
+class TriggerUpdateHooks implements HandlesUpdateCommands
 {
     /**
      * @inheritDoc
      */
-    public function handle(StoreCommand $command, Closure $next): Result
+    public function handle(UpdateCommand $command, Closure $next): Result
     {
         $hooks = $command->hooks();
 
@@ -40,16 +40,17 @@ class TriggerStoreHooks implements HandlesStoreCommands
 
         $request = $command->request() ?? throw new RuntimeException('Hooks require a request to be set.');
         $query = $command->query() ?? throw new RuntimeException('Hooks require query parameters to be set.');
+        $model = $command->modelOrFail();
 
-        $hooks->saving(null, $request, $query);
-        $hooks->creating($request, $query);
+        $hooks->saving($model, $request, $query);
+        $hooks->updating($model, $request, $query);
 
         /** @var Result $result */
         $result = $next($command);
 
         if ($result->didSucceed()) {
-            $model = $result->payload()->data;
-            $hooks->created($model, $request, $query);
+            $model = $result->payload()->data ?? $model;
+            $hooks->updated($model, $request, $query);
             $hooks->saved($model, $request, $query);
         }
 

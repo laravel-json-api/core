@@ -23,6 +23,7 @@ use Closure;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\FetchRelatedQuery;
+use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
 use LaravelJsonApi\Core\Bus\Queries\Query;
@@ -64,22 +65,37 @@ class LookupModelIfRequiredTest extends TestCase
     public static function modelRequiredProvider(): array
     {
         return [
-            'find-one:authorize' => [
+            'fetch-one:authorize' => [
                 static function (): FetchOneQuery {
                     return FetchOneQuery::make(null, 'posts')
                         ->withId('123');
                 },
             ],
-            'find-related:authorize' => [
+            'fetch-related:authorize' => [
                 static function (): FetchRelatedQuery {
                     return FetchRelatedQuery::make(null, 'posts')
                         ->withId('123')
                         ->withFieldName('comments');
                 },
             ],
-            'find-related:no authorization' => [
+            'fetch-related:no authorization' => [
                 static function (): FetchRelatedQuery {
                     return FetchRelatedQuery::make(null, 'posts')
+                        ->withId('123')
+                        ->withFieldName('comments')
+                        ->skipAuthorization();
+                },
+            ],
+            'fetch-relationship:authorize' => [
+                static function (): FetchRelationshipQuery {
+                    return FetchRelationshipQuery::make(null, 'posts')
+                        ->withId('123')
+                        ->withFieldName('comments');
+                },
+            ],
+            'fetch-relationship:no authorization' => [
+                static function (): FetchRelationshipQuery {
+                    return FetchRelationshipQuery::make(null, 'posts')
                         ->withId('123')
                         ->withFieldName('comments')
                         ->skipAuthorization();
@@ -94,7 +110,7 @@ class LookupModelIfRequiredTest extends TestCase
     public static function modelNotRequiredProvider(): array
     {
         return [
-            'find-one:no authorization' => [
+            'fetch-one:no authorization' => [
                 static function (): FetchOneQuery {
                     return FetchOneQuery::make(null, 'posts')
                         ->withId('123')
@@ -205,31 +221,6 @@ class LookupModelIfRequiredTest extends TestCase
 
         /** @var Query&IsIdentifiable $query */
         $query = $scenario();
-
-        $expected = Result::ok(new Payload(null, true));
-
-        $actual = $this->middleware->handle(
-            $query,
-            function (Query $passed) use ($query, $expected): Result {
-                $this->assertSame($passed, $query);
-                return $expected;
-            },
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @return void
-     */
-    public function testItDoesntLookupModelIfModelIsAlreadySet(): void
-    {
-        $this->store
-            ->expects($this->never())
-            ->method($this->anything());
-
-        $query = FetchOneQuery::make(null, 'posts')
-            ->withModel(new stdClass());
 
         $expected = Result::ok(new Payload(null, true));
 

@@ -19,25 +19,28 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Validation;
 
-interface Factory
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Request;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
+
+interface UpdateValidator
 {
     /**
-     * @return QueryManyValidator
+     * Extract validation data from the update operation.
+     *
+     * @param object $model
+     * @param Update $operation
+     * @return array
      */
-    public function queryMany(): QueryManyValidator;
+    public function extract(object $model, Update $operation): array;
 
     /**
-     * @return QueryOneValidator
+     * Make a validator for the store operation.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @param Update $operation
+     * @return Validator
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
-
-    /**
-     * @return UpdateValidator
-     */
-    public function update(): UpdateValidator;
+    public function make(?Request $request, object $model, Update $operation): Validator;
 }

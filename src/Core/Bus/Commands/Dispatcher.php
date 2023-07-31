@@ -23,6 +23,8 @@ use Illuminate\Contracts\Container\Container;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as DispatcherContract;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommandHandler;
+use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
+use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommandHandler;
 use RuntimeException;
 
 class Dispatcher implements DispatcherContract
@@ -65,6 +67,7 @@ class Dispatcher implements DispatcherContract
     {
         return match ($commandClass) {
             StoreCommand::class => StoreCommandHandler::class,
+            UpdateCommand::class => UpdateCommandHandler::class,
             default => throw new RuntimeException('Unexpected command class: ' . $commandClass),
         };
     }

@@ -17,27 +17,17 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Bus\Commands\Update;
 
-interface Factory
+use Closure;
+use LaravelJsonApi\Core\Bus\Commands\Result;
+
+interface HandlesUpdateCommands
 {
     /**
-     * @return QueryManyValidator
+     * @param UpdateCommand $command
+     * @param Closure $next
+     * @return Result
      */
-    public function queryMany(): QueryManyValidator;
-
-    /**
-     * @return QueryOneValidator
-     */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
-
-    /**
-     * @return UpdateValidator
-     */
-    public function update(): UpdateValidator;
+    public function handle(UpdateCommand $command, Closure $next): Result;
 }

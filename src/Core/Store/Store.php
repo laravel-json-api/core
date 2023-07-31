@@ -192,7 +192,7 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function update(string $resourceType, $modelOrResourceId): ResourceBuilder
+    public function update(ResourceType|string $resourceType, $modelOrResourceId): ResourceBuilder
     {
         $repository = $this->resources($resourceType);
 

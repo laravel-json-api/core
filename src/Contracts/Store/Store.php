@@ -107,11 +107,11 @@ interface Store
     /**
      * Update an existing resource.
      *
-     * @param string $resourceType
+     * @param ResourceType|string $resourceType
      * @param object|string $modelOrResourceId
      * @return ResourceBuilder
      */
-    public function update(string $resourceType, $modelOrResourceId): ResourceBuilder;
+    public function update(ResourceType|string $resourceType, $modelOrResourceId): ResourceBuilder;
 
     /**
      * Delete an existing resource.

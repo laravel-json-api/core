@@ -23,7 +23,6 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
@@ -86,11 +85,6 @@ class ParseStoreOperationTest extends TestCase
                 default => $this->fail('Unexpected json key: ' . $key),
             });
 
-        $this->request
-            ->expects($this->once())
-            ->method('url')
-            ->willReturn($url = '/api/v1/tags');
-
         $this->parser
             ->expects($this->once())
             ->method('parse')
@@ -101,12 +95,12 @@ class ParseStoreOperationTest extends TestCase
 
         $actual = $this->middleware->handle(
             $this->action,
-            function (StoreActionInput $passed) use ($url, $resource, $meta, $expected): DataResponse {
+            function (StoreActionInput $passed) use ($resource, $meta, $expected): DataResponse {
                 $op = $passed->operation();
                 $this->assertNotSame($this->action, $passed);
                 $this->assertSame($this->action->request(), $passed->request());
                 $this->assertSame($this->action->type(), $passed->type());
-                $this->assertObjectEquals(new Href($url), $op->href());
+                $this->assertNull($op->target);
                 $this->assertSame($resource, $op->data);
                 $this->assertSame($meta, $op->meta);
                 return $expected;

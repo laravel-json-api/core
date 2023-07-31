@@ -149,6 +149,43 @@ class ResourceAuthorizer
     }
 
     /**
+     * Authorize a JSON:API update command.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @return ErrorList|null
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function update(?Request $request, object $model): ?ErrorList
+    {
+        $passes = $this->authorizer->update(
+            $request,
+            $model,
+        );
+
+        return $passes ? null : $this->failed();
+    }
+
+    /**
+     * Authorize a JSON:API update command, or fail.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @return void
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function updateOrFail(?Request $request, object $model): void
+    {
+        if ($errors = $this->update($request, $model)) {
+            throw new JsonApiException($errors);
+        }
+    }
+
+    /**
      * Authorize a JSON:API show related query.
      *
      * @param Request|null $request

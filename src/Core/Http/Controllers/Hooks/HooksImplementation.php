@@ -27,6 +27,7 @@ use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\UpdateImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Support\Str;
 use RuntimeException;
@@ -36,6 +37,7 @@ class HooksImplementation implements
     IndexImplementation,
     StoreImplementation,
     ShowImplementation,
+    UpdateImplementation,
     ShowRelatedImplementation,
     ShowRelationshipImplementation
 {
@@ -158,6 +160,22 @@ class HooksImplementation implements
     public function created(object $model, Request $request, QueryParameters $query): void
     {
         $this('created', $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updating(object $model, Request $request, QueryParameters $query): void
+    {
+        $this('updating', $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updated(object $model, Request $request, QueryParameters $query): void
+    {
+        $this('updated', $model, $request, $query);
     }
 
     /**
