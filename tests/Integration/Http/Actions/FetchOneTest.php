@@ -38,7 +38,6 @@ use LaravelJsonApi\Contracts\Validation\QueryOneValidator;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchOne;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -313,21 +312,14 @@ class FetchOneTest extends TestCase
 
         $resources
             ->expects($this->once())
-            ->method('create')
-            ->with($this->identicalTo($model))
-            ->willReturn($resource = $this->createMock(JsonApiResource::class));
-
-        $resource
-            ->expects($this->atLeastOnce())
-            ->method('type')
-            ->willReturn($type);
-
-        $resource
-            ->expects($this->atLeastOnce())
-            ->method('id')
+            ->method('idForType')
+            ->with(
+                $this->callback(fn ($actual) => $type === (string) $actual),
+                $this->identicalTo($model),
+            )
             ->willReturnCallback(function () use ($id) {
                 $this->sequence[] = 'lookup-id';
-                return $id;
+                return new ResourceId($id);
             });
     }
 

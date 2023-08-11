@@ -20,6 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Resources;
 
 use Generator;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 
 interface Container
@@ -64,4 +66,21 @@ interface Container
      * @return Generator
      */
     public function cursor(iterable $models): Generator;
+
+    /**
+     * Get the resource id for the supplied model.
+     *
+     * @param object $model
+     * @return ResourceId
+     */
+    public function idFor(object $model): ResourceId;
+
+    /**
+     * Get the resource id for the provided model of the expected type.
+     *
+     * @param ResourceType $expected
+     * @param object $model
+     * @return ResourceId
+     */
+    public function idForType(ResourceType $expected, object $model): ResourceId;
 }

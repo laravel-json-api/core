@@ -47,7 +47,6 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create as StoreOperation;
 use LaravelJsonApi\Core\Http\Actions\Store;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -441,21 +440,14 @@ class StoreTest extends TestCase
 
         $resources
             ->expects($this->once())
-            ->method('create')
-            ->with($this->identicalTo($model))
-            ->willReturn($resource = $this->createMock(JsonApiResource::class));
-
-        $resource
-            ->expects($this->atLeastOnce())
-            ->method('type')
-            ->willReturn($type);
-
-        $resource
-            ->expects($this->atLeastOnce())
-            ->method('id')
+            ->method('idForType')
+            ->with(
+                $this->callback(fn ($actual) => $type === (string) $actual),
+                $this->identicalTo($model),
+            )
             ->willReturnCallback(function () use ($id) {
                 $this->sequence[] = 'lookup-id';
-                return $id;
+                return new ResourceId($id);
             });
     }
 

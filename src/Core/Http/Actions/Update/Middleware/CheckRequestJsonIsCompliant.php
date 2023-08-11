@@ -17,16 +17,16 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Http\Actions\Store\Middleware;
+namespace LaravelJsonApi\Core\Http\Actions\Update\Middleware;
 
 use Closure;
 use LaravelJsonApi\Contracts\Spec\ResourceDocumentComplianceChecker;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Http\Actions\Store\HandlesStoreActions;
-use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
+use LaravelJsonApi\Core\Http\Actions\Update\HandlesUpdateActions;
+use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
 
-class CheckRequestJsonIsCompliant implements HandlesStoreActions
+class CheckRequestJsonIsCompliant implements HandlesUpdateActions
 {
     /**
      * CheckRequestJsonIsCompliant constructor
@@ -40,10 +40,10 @@ class CheckRequestJsonIsCompliant implements HandlesStoreActions
     /**
      * @inheritDoc
      */
-    public function handle(StoreActionInput $action, Closure $next): DataResponse
+    public function handle(UpdateActionInput $action, Closure $next): DataResponse
     {
         $result = $this->complianceChecker
-            ->mustSee($action->type())
+            ->mustSee($action->type(), $action->idOrFail())
             ->check($action->request()->getContent());
 
         if ($result->didFail()) {

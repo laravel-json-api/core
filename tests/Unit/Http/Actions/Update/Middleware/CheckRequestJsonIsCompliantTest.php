@@ -17,16 +17,17 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Tests\Unit\Http\Actions\Store\Middleware;
+namespace LaravelJsonApi\Core\Tests\Unit\Http\Actions\Update\Middleware;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Spec\ResourceDocumentComplianceChecker;
 use LaravelJsonApi\Contracts\Support\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
-use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
+use LaravelJsonApi\Core\Http\Actions\Update\Middleware\CheckRequestJsonIsCompliant;
+use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -36,17 +37,27 @@ class CheckRequestJsonIsCompliantTest extends TestCase
     /**
      * @var MockObject&ResourceDocumentComplianceChecker
      */
-    private ResourceDocumentComplianceChecker&MockObject $complianceChecker;
+    private readonly ResourceDocumentComplianceChecker&MockObject $complianceChecker;
 
     /**
      * @var CheckRequestJsonIsCompliant
      */
-    private CheckRequestJsonIsCompliant $middleware;
+    private readonly CheckRequestJsonIsCompliant $middleware;
 
     /**
-     * @var StoreActionInput
+     * @var UpdateActionInput
      */
-    private StoreActionInput $action;
+    private readonly UpdateActionInput $action;
+
+    /**
+     * @var Request
+     */
+    private readonly Request $request;
+
+    /**
+     * @var ResourceId
+     */
+    private readonly ResourceId $id;
 
     /**
      * @var Result|null
@@ -64,12 +75,12 @@ class CheckRequestJsonIsCompliantTest extends TestCase
             $this->complianceChecker = $this->createMock(ResourceDocumentComplianceChecker::class),
         );
 
-        $this->action = new StoreActionInput(
-            $request = $this->createMock(Request::class),
+        $this->action = UpdateActionInput::make(
+            $this->request = $this->createMock(Request::class),
             $type = new ResourceType('posts'),
-        );
+        )->withId($this->id = new ResourceId('123'));
 
-        $request
+        $this->request
             ->expects($this->once())
             ->method('getContent')
             ->willReturn($content = '{}');
@@ -77,7 +88,7 @@ class CheckRequestJsonIsCompliantTest extends TestCase
         $this->complianceChecker
             ->expects($this->once())
             ->method('mustSee')
-            ->with($this->identicalTo($type), $this->identicalTo(null))
+            ->with($this->identicalTo($type), $this->identicalTo($this->id))
             ->willReturnSelf();
 
         $this->complianceChecker

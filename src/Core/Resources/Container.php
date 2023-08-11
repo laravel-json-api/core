@@ -22,6 +22,8 @@ namespace LaravelJsonApi\Core\Resources;
 use Generator;
 use LaravelJsonApi\Contracts\Resources\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Resources\Factory;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LogicException;
 use function get_class;
 use function is_iterable;
@@ -114,4 +116,31 @@ class Container implements ContainerContract
         }
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function idFor(object $model): ResourceId
+    {
+        return new ResourceId(
+            $this->create($model)->id(),
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function idForType(ResourceType $expected, object $model): ResourceId
+    {
+        $resource = $this->create($model);
+
+        if ($expected->value !== $resource->type()) {
+            throw new LogicException(sprintf(
+                'Expecting resource type "%s" but provided model is of type "%s".',
+                $expected,
+                $resource->type(),
+            ));
+        }
+
+        return new ResourceId($resource->id());
+    }
 }

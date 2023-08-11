@@ -39,7 +39,6 @@ use LaravelJsonApi\Contracts\Validation\QueryManyValidator;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchRelated;
-use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Store\QueryManyHandler;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use PHPUnit\Framework\Assert;
@@ -140,7 +139,7 @@ class FetchRelatedToManyTest extends TestCase
     /**
      * @return void
      */
-    public function testItFetchesOneByModel(): void
+    public function testItFetchesToManyByModel(): void
     {
         $this->route
             ->expects($this->never())
@@ -348,21 +347,14 @@ class FetchRelatedToManyTest extends TestCase
 
         $resources
             ->expects($this->once())
-            ->method('create')
-            ->with($this->identicalTo($model))
-            ->willReturn($resource = $this->createMock(JsonApiResource::class));
-
-        $resource
-            ->expects($this->atLeastOnce())
-            ->method('type')
-            ->willReturn($type);
-
-        $resource
-            ->expects($this->atLeastOnce())
-            ->method('id')
+            ->method('idForType')
+            ->with(
+                $this->callback(fn ($actual) => $type === (string) $actual),
+                $this->identicalTo($model),
+            )
             ->willReturnCallback(function () use ($id) {
                 $this->sequence[] = 'lookup-id';
-                return $id;
+                return new ResourceId($id);
             });
     }
 

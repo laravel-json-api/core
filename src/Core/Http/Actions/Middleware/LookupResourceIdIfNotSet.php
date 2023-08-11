@@ -17,13 +17,13 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Queries\Middleware;
+namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 
 use Closure;
 use LaravelJsonApi\Contracts\Resources\Container;
-use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
-use LaravelJsonApi\Core\Bus\Queries\Query;
-use LaravelJsonApi\Core\Bus\Queries\Result;
+use LaravelJsonApi\Core\Http\Actions\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\IsIdentifiable;
+use LaravelJsonApi\Core\Responses\DataResponse;
 
 class LookupResourceIdIfNotSet
 {
@@ -37,23 +37,23 @@ class LookupResourceIdIfNotSet
     }
 
     /**
-     * Handle an identifiable query.
+     * Set the resource id on the action, if not set.
      *
-     * @param IsIdentifiable&Query $query
+     * @param IsIdentifiable&ActionInput $action
      * @param Closure $next
-     * @return Result
+     * @return DataResponse
      */
-    public function handle(Query&IsIdentifiable $query, Closure $next): Result
+    public function handle(ActionInput&IsIdentifiable $action, Closure $next): DataResponse
     {
-        if ($query->id() === null) {
-            $query = $query->withId(
+        if ($action->id() === null) {
+            $action = $action->withId(
                 $this->resources->idForType(
-                    $query->type(),
-                    $query->modelOrFail(),
+                    $action->type(),
+                    $action->modelOrFail(),
                 ),
             );
         }
 
-        return $next($query);
+        return $next($action);
     }
 }
