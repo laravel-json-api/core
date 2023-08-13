@@ -24,6 +24,7 @@ use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcher;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
@@ -63,10 +64,10 @@ class UpdateActionHandler
     public function execute(UpdateActionInput $action): DataResponse
     {
         $pipes = [
-            LookupModelIfMissing::class,
-            LookupResourceIdIfNotSet::class,
             ItHasJsonApiContent::class,
             ItAcceptsJsonApiResponses::class,
+            LookupModelIfMissing::class,
+            LookupResourceIdIfNotSet::class,
             AuthorizeUpdateAction::class,
             CheckRequestJsonIsCompliant::class,
             ValidateQueryOneParameters::class,
@@ -105,7 +106,7 @@ class UpdateActionHandler
         return DataResponse::make($payload->data)
             ->withMeta(array_merge($commandResult->meta, $payload->meta))
             ->withQueryParameters($queryResult->query())
-            ->didCreate();
+            ->didntCreate();
     }
 
     /**
@@ -144,6 +145,7 @@ class UpdateActionHandler
     {
         $query = FetchOneQuery::make($action->request(), $action->type())
             ->withModel($model)
+            ->withId($action->idOrFail())
             ->withValidated($action->query())
             ->skipAuthorization();
 

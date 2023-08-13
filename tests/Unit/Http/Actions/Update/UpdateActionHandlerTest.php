@@ -30,6 +30,7 @@ use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result as QueryResult;
 use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
@@ -103,6 +104,7 @@ class UpdateActionHandlerTest extends TestCase
 
         $passed = UpdateActionInput::make($request, $type)
             ->withModel($model = new \stdClass())
+            ->withId($id = new ResourceId('123'))
             ->withOperation($op = new Update(null, new ResourceObject($type)))
             ->withQuery($queryParams)
             ->withHooks($hooks = new \stdClass());
@@ -135,11 +137,11 @@ class UpdateActionHandlerTest extends TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with($this->callback(
-                function (FetchOneQuery $query) use ($request, $type, $m, $queryParams, $hooks): bool {
+                function (FetchOneQuery $query) use ($request, $type, $m, $id, $queryParams, $hooks): bool {
                     $this->assertSame($request, $query->request());
                     $this->assertSame($type, $query->type());
                     $this->assertSame($m, $query->model());
-                    $this->assertNull($query->id());
+                    $this->assertSame($id, $query->id());
                     $this->assertSame($queryParams, $query->toQueryParams());
                     // hooks must be null, otherwise we trigger the "reading" and "read" hooks
                     $this->assertNull($query->hooks());
@@ -213,6 +215,7 @@ class UpdateActionHandlerTest extends TestCase
 
         $passed = UpdateActionInput::make($request, $type)
             ->withModel($model = new \stdClass())
+            ->withId($id = new ResourceId('456'))
             ->withOperation(new Update(null, new ResourceObject($type)))
             ->withQuery($queryParams = $this->createMock(QueryParameters::class));
 
@@ -232,11 +235,11 @@ class UpdateActionHandlerTest extends TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with($this->callback(
-                function (FetchOneQuery $query) use ($request, $type, $model, $queryParams): bool {
+                function (FetchOneQuery $query) use ($request, $type, $model, $id, $queryParams): bool {
                     $this->assertSame($request, $query->request());
                     $this->assertSame($type, $query->type());
                     $this->assertSame($model, $query->model());
-                    $this->assertNull($query->id());
+                    $this->assertSame($id, $query->id());
                     $this->assertSame($queryParams, $query->toQueryParams());
                     // hooks must be null, otherwise we trigger the "reading" and "read" hooks
                     $this->assertNull($query->hooks());
@@ -262,6 +265,7 @@ class UpdateActionHandlerTest extends TestCase
 
         $passed = UpdateActionInput::make($request, $type)
             ->withModel(new \stdClass())
+            ->withId('123')
             ->withOperation(new Update(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
@@ -295,6 +299,7 @@ class UpdateActionHandlerTest extends TestCase
 
         $passed = UpdateActionInput::make($request, $type)
             ->withModel(new \stdClass())
+            ->withId('123')
             ->withOperation(new Update(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
@@ -341,10 +346,10 @@ class UpdateActionHandlerTest extends TestCase
             ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
-                    LookupModelIfMissing::class,
-                    LookupResourceIdIfNotSet::class,
                     ItHasJsonApiContent::class,
                     ItAcceptsJsonApiResponses::class,
+                    LookupModelIfMissing::class,
+                    LookupResourceIdIfNotSet::class,
                     AuthorizeUpdateAction::class,
                     CheckRequestJsonIsCompliant::class,
                     ValidateQueryOneParameters::class,
