@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Bus\Commands;
 
 use Illuminate\Contracts\Container\Container;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as DispatcherContract;
+use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommandHandler;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;

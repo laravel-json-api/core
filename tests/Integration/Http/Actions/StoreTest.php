@@ -75,6 +75,11 @@ class StoreTest extends TestCase
     private SchemaContainer&MockObject $schemas;
 
     /**
+     * @var MockObject&ResourceContainer
+     */
+    private ResourceContainer&MockObject $resources;
+
+    /**
      * @var ValidatorFactory&MockObject|null
      */
     private ?ValidatorFactory $validatorFactory = null;
@@ -102,6 +107,10 @@ class StoreTest extends TestCase
         $this->container->instance(
             SchemaContainer::class,
             $this->schemas = $this->createMock(SchemaContainer::class),
+        );
+        $this->container->instance(
+            ResourceContainer::class,
+            $this->resources = $this->createMock(ResourceContainer::class),
         );
 
         $this->request = $this->createMock(Request::class);
@@ -433,12 +442,7 @@ class StoreTest extends TestCase
      */
     private function willLookupResourceId(object $model, string $type, string $id): void
     {
-        $this->container->instance(
-            ResourceContainer::class,
-            $resources = $this->createMock(ResourceContainer::class),
-        );
-
-        $resources
+        $this->resources
             ->expects($this->once())
             ->method('idForType')
             ->with(

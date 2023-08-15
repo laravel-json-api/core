@@ -66,6 +66,11 @@ class FetchOneTest extends TestCase
     private SchemaContainer&MockObject $schemas;
 
     /**
+     * @var ResourceContainer&MockObject
+     */
+    private ResourceContainer&MockObject $resources;
+
+    /**
      * @var FetchOneContract
      */
     private FetchOneContract $action;
@@ -88,6 +93,10 @@ class FetchOneTest extends TestCase
         $this->container->instance(
             SchemaContainer::class,
             $this->schemas = $this->createMock(SchemaContainer::class),
+        );
+        $this->container->instance(
+            ResourceContainer::class,
+            $this->resources = $this->createMock(ResourceContainer::class),
         );
 
         $this->request = $this->createMock(Request::class);
@@ -140,16 +149,15 @@ class FetchOneTest extends TestCase
 
         $authModel = new stdClass();
 
+        $this->willLookupResourceId($authModel, 'comments', '456');
         $this->willNegotiateContent();
         $this->willNotFindModel();
         $this->willAuthorize('comments', $authModel);
         $this->willValidate('comments');
-        $this->willLookupResourceId($authModel, 'comments', '456');
         $model = $this->willQueryOne('comments', '456');
 
         $response = $this->action
-            ->withType('comments')
-            ->withIdOrModel($authModel)
+            ->withTarget('comments', $authModel)
             ->withHooks($this->withHooks($model))
             ->execute($this->request);
 
@@ -157,7 +165,6 @@ class FetchOneTest extends TestCase
             'content-negotiation',
             'authorize',
             'validate',
-            'lookup-id',
             'hook:reading',
             'query',
             'hook:read',
@@ -305,22 +312,14 @@ class FetchOneTest extends TestCase
      */
     private function willLookupResourceId(object $model, string $type, string $id): void
     {
-        $this->container->instance(
-            ResourceContainer::class,
-            $resources = $this->createMock(ResourceContainer::class),
-        );
-
-        $resources
+        $this->resources
             ->expects($this->once())
             ->method('idForType')
             ->with(
                 $this->callback(fn ($actual) => $type === (string) $actual),
                 $this->identicalTo($model),
             )
-            ->willReturnCallback(function () use ($id) {
-                $this->sequence[] = 'lookup-id';
-                return new ResourceId($id);
-            });
+            ->willReturn(new ResourceId($id));
     }
 
     /**
@@ -328,12 +327,7 @@ class FetchOneTest extends TestCase
      */
     private function willNotLookupResourceId(): void
     {
-        $this->container->instance(
-            ResourceContainer::class,
-            $resources = $this->createMock(ResourceContainer::class),
-        );
-
-        $resources
+        $this->resources
             ->expects($this->never())
             ->method($this->anything());
     }

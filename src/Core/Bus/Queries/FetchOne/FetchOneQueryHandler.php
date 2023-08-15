@@ -24,7 +24,6 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\ValidateFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Support\PipelineFactory;
@@ -56,7 +55,6 @@ class FetchOneQueryHandler
             LookupModelIfRequired::class,
             AuthorizeFetchOneQuery::class,
             ValidateFetchOneQuery::class,
-            LookupResourceIdIfNotSet::class,
             TriggerShowHooks::class,
         ];
 
@@ -84,7 +82,7 @@ class FetchOneQueryHandler
         $params = $query->toQueryParams();
 
         $model = $this->store
-            ->queryOne($query->type(), $query->idOrFail())
+            ->queryOne($query->type(), $query->id())
             ->withQuery($params)
             ->first();
 

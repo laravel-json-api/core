@@ -34,7 +34,6 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\AuthorizeFetchR
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\TriggerShowRelationshipHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\ValidateFetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
@@ -87,14 +86,13 @@ class FetchRelationshipQueryHandlerTest extends TestCase
         $original = new FetchRelationshipQuery(
             request: $request = $this->createMock(Request::class),
             type: $type = new ResourceType('comments'),
-            fieldName: 'author'
+            id: $id = new ResourceId('123'),
+            fieldName: 'author',
         );
 
-        $passed = FetchRelationshipQuery::make($request, $type)
+        $passed = FetchRelationshipQuery::make($request, $type, $id, $fieldName = 'createdBy')
             ->withModel($model = new \stdClass())
-            ->withFieldName($fieldName = 'createdBy')
-            ->withValidated($validated = ['include' => 'profile'])
-            ->withId($id = new ResourceId('123'));
+            ->withValidated($validated = ['include' => 'profile']);
 
         $this->willSendThroughPipe($original, $passed);
         $this->willSeeRelation($type, $fieldName, toOne: true);
@@ -136,14 +134,13 @@ class FetchRelationshipQueryHandlerTest extends TestCase
         $original = new FetchRelationshipQuery(
             request: $request = $this->createMock(Request::class),
             type: $type = new ResourceType('posts'),
-            fieldName: 'comments'
+            id: $id = new ResourceId('123'),
+            fieldName: 'comments',
         );
 
-        $passed = FetchRelationshipQuery::make($request, $type)
+        $passed = FetchRelationshipQuery::make($request, $type, $id, $fieldName = 'tags')
             ->withModel($model = new \stdClass())
-            ->withFieldName($fieldName = 'tags')
-            ->withValidated($validated = ['include' => 'parent', 'page' => ['number' => 2]])
-            ->withId($id = new ResourceId('123'));
+            ->withValidated($validated = ['include' => 'parent', 'page' => ['number' => 2]]);
 
         $this->willSendThroughPipe($original, $passed);
         $this->willSeeRelation($type, $fieldName, toOne: false);
@@ -202,7 +199,6 @@ class FetchRelationshipQueryHandlerTest extends TestCase
                     LookupModelIfRequired::class,
                     AuthorizeFetchRelationshipQuery::class,
                     ValidateFetchRelationshipQuery::class,
-                    LookupResourceIdIfNotSet::class,
                     TriggerShowRelationshipHooks::class,
                 ], $actual);
                 return $pipeline;

@@ -23,8 +23,8 @@ use Closure;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
-use LaravelJsonApi\Core\Http\Actions\IsIdentifiable;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\IsIdentifiable;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,7 +52,7 @@ class LookupModelIfMissing
         if ($action->model() === null) {
             $model = $this->store->find(
                 $action->type(),
-                $action->idOrFail(),
+                $action->id(),
             );
 
             if ($model === null) {

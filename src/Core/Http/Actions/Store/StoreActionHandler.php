@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Http\Actions\Store;
 
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcher;
+use LaravelJsonApi\Contracts\Resources\Container;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
@@ -45,11 +46,13 @@ class StoreActionHandler
      * @param PipelineFactory $pipelines
      * @param CommandDispatcher $commands
      * @param QueryDispatcher $queries
+     * @param Container $resources
      */
     public function __construct(
         private readonly PipelineFactory $pipelines,
         private readonly CommandDispatcher $commands,
         private readonly QueryDispatcher $queries,
+        private readonly Container $resources,
     ) {
     }
 
@@ -144,7 +147,12 @@ class StoreActionHandler
      */
     private function query(StoreActionInput $action, object $model): Result
     {
-        $query = FetchOneQuery::make($action->request(), $action->type())
+        $id = $this->resources->idForType(
+            $action->type(),
+            $model,
+        );
+
+        $query = FetchOneQuery::make($action->request(), $action->type(), $id)
             ->withModel($model)
             ->withValidated($action->query())
             ->skipAuthorization();

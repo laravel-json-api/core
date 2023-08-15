@@ -68,6 +68,11 @@ class FetchRelatedToOneTest extends TestCase
     private SchemaContainer&MockObject $schemas;
 
     /**
+     * @var MockObject&ResourceContainer
+     */
+    private ResourceContainer&MockObject $resources;
+
+    /**
      * @var FetchRelatedContract
      */
     private FetchRelatedContract $action;
@@ -91,6 +96,10 @@ class FetchRelatedToOneTest extends TestCase
             SchemaContainer::class,
             $this->schemas = $this->createMock(SchemaContainer::class),
         );
+        $this->container->instance(
+            ResourceContainer::class,
+            $this->resources = $this->createMock(ResourceContainer::class),
+        );
 
         $this->request = $this->createMock(Request::class);
 
@@ -106,6 +115,7 @@ class FetchRelatedToOneTest extends TestCase
         $this->route->method('modelOrResourceId')->willReturn('123');
         $this->route->method('fieldName')->willReturn('author');
 
+        $this->willNotLookupResourceId();
         $this->willNegotiateContent();
         $this->withSchema('posts', 'author', 'users');
         $this->willFindModel('posts', '123', $model = new stdClass());
@@ -114,7 +124,6 @@ class FetchRelatedToOneTest extends TestCase
             'fields' => ['posts' => 'title,content,author'],
             'include' => 'profile',
         ]);
-        $this->willNotLookupResourceId();
         $related = $this->willQueryToOne('posts', '123', 'author', $queryParams);
 
         $response = $this->action
@@ -144,19 +153,17 @@ class FetchRelatedToOneTest extends TestCase
             ->expects($this->never())
             ->method($this->anything());
 
+        $this->willLookupResourceId($model = new stdClass(), 'comments', '456');
         $this->willNegotiateContent();
         $this->withSchema('comments', 'author', 'user');
         $this->willNotFindModel();
-        $this->willAuthorize('comments', 'author', $model = new \stdClass());
+        $this->willAuthorize('comments', 'author', $model);
         $this->willValidate('user');
-        $this->willLookupResourceId($model, 'comments', '456');
 
         $related = $this->willQueryToOne('comments', '456', 'author');
 
         $response = $this->action
-            ->withType('comments')
-            ->withIdOrModel($model)
-            ->withFieldName('author')
+            ->withTarget('comments', $model, 'author')
             ->withHooks($this->withHooks($model, $related))
             ->execute($this->request);
 
@@ -164,7 +171,6 @@ class FetchRelatedToOneTest extends TestCase
             'content-negotiation',
             'authorize',
             'validate',
-            'lookup-id',
             'hook:reading',
             'query',
             'hook:read',
@@ -339,22 +345,14 @@ class FetchRelatedToOneTest extends TestCase
      */
     private function willLookupResourceId(object $model, string $type, string $id): void
     {
-        $this->container->instance(
-            ResourceContainer::class,
-            $resources = $this->createMock(ResourceContainer::class),
-        );
-
-        $resources
+        $this->resources
             ->expects($this->once())
             ->method('idForType')
             ->with(
                 $this->callback(fn ($actual) => $type === (string) $actual),
                 $this->identicalTo($model),
             )
-            ->willReturnCallback(function () use ($id) {
-                $this->sequence[] = 'lookup-id';
-                return new ResourceId($id);
-            });
+            ->willReturn(new ResourceId($id));
     }
 
     /**
@@ -362,12 +360,7 @@ class FetchRelatedToOneTest extends TestCase
      */
     private function willNotLookupResourceId(): void
     {
-        $this->container->instance(
-            ResourceContainer::class,
-            $resources = $this->createMock(ResourceContainer::class),
-        );
-
-        $resources
+        $this->resources
             ->expects($this->never())
             ->method($this->anything());
     }

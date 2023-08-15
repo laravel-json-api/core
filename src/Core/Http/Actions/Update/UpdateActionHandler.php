@@ -24,13 +24,11 @@ use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcher;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItHasJsonApiContent;
 use LaravelJsonApi\Core\Http\Actions\Middleware\LookupModelIfMissing;
-use LaravelJsonApi\Core\Http\Actions\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateQueryOneParameters;
 use LaravelJsonApi\Core\Http\Actions\Update\Middleware\AuthorizeUpdateAction;
 use LaravelJsonApi\Core\Http\Actions\Update\Middleware\CheckRequestJsonIsCompliant;
@@ -67,7 +65,6 @@ class UpdateActionHandler
             ItHasJsonApiContent::class,
             ItAcceptsJsonApiResponses::class,
             LookupModelIfMissing::class,
-            LookupResourceIdIfNotSet::class,
             AuthorizeUpdateAction::class,
             CheckRequestJsonIsCompliant::class,
             ValidateQueryOneParameters::class,
@@ -143,9 +140,8 @@ class UpdateActionHandler
      */
     private function query(UpdateActionInput $action, object $model): Result
     {
-        $query = FetchOneQuery::make($action->request(), $action->type())
+        $query = FetchOneQuery::make($action->request(), $action->type(), $action->id())
             ->withModel($model)
-            ->withId($action->idOrFail())
             ->withValidated($action->query())
             ->skipAuthorization();
 

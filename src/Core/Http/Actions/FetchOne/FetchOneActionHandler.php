@@ -96,8 +96,7 @@ class FetchOneActionHandler
      */
     private function query(FetchOneActionInput $action): Result
     {
-        $query = FetchOneQuery::make($action->request(), $action->type())
-            ->maybeWithId($action->id())
+        $query = FetchOneQuery::make($action->request(), $action->type(), $action->id())
             ->withModel($action->model())
             ->withHooks($action->hooks());
 

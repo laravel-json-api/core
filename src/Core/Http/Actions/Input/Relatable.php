@@ -17,14 +17,22 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Queries;
+namespace LaravelJsonApi\Core\Http\Actions\Input;
 
-interface IsRelatable extends IsIdentifiable
+trait Relatable
 {
+    use Identifiable;
+
     /**
-     * Get the JSON:API field name.
-     *
+     * @var string
+     */
+    private readonly string $fieldName;
+
+    /**
      * @return string
      */
-    public function fieldName(): string;
+    public function fieldName(): string
+    {
+        return $this->fieldName;
+    }
 }

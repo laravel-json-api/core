@@ -43,7 +43,7 @@ class CheckRequestJsonIsCompliant implements HandlesUpdateActions
     public function handle(UpdateActionInput $action, Closure $next): DataResponse
     {
         $result = $this->complianceChecker
-            ->mustSee($action->type(), $action->idOrFail())
+            ->mustSee($action->type(), $action->id())
             ->check($action->request()->getContent());
 
         if ($result->didFail()) {

@@ -20,23 +20,35 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\FetchRelated;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Bus\Queries\Concerns\Relatable;
+use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\IsRelatable;
 
-class FetchRelatedActionInput extends ActionInput
+class FetchRelatedActionInput extends ActionInput implements IsRelatable
 {
     use Relatable;
 
     /**
-     * Fluent constructor.
+     * FetchRelatedActionInput constructor
      *
      * @param Request $request
-     * @param ResourceType|string $type
-     * @return self
+     * @param ResourceType $type
+     * @param ResourceId $id
+     * @param string $fieldName
+     * @param object|null $model
      */
-    public static function make(Request $request, ResourceType|string $type): self
-    {
-        return new self($request, $type);
+    public function __construct(
+        Request $request,
+        ResourceType $type,
+        ResourceId $id,
+        string $fieldName,
+        object $model = null,
+    ) {
+        parent::__construct($request, $type);
+        $this->id = $id;
+        $this->fieldName = $fieldName;
+        $this->model = $model;
     }
 }

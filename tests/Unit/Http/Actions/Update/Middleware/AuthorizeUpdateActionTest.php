@@ -23,6 +23,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Auth\ResourceAuthorizer;
 use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Update\Middleware\AuthorizeUpdateAction;
 use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInput;
@@ -68,10 +69,11 @@ class AuthorizeUpdateActionTest extends TestCase
             $factory = $this->createMock(ResourceAuthorizerFactory::class),
         );
 
-        $this->action = UpdateActionInput::make(
+        $this->action = (new UpdateActionInput(
             $this->request = $this->createMock(Request::class),
             $type = new ResourceType('posts'),
-        )->withModel($this->model = new \stdClass());
+            new ResourceId('123'),
+        ))->withModel($this->model = new \stdClass());
 
         $factory
             ->method('make')

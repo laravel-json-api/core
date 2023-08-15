@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Http\Actions;
+namespace LaravelJsonApi\Core\Http\Actions\Input;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
@@ -27,11 +27,6 @@ use RuntimeException;
 
 abstract class ActionInput
 {
-    /**
-     * @var ResourceType
-     */
-    private readonly ResourceType $type;
-
     /**
      * @var QueryParameters|null
      */
@@ -43,13 +38,13 @@ abstract class ActionInput
     private ?HooksImplementation $hooks = null;
 
     /**
-     * Action constructor
+     * ActionInput constructor
      *
      * @param Request $request
+     * @param ResourceType $type
      */
-    public function __construct(private readonly Request $request, ResourceType|string $type)
+    public function __construct(private readonly Request $request, private readonly ResourceType $type)
     {
-        $this->type = ResourceType::cast($type);
     }
 
     /**

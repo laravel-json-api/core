@@ -96,11 +96,12 @@ class FetchRelatedActionHandler
      */
     private function query(FetchRelatedActionInput $action): Result
     {
-        $query = FetchRelatedQuery::make($action->request(), $action->type())
-            ->withFieldName($action->fieldName())
-            ->maybeWithId($action->id())
-            ->withModel($action->model())
-            ->withHooks($action->hooks());
+        $query = FetchRelatedQuery::make(
+            $action->request(),
+            $action->type(),
+            $action->id(),
+            $action->fieldName(),
+        )->withModel($action->model())->withHooks($action->hooks());
 
         $result = $this->dispatcher->dispatch($query);
 

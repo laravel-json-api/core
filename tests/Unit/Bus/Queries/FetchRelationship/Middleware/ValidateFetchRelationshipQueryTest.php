@@ -87,8 +87,7 @@ class ValidateFetchRelationshipQueryTest extends TestCase
     public function testItPassesToOneValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName($fieldName = 'author')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', $fieldName = 'author')
             ->withParameters($params = ['foo' => 'bar']);
 
         $validator = $this->willValidateToOne($fieldName, $request, $params);
@@ -125,8 +124,7 @@ class ValidateFetchRelationshipQueryTest extends TestCase
     public function testItFailsToOneValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName($fieldName = 'image')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', $fieldName = 'image')
             ->withParameters($params = ['foo' => 'bar']);
 
         $validator = $this->willValidateToOne($fieldName, $request, $params);
@@ -157,8 +155,7 @@ class ValidateFetchRelationshipQueryTest extends TestCase
     public function testItPassesToManyValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName($fieldName = 'comments')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', $fieldName = 'comments')
             ->withParameters($params = ['foo' => 'bar']);
 
         $validator = $this->willValidateToMany($fieldName, $request, $params);
@@ -195,8 +192,7 @@ class ValidateFetchRelationshipQueryTest extends TestCase
     public function testItFailsToManyValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName($fieldName = 'tags')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', $fieldName = 'tags')
             ->withParameters($params = ['foo' => 'bar']);
 
         $validator = $this->willValidateToMany($fieldName, $request, $params);
@@ -228,8 +224,7 @@ class ValidateFetchRelationshipQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName('comments')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', 'comments')
             ->withParameters($params = ['foo' => 'bar'])
             ->skipValidation();
 
@@ -256,8 +251,7 @@ class ValidateFetchRelationshipQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName('tags')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', 'tags')
             ->withValidated($validated = ['foo' => 'bar']);
 
         $this->willNotValidate();

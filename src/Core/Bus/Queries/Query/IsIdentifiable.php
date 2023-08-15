@@ -17,28 +17,28 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands;
+namespace LaravelJsonApi\Core\Bus\Queries\Query;
 
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 
 interface IsIdentifiable
 {
     /**
-     * Get the resource id for the command.
+     * Get the resource id for the query.
      *
      * @return ResourceId
      */
     public function id(): ResourceId;
 
     /**
-     * Get the model for the command, if there is one.
+     * Get the model for the query, if there is one.
      *
      * @return object|null
      */
     public function model(): ?object;
 
     /**
-     * Get the model for the command, or fail if there isn't one.
+     * Get the model for the query, or fail if there isn't one.
      *
      * @return object
      */

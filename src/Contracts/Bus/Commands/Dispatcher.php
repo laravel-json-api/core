@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Bus\Commands;
 
-use LaravelJsonApi\Core\Bus\Commands\Command;
+use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 
 interface Dispatcher

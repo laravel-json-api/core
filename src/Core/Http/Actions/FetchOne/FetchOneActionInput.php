@@ -20,23 +20,32 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\FetchOne;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Bus\Queries\Concerns\Identifiable;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\Identifiable;
+use LaravelJsonApi\Core\Http\Actions\Input\IsIdentifiable;
 
-class FetchOneActionInput extends ActionInput
+class FetchOneActionInput extends ActionInput implements IsIdentifiable
 {
     use Identifiable;
 
     /**
-     * Fluent constructor.
+     * FetchOneActionInput constructor
      *
      * @param Request $request
-     * @param ResourceType|string $type
-     * @return self
+     * @param ResourceType $type
+     * @param ResourceId $id
+     * @param object|null $model
      */
-    public static function make(Request $request, ResourceType|string $type): self
-    {
-        return new self($request, $type);
+    public function __construct(
+        Request $request,
+        ResourceType $type,
+        ResourceId $id,
+        object $model = null,
+    ) {
+        parent::__construct($request, $type);
+        $this->id = $id;
+        $this->model = $model;
     }
 }

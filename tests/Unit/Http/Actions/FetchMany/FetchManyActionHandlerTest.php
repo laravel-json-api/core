@@ -79,7 +79,7 @@ class FetchManyActionHandlerTest extends TestCase
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
 
-        $passed = FetchManyActionInput::make($request, $type)
+        $passed = (new FetchManyActionInput($request, $type))
             ->withHooks($hooks = new \stdClass);
 
         $original = $this->willSendThroughPipeline($passed);
@@ -119,7 +119,7 @@ class FetchManyActionHandlerTest extends TestCase
      */
     public function testItIsNotSuccessful(): void
     {
-        $passed = FetchManyActionInput::make(
+        $passed = new FetchManyActionInput(
             $this->createMock(Request::class),
             new ResourceType('comments2'),
         );
@@ -146,7 +146,7 @@ class FetchManyActionHandlerTest extends TestCase
      */
     public function testItDoesNotReturnData(): void
     {
-        $passed = FetchManyActionInput::make(
+        $passed = new FetchManyActionInput(
             $this->createMock(Request::class),
             new ResourceType('comments2'),
         );

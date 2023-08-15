@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Tests\Unit\Http\Actions\Update\Middleware;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Update\Middleware\ParseUpdateOperation;
@@ -65,6 +66,7 @@ class ParseUpdateOperationTest extends TestCase
         $this->action = new UpdateActionInput(
             $this->request = $this->createMock(Request::class),
             new ResourceType('tags'),
+            new ResourceId('123'),
         );
     }
 

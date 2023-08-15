@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Core\Bus\Queries\Middleware;
 
 use Closure;
 use LaravelJsonApi\Contracts\Store\Store;
-use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
-use LaravelJsonApi\Core\Bus\Queries\IsRelatable;
-use LaravelJsonApi\Core\Bus\Queries\Query;
+use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
+use LaravelJsonApi\Core\Bus\Queries\Query\IsRelatable;
+use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Error;
 use RuntimeException;

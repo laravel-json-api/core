@@ -27,20 +27,16 @@ use LaravelJsonApi\Core\Responses\DataResponse;
 interface Update extends Responsable
 {
     /**
-     * Set the JSON:API resource type for the action.
+     * Set the target for the action.
+     *
+     * A model can be set if the bindings have been substituted, or if the action is being
+     * run manually.
      *
      * @param ResourceType|string $type
-     * @return $this
-     */
-    public function withType(ResourceType|string $type): static;
-
-    /**
-     * Set the JSON:API resource id for the action, or the model (if bindings have been substituted).
-     *
      * @param object|string $idOrModel
      * @return $this
      */
-    public function withIdOrModel(object|string $idOrModel): static;
+    public function withTarget(ResourceType|string $type, object|string $idOrModel): static;
 
     /**
      * Set the object that implements controller hooks.

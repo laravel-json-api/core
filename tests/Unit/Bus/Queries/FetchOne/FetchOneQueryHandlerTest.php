@@ -31,7 +31,6 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\ValidateFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
@@ -77,11 +76,11 @@ class FetchOneQueryHandlerTest extends TestCase
         $original = new FetchOneQuery(
             $request = $this->createMock(Request::class),
             $type = new ResourceType('comments'),
+            $id = new ResourceId('123'),
         );
 
-        $passed = FetchOneQuery::make($request, $type)
-            ->withValidated($validated = ['include' => 'user'])
-            ->withId($id = new ResourceId('123'));
+        $passed = FetchOneQuery::make($request, $type, $id)
+            ->withValidated($validated = ['include' => 'user']);
 
         $sequence = [];
 
@@ -100,7 +99,6 @@ class FetchOneQueryHandlerTest extends TestCase
                     LookupModelIfRequired::class,
                     AuthorizeFetchOneQuery::class,
                     ValidateFetchOneQuery::class,
-                    LookupResourceIdIfNotSet::class,
                     TriggerShowHooks::class,
                 ], $actual);
                 return $pipeline;

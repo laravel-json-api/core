@@ -17,49 +17,52 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Queries\Concerns;
+namespace LaravelJsonApi\Core\Bus\Commands\Command;
 
-use InvalidArgumentException;
 use RuntimeException;
 
-trait Relatable
+trait Identifiable
 {
-    use Identifiable;
-
     /**
-     * @var string|null
+     * @var object|null
      */
-    private ?string $fieldName = null;
+    private ?object $model = null;
 
     /**
-     * Return a new instance with the JSON:API field name set.
+     * Return a new instance with the model set, if known.
      *
-     * @param string $field
-     * @return $this
+     * @param object|null $model
+     * @return static
      */
-    public function withFieldName(string $field): static
+    public function withModel(?object $model): static
     {
-        if (empty($field)) {
-            throw new InvalidArgumentException('Expecting a non-empty field name.');
-        }
-
         $copy = clone $this;
-        $copy->fieldName = $field;
+        $copy->model = $model;
 
         return $copy;
     }
 
     /**
-     * Get the JSON:API field name.
+     * Get the model for the query.
      *
-     * @return string
+     * @return object|null
      */
-    public function fieldName(): string
+    public function model(): ?object
     {
-        if ($this->fieldName) {
-            return $this->fieldName;
+        return $this->model;
+    }
+
+    /**
+     * Get the model for the query.
+     *
+     * @return object
+     */
+    public function modelOrFail(): object
+    {
+        if ($this->model !== null) {
+            return $this->model;
         }
 
-        throw new RuntimeException('Expecting a field name to be set.');
+        throw new RuntimeException('Expecting a model to be set on the query.');
     }
 }

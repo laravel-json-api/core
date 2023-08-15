@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 
 use Closure;
 use Illuminate\Contracts\Support\Responsable;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 
 interface HandlesActions
 {

@@ -24,7 +24,7 @@ use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Query\QueryParameters;
 
 class ValidateQueryOneParameters implements HandlesActions

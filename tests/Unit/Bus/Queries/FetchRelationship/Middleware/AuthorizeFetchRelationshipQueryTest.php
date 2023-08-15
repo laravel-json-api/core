@@ -71,8 +71,7 @@ class AuthorizeFetchRelationshipQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName('comments')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', 'comments')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, 'comments');
@@ -95,8 +94,7 @@ class AuthorizeFetchRelationshipQueryTest extends TestCase
      */
     public function testItPassesAuthorizationWithoutRequest(): void
     {
-        $query = FetchRelationshipQuery::make(null, $this->type)
-            ->withFieldName('tags')
+        $query = FetchRelationshipQuery::make(null, $this->type, '123', 'tags')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize(null, $model, 'tags');
@@ -121,8 +119,7 @@ class AuthorizeFetchRelationshipQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName('comments')
+        $query = FetchRelationshipQuery::make($request, $this->type, '13', 'comments')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorizeAndThrow(
@@ -150,8 +147,7 @@ class AuthorizeFetchRelationshipQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName('tags')
+        $query = FetchRelationshipQuery::make($request, $this->type, '456', 'tags')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, 'tags', $expected = new ErrorList());
@@ -172,8 +168,7 @@ class AuthorizeFetchRelationshipQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelationshipQuery::make($request, $this->type)
-            ->withFieldName('videos')
+        $query = FetchRelationshipQuery::make($request, $this->type, '123', 'videos')
             ->withModel(new \stdClass())
             ->skipAuthorization();
 

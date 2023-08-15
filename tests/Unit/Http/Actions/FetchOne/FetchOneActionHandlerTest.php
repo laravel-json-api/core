@@ -78,9 +78,9 @@ class FetchOneActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
+        $id = new ResourceId('123');
 
-        $passed = FetchOneActionInput::make($request, $type)
-            ->withId($id = new ResourceId('123'))
+        $passed = (new FetchOneActionInput($request, $type, $id))
             ->withHooks($hooks = new \stdClass);
 
         $original = $this->willSendThroughPipeline($passed);
@@ -122,10 +122,11 @@ class FetchOneActionHandlerTest extends TestCase
      */
     public function testItIsSuccessfulWithModel(): void
     {
-        $passed = FetchOneActionInput::make(
+        $passed = (new FetchOneActionInput(
             $request = $this->createMock(Request::class),
             $type = new ResourceType('comments2'),
-        )->withModel($model1 = new \stdClass());
+            $id = new ResourceId('123'),
+        ))->withModel($model1 = new \stdClass());
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -136,10 +137,10 @@ class FetchOneActionHandlerTest extends TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(function (FetchOneQuery $query) use ($request, $type, $model1): bool {
+            ->with($this->callback(function (FetchOneQuery $query) use ($request, $type, $id, $model1): bool {
                 $this->assertSame($request, $query->request());
                 $this->assertSame($type, $query->type());
-                $this->assertNull($query->id());
+                $this->assertSame($id, $query->id());
                 $this->assertSame($model1, $query->model());
                 $this->assertTrue($query->mustAuthorize());
                 $this->assertTrue($query->mustValidate());
@@ -161,10 +162,11 @@ class FetchOneActionHandlerTest extends TestCase
      */
     public function testItIsNotSuccessful(): void
     {
-        $passed = FetchOneActionInput::make(
+        $passed = new FetchOneActionInput(
             $this->createMock(Request::class),
             new ResourceType('comments2'),
-        )->withId('123');
+            new ResourceId('123'),
+        );
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -188,10 +190,11 @@ class FetchOneActionHandlerTest extends TestCase
      */
     public function testItDoesNotReturnData(): void
     {
-        $passed = FetchOneActionInput::make(
+        $passed = new FetchOneActionInput(
             $this->createMock(Request::class),
             new ResourceType('comments2'),
-        )->withId('123');
+            new ResourceId('123'),
+        );
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -217,6 +220,7 @@ class FetchOneActionHandlerTest extends TestCase
         $original = new FetchOneActionInput(
             $this->createMock(Request::class),
             new ResourceType('comments1'),
+            new ResourceId('123'),
         );
 
         $sequence = [];

@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands;
+namespace LaravelJsonApi\Core\Bus\Commands\Command;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\ValidatedInput;

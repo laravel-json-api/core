@@ -61,7 +61,7 @@ class LookupModelIfMissingTest extends TestCase
         $action = $this->createMock(UpdateActionInput::class);
         $action->method('model')->willReturn(null);
         $action->method('type')->willReturn($type = new ResourceType('posts'));
-        $action->method('idOrFail')->willReturn($id = new ResourceId('123'));
+        $action->method('id')->willReturn($id = new ResourceId('123'));
         $action
             ->expects($this->once())
             ->method('withModel')
@@ -95,7 +95,7 @@ class LookupModelIfMissingTest extends TestCase
         $action = $this->createMock(UpdateActionInput::class);
         $action->method('model')->willReturn(null);
         $action->method('type')->willReturn($type = new ResourceType('posts'));
-        $action->method('idOrFail')->willReturn($id = new ResourceId('123'));
+        $action->method('id')->willReturn($id = new ResourceId('123'));
         $action->expects($this->never())->method('withModel');
 
         $this->store

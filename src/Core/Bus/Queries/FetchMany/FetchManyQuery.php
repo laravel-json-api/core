@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Bus\Queries\FetchMany;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
-use LaravelJsonApi\Core\Bus\Queries\Query;
+use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
 class FetchManyQuery extends Query

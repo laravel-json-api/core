@@ -89,6 +89,7 @@ class ValidateFetchOneQueryTest extends TestCase
         $query = FetchOneQuery::make(
             $request = $this->createMock(Request::class),
             $this->type,
+            '123',
         )->withParameters($params = ['foo' => 'bar']);
 
         $this->validator
@@ -131,6 +132,7 @@ class ValidateFetchOneQueryTest extends TestCase
         $query = FetchOneQuery::make(
             $request = $this->createMock(Request::class),
             $this->type,
+            '123',
         )->withParameters($params = ['foo' => 'bar']);
 
         $this->validator
@@ -166,7 +168,7 @@ class ValidateFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type)
+        $query = FetchOneQuery::make($request, $this->type, '456')
             ->withParameters($params = ['foo' => 'bar'])
             ->skipValidation();
 
@@ -195,7 +197,7 @@ class ValidateFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type)
+        $query = FetchOneQuery::make($request, $this->type, '123')
             ->withValidated($validated = ['foo' => 'bar']);
 
         $this->validator

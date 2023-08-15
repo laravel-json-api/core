@@ -23,7 +23,7 @@ use Closure;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Exceptions\HttpUnsupportedMediaTypeException;
 
 class ItHasJsonApiContent implements HandlesActions

@@ -24,16 +24,16 @@ use LaravelJsonApi\Contracts\Http\Actions\Update as UpdateContract;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionHandler;
-use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInput;
+use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInputFactory;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class Update implements UpdateContract
 {
     /**
-     * @var ResourceType|null
+     * @var ResourceType|string|null
      */
-    private ?ResourceType $type = null;
+    private ResourceType|string|null $type = null;
 
     /**
      * @var object|string|null
@@ -49,29 +49,23 @@ class Update implements UpdateContract
      * Update constructor
      *
      * @param Route $route
+     * @param UpdateActionInputFactory $factory
      * @param UpdateActionHandler $handler
      */
     public function __construct(
         private readonly Route $route,
+        private readonly UpdateActionInputFactory $factory,
         private readonly UpdateActionHandler $handler,
-    ) {
+    )
+    {
     }
 
     /**
      * @inheritDoc
      */
-    public function withType(string|ResourceType $type): static
+    public function withTarget(ResourceType|string $type, object|string $idOrModel): static
     {
-        $this->type = ResourceType::cast($type);
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withIdOrModel(object|string $idOrModel): static
-    {
+        $this->type = $type;
         $this->idOrModel = $idOrModel;
 
         return $this;
@@ -93,9 +87,10 @@ class Update implements UpdateContract
     public function execute(Request $request): DataResponse
     {
         $type = $this->type ?? $this->route->resourceType();
+        $idOrModel = $this->idOrModel ?? $this->route->modelOrResourceId();
 
-        $input = UpdateActionInput::make($request, $type)
-            ->withIdOrModel($this->idOrModel ?? $this->route->modelOrResourceId())
+        $input = $this->factory
+            ->make($request, $type, $idOrModel)
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);

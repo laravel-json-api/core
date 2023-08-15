@@ -39,7 +39,6 @@ use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItHasJsonApiContent;
 use LaravelJsonApi\Core\Http\Actions\Middleware\LookupModelIfMissing;
-use LaravelJsonApi\Core\Http\Actions\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateQueryOneParameters;
 use LaravelJsonApi\Core\Http\Actions\Update\Middleware\AuthorizeUpdateAction;
 use LaravelJsonApi\Core\Http\Actions\Update\Middleware\CheckRequestJsonIsCompliant;
@@ -97,14 +96,14 @@ class UpdateActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
+        $id = new ResourceId('123');
 
         $queryParams = $this->createMock(QueryParameters::class);
         $queryParams->method('includePaths')->willReturn($include = new IncludePaths());
         $queryParams->method('sparseFieldSets')->willReturn($fields = new FieldSets());
 
-        $passed = UpdateActionInput::make($request, $type)
+        $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel($model = new \stdClass())
-            ->withId($id = new ResourceId('123'))
             ->withOperation($op = new Update(null, new ResourceObject($type)))
             ->withQuery($queryParams)
             ->withHooks($hooks = new \stdClass());
@@ -167,9 +166,10 @@ class UpdateActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
+        $id = new ResourceId('123');
 
-        $passed = UpdateActionInput::make($request, $type)
-            ->withModel($model = new \stdClass())
+        $passed = (new UpdateActionInput($request, $type, $id))
+            ->withModel(new \stdClass())
             ->withOperation(new Update(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
@@ -212,10 +212,10 @@ class UpdateActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
+        $id = new ResourceId('456');
 
-        $passed = UpdateActionInput::make($request, $type)
+        $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel($model = new \stdClass())
-            ->withId($id = new ResourceId('456'))
             ->withOperation(new Update(null, new ResourceObject($type)))
             ->withQuery($queryParams = $this->createMock(QueryParameters::class));
 
@@ -262,10 +262,10 @@ class UpdateActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
+        $id = new ResourceId('123');
 
-        $passed = UpdateActionInput::make($request, $type)
+        $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel(new \stdClass())
-            ->withId('123')
             ->withOperation(new Update(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
@@ -296,10 +296,10 @@ class UpdateActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
+        $id = new ResourceId('123');
 
-        $passed = UpdateActionInput::make($request, $type)
+        $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel(new \stdClass())
-            ->withId('123')
             ->withOperation(new Update(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
@@ -330,6 +330,7 @@ class UpdateActionHandlerTest extends TestCase
         $original = new UpdateActionInput(
             $this->createMock(Request::class),
             new ResourceType('comments1'),
+            new ResourceId('123'),
         );
 
         $sequence = [];
@@ -349,7 +350,6 @@ class UpdateActionHandlerTest extends TestCase
                     ItHasJsonApiContent::class,
                     ItAcceptsJsonApiResponses::class,
                     LookupModelIfMissing::class,
-                    LookupResourceIdIfNotSet::class,
                     AuthorizeUpdateAction::class,
                     CheckRequestJsonIsCompliant::class,
                     ValidateQueryOneParameters::class,

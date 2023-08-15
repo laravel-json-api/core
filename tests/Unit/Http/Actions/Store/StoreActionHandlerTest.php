@@ -25,25 +25,26 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcher;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
+use LaravelJsonApi\Contracts\Resources\Container;
 use LaravelJsonApi\Core\Bus\Commands\Result as CommandResult;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result as QueryResult;
 use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItHasJsonApiContent;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateQueryOneParameters;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\AuthorizeStoreAction;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
-use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionHandler;
+use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
 use LaravelJsonApi\Core\Http\Controllers\Hooks\HooksImplementation;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
@@ -57,22 +58,27 @@ class StoreActionHandlerTest extends TestCase
     /**
      * @var PipelineFactory&MockObject
      */
-    private PipelineFactory&MockObject $pipelineFactory;
+    private readonly PipelineFactory&MockObject $pipelineFactory;
 
     /**
      * @var MockObject&CommandDispatcher
      */
-    private CommandDispatcher&MockObject $commandDispatcher;
+    private readonly CommandDispatcher&MockObject $commandDispatcher;
 
     /**
      * @var MockObject&QueryDispatcher
      */
-    private QueryDispatcher&MockObject $queryDispatcher;
+    private readonly QueryDispatcher&MockObject $queryDispatcher;
+
+    /**
+     * @var MockObject&Container
+     */
+    private readonly Container&MockObject $resources;
 
     /**
      * @var StoreActionHandler
      */
-    private StoreActionHandler $handler;
+    private readonly StoreActionHandler $handler;
 
     /**
      * @return void
@@ -85,6 +91,7 @@ class StoreActionHandlerTest extends TestCase
             $this->pipelineFactory = $this->createMock(PipelineFactory::class),
             $this->commandDispatcher = $this->createMock(CommandDispatcher::class),
             $this->queryDispatcher = $this->createMock(QueryDispatcher::class),
+            $this->resources = $this->createMock(Container::class),
         );
     }
 
@@ -100,8 +107,8 @@ class StoreActionHandlerTest extends TestCase
         $queryParams->method('includePaths')->willReturn($include = new IncludePaths());
         $queryParams->method('sparseFieldSets')->willReturn($fields = new FieldSets());
 
-        $passed = StoreActionInput::make($request, $type)
-            ->withOperation($op = new Create(new Href('/posts'), new ResourceObject($type)))
+        $passed = (new StoreActionInput($request, $type))
+            ->withOperation($op = new Create(null, new ResourceObject($type)))
             ->withQuery($queryParams)
             ->withHooks($hooks = new \stdClass());
 
@@ -126,15 +133,17 @@ class StoreActionHandlerTest extends TestCase
             }))
             ->willReturn(CommandResult::ok(new Payload($model = new \stdClass(), true, ['foo' => 'bar'])));
 
+        $id = $this->willLookupId($type, $model);
+
         $this->queryDispatcher
             ->expects($this->once())
             ->method('dispatch')
             ->with($this->callback(
-                function (FetchOneQuery $query) use ($request, $type, $model, $queryParams, $hooks): bool {
+                function (FetchOneQuery $query) use ($request, $type, $id, $model, $queryParams, $hooks): bool {
                     $this->assertSame($request, $query->request());
                     $this->assertSame($type, $query->type());
                     $this->assertSame($model, $query->model());
-                    $this->assertNull($query->id());
+                    $this->assertSame($id, $query->id());
                     $this->assertSame($queryParams, $query->toQueryParams());
                     // hooks must be null, otherwise we trigger the "reading" and "read" hooks
                     $this->assertNull($query->hooks());
@@ -161,8 +170,8 @@ class StoreActionHandlerTest extends TestCase
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
 
-        $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
+        $passed = (new StoreActionInput($request, $type))
+            ->withOperation(new Create(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
@@ -171,6 +180,8 @@ class StoreActionHandlerTest extends TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->willReturn(CommandResult::failed($expected = new ErrorList()));
+
+        $this->willNotLookupId();
 
         $this->queryDispatcher
             ->expects($this->never())
@@ -205,8 +216,8 @@ class StoreActionHandlerTest extends TestCase
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
 
-        $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
+        $passed = (new StoreActionInput($request, $type))
+            ->withOperation(new Create(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
@@ -215,6 +226,8 @@ class StoreActionHandlerTest extends TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->willReturn(CommandResult::ok($payload));
+
+        $this->willNotLookupId();
 
         $this->queryDispatcher
             ->expects($this->never())
@@ -234,8 +247,8 @@ class StoreActionHandlerTest extends TestCase
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
 
-        $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
+        $passed = (new StoreActionInput($request, $type))
+            ->withOperation(new Create(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
@@ -243,7 +256,9 @@ class StoreActionHandlerTest extends TestCase
         $this->commandDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->willReturn(CommandResult::ok(new Payload(new \stdClass(), true)));
+            ->willReturn(CommandResult::ok(new Payload($model = new \stdClass(), true)));
+
+        $this->willLookupId($type, $model);
 
         $this->queryDispatcher
             ->expects($this->once())
@@ -266,8 +281,8 @@ class StoreActionHandlerTest extends TestCase
         $request = $this->createMock(Request::class);
         $type = new ResourceType('comments2');
 
-        $passed = StoreActionInput::make($request, $type)
-            ->withOperation(new Create(new Href('/posts'), new ResourceObject($type)))
+        $passed = (new StoreActionInput($request, $type))
+            ->withOperation(new Create(null, new ResourceObject($type)))
             ->withQuery($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
@@ -275,7 +290,9 @@ class StoreActionHandlerTest extends TestCase
         $this->commandDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->willReturn(CommandResult::ok(new Payload(new \stdClass(), true)));
+            ->willReturn(CommandResult::ok(new Payload($model = new \stdClass(), true)));
+
+        $this->willLookupId($type, $model);
 
         $this->queryDispatcher
             ->expects($this->once())
@@ -341,5 +358,31 @@ class StoreActionHandlerTest extends TestCase
             });
 
         return $original;
+    }
+
+    /**
+     * @param ResourceType $type
+     * @param object $model
+     * @return ResourceId
+     */
+    private function willLookupId(ResourceType $type, object $model): ResourceId
+    {
+        $this->resources
+            ->expects($this->once())
+            ->method('idForType')
+            ->with($this->identicalTo($type), $this->identicalTo($model))
+            ->willReturn($id = new ResourceId('999'));
+
+        return $id;
+    }
+
+    /**
+     * @return void
+     */
+    private function willNotLookupId(): void
+    {
+        $this->resources
+            ->expects($this->never())
+            ->method($this->anything());
     }
 }

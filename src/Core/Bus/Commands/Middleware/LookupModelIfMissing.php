@@ -21,8 +21,8 @@ namespace LaravelJsonApi\Core\Bus\Commands\Middleware;
 
 use Closure;
 use LaravelJsonApi\Contracts\Store\Store;
-use LaravelJsonApi\Core\Bus\Commands\Command;
-use LaravelJsonApi\Core\Bus\Commands\IsIdentifiable;
+use LaravelJsonApi\Core\Bus\Commands\Command\Command;
+use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Document\Error;
 use Symfony\Component\HttpFoundation\Response;

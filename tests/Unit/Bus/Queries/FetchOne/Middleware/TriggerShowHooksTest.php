@@ -58,7 +58,7 @@ class TriggerShowHooksTest extends TestCase
     public function testItHasNoHooks(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchOneQuery::make($request, 'tags');
+        $query = FetchOneQuery::make($request, 'tags', '123');
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -85,7 +85,7 @@ class TriggerShowHooksTest extends TestCase
         $model = new \stdClass();
         $sequence = [];
 
-        $query = FetchOneQuery::make($request, 'tags')
+        $query = FetchOneQuery::make($request, 'tags', '123')
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 
@@ -135,7 +135,7 @@ class TriggerShowHooksTest extends TestCase
         $hooks = $this->createMock(ShowImplementation::class);
         $sequence = [];
 
-        $query = FetchOneQuery::make($request, 'tags')
+        $query = FetchOneQuery::make($request, 'tags', '123')
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 

@@ -78,10 +78,9 @@ class FetchRelatedActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('posts');
+        $id = new ResourceId('123');
 
-        $passed = FetchRelatedActionInput::make($request, $type)
-            ->withId($id = new ResourceId('123'))
-            ->withFieldName('comments1')
+        $passed = (new FetchRelatedActionInput($request, $type, $id, 'comments1'))
             ->withHooks($hooks = new \stdClass);
 
         $original = $this->willSendThroughPipeline($passed);
@@ -126,10 +125,12 @@ class FetchRelatedActionHandlerTest extends TestCase
      */
     public function testItIsSuccessfulWithModel(): void
     {
-        $passed = FetchRelatedActionInput::make(
+        $passed = (new FetchRelatedActionInput(
             $request = $this->createMock(Request::class),
             $type = new ResourceType('posts'),
-        )->withModel($model1 = new \stdClass())->withFieldName('comments1');
+            $id = new ResourceId('123'),
+            'comments1',
+        ))->withModel($model1 = new \stdClass());
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -139,10 +140,10 @@ class FetchRelatedActionHandlerTest extends TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(function (FetchRelatedQuery $query) use ($request, $type, $model1): bool {
+            ->with($this->callback(function (FetchRelatedQuery $query) use ($request, $type, $id, $model1): bool {
                 $this->assertSame($request, $query->request());
                 $this->assertSame($type, $query->type());
-                $this->assertNull($query->id());
+                $this->assertSame($id, $query->id());
                 $this->assertSame($model1, $query->model());
                 $this->assertSame('comments1', $query->fieldName());
                 $this->assertTrue($query->mustAuthorize());
@@ -167,10 +168,12 @@ class FetchRelatedActionHandlerTest extends TestCase
      */
     public function testItIsNotSuccessful(): void
     {
-        $passed = FetchRelatedActionInput::make(
+        $passed = new FetchRelatedActionInput(
             $this->createMock(Request::class),
             new ResourceType('posts'),
-        )->withId('123')->withFieldName('tags');
+            new ResourceId('123'),
+            'tags',
+        );
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -194,10 +197,12 @@ class FetchRelatedActionHandlerTest extends TestCase
      */
     public function testItDoesNotReturnData(): void
     {
-        $passed = FetchRelatedActionInput::make(
+        $passed = new FetchRelatedActionInput(
             $this->createMock(Request::class),
             new ResourceType('posts'),
-        )->withId('123')->withFieldName('tags');
+            new ResourceId('123'),
+            'tags',
+        );
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -223,6 +228,8 @@ class FetchRelatedActionHandlerTest extends TestCase
         $original = new FetchRelatedActionInput(
             $this->createMock(Request::class),
             new ResourceType('foobar'),
+            new ResourceId('999'),
+            'bazbat',
         );
 
         $sequence = [];

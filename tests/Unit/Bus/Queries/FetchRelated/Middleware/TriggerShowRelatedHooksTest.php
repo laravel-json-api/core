@@ -58,7 +58,7 @@ class TriggerShowRelatedHooksTest extends TestCase
     public function testItHasNoHooks(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelatedQuery::make($request, 'tags');
+        $query = FetchRelatedQuery::make($request, 'tags', '456', 'videos');
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -86,9 +86,8 @@ class TriggerShowRelatedHooksTest extends TestCase
         $related = new \ArrayObject();
         $sequence = [];
 
-        $query = FetchRelatedQuery::make($request, 'posts')
+        $query = FetchRelatedQuery::make($request, 'posts', '123', 'tags')
             ->withModel($model)
-            ->withFieldName('tags')
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 
@@ -142,9 +141,8 @@ class TriggerShowRelatedHooksTest extends TestCase
         $hooks = $this->createMock(ShowRelatedImplementation::class);
         $sequence = [];
 
-        $query = FetchRelatedQuery::make($request, 'tags')
+        $query = FetchRelatedQuery::make($request, 'tags', '123', 'createdBy')
             ->withModel($model = new \stdClass())
-            ->withFieldName('createdBy')
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 

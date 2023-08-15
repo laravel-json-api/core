@@ -24,16 +24,16 @@ use LaravelJsonApi\Contracts\Http\Actions\FetchRelationship as FetchRelationship
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchRelationship\FetchRelationshipActionHandler;
-use LaravelJsonApi\Core\Http\Actions\FetchRelationship\FetchRelationshipActionInput;
+use LaravelJsonApi\Core\Http\Actions\FetchRelationship\FetchRelationshipActionInputFactory;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class FetchRelationship implements FetchRelationshipContract
 {
     /**
-     * @var ResourceType|null
+     * @var ResourceType|string|null
      */
-    private ?ResourceType $type = null;
+    private ResourceType|string|null $type = null;
 
     /**
      * @var object|string|null
@@ -54,10 +54,12 @@ class FetchRelationship implements FetchRelationshipContract
      * FetchRelationship constructor
      *
      * @param Route $route
+     * @param FetchRelationshipActionInputFactory $factory
      * @param FetchRelationshipActionHandler $handler
      */
     public function __construct(
         private readonly Route $route,
+        private readonly FetchRelationshipActionInputFactory $factory,
         private readonly FetchRelationshipActionHandler $handler,
     ) {
     }
@@ -65,28 +67,10 @@ class FetchRelationship implements FetchRelationshipContract
     /**
      * @inheritDoc
      */
-    public function withType(string|ResourceType $type): static
+    public function withTarget(ResourceType|string $type, object|string $idOrModel, string $fieldName): static
     {
-        $this->type = ResourceType::cast($type);
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withIdOrModel(object|string $idOrModel): static
-    {
+        $this->type = $type;
         $this->idOrModel = $idOrModel;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withFieldName(string $fieldName): static
-    {
         $this->fieldName = $fieldName;
 
         return $this;
@@ -108,10 +92,11 @@ class FetchRelationship implements FetchRelationshipContract
     public function execute(Request $request): RelationshipResponse
     {
         $type = $this->type ?? $this->route->resourceType();
+        $idOrModel = $this->idOrModel ?? $this->route->modelOrResourceId();
+        $fieldName = $this->fieldName ?? $this->route->fieldName();
 
-        $input = FetchRelationshipActionInput::make($request, $type)
-            ->withIdOrModel($this->idOrModel ?? $this->route->modelOrResourceId())
-            ->withFieldName($this->fieldName ?? $this->route->fieldName())
+        $input = $this->factory
+            ->make($request, $type, $idOrModel, $fieldName)
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);

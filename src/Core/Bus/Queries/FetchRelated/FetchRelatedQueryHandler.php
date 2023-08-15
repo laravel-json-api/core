@@ -25,7 +25,6 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\AuthorizeFetchRelate
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\TriggerShowRelatedHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\ValidateFetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupResourceIdIfNotSet;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Support\PipelineFactory;
@@ -59,7 +58,6 @@ class FetchRelatedQueryHandler
             LookupModelIfRequired::class,
             AuthorizeFetchRelatedQuery::class,
             ValidateFetchRelatedQuery::class,
-            LookupResourceIdIfNotSet::class,
             TriggerShowRelatedHooks::class,
         ];
 
@@ -88,7 +86,7 @@ class FetchRelatedQueryHandler
             ->schemaFor($type = $query->type())
             ->relationship($fieldName = $query->fieldName());
 
-        $id = $query->idOrFail();
+        $id = $query->id();
         $params = $query->toQueryParams();
 
         if ($relation->toOne()) {

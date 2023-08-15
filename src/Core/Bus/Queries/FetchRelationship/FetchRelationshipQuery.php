@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Core\Bus\Queries\FetchRelationship;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelationshipImplementation;
-use LaravelJsonApi\Core\Bus\Queries\Concerns\Relatable;
-use LaravelJsonApi\Core\Bus\Queries\IsRelatable;
-use LaravelJsonApi\Core\Bus\Queries\Query;
+use LaravelJsonApi\Core\Bus\Queries\Query\IsRelatable;
+use LaravelJsonApi\Core\Bus\Queries\Query\Query;
+use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
@@ -41,15 +41,15 @@ class FetchRelationshipQuery extends Query implements IsRelatable
      *
      * @param Request|null $request
      * @param ResourceType|string $type
-     * @param ResourceId|string|null $id
-     * @param string|null $fieldName
+     * @param ResourceId|string $id
+     * @param string $fieldName
      * @return self
      */
     public static function make(
         ?Request $request,
         ResourceType|string $type,
-        ResourceId|string|null $id = null,
-        ?string $fieldName = null,
+        ResourceId|string $id,
+        string $fieldName,
     ): self
     {
         return new self($request, $type, $id, $fieldName);
@@ -60,17 +60,17 @@ class FetchRelationshipQuery extends Query implements IsRelatable
      *
      * @param Request|null $request
      * @param ResourceType|string $type
-     * @param ResourceId|string|null $id
-     * @param string|null $fieldName
+     * @param ResourceId|string $id
+     * @param string $fieldName
      */
     public function __construct(
         ?Request $request,
         ResourceType|string $type,
-        ResourceId|string|null $id = null,
-        ?string $fieldName = null,
+        ResourceId|string $id,
+        string $fieldName,
     ) {
         parent::__construct($request, $type);
-        $this->id = ResourceId::nullable($id);
+        $this->id = ResourceId::cast($id);
         $this->fieldName = $fieldName ?: null;
     }
 

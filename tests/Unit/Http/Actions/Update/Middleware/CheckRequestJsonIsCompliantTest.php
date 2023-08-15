@@ -75,10 +75,11 @@ class CheckRequestJsonIsCompliantTest extends TestCase
             $this->complianceChecker = $this->createMock(ResourceDocumentComplianceChecker::class),
         );
 
-        $this->action = UpdateActionInput::make(
+        $this->action = new UpdateActionInput(
             $this->request = $this->createMock(Request::class),
             $type = new ResourceType('posts'),
-        )->withId($this->id = new ResourceId('123'));
+            $this->id = new ResourceId('123'),
+        );
 
         $this->request
             ->expects($this->once())

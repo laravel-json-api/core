@@ -96,11 +96,12 @@ class FetchRelationshipActionHandler
      */
     private function query(FetchRelationshipActionInput $action): Result
     {
-        $query = FetchRelationshipQuery::make($action->request(), $action->type())
-            ->withFieldName($action->fieldName())
-            ->maybeWithId($action->id())
-            ->withModel($action->model())
-            ->withHooks($action->hooks());
+        $query = FetchRelationshipQuery::make(
+            $action->request(),
+            $action->type(),
+            $action->id(),
+            $action->fieldName(),
+        )->withModel($action->model())->withHooks($action->hooks());
 
         $result = $this->dispatcher->dispatch($query);
 

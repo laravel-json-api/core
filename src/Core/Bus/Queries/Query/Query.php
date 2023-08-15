@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Queries;
+namespace LaravelJsonApi\Core\Bus\Queries\Query;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\ValidatedInput;

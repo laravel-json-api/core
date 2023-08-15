@@ -24,16 +24,16 @@ use LaravelJsonApi\Contracts\Http\Actions\FetchRelated as FetchRelatedContract;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchRelated\FetchRelatedActionHandler;
-use LaravelJsonApi\Core\Http\Actions\FetchRelated\FetchRelatedActionInput;
+use LaravelJsonApi\Core\Http\Actions\FetchRelated\FetchRelatedActionInputFactory;
 use LaravelJsonApi\Core\Responses\RelatedResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class FetchRelated implements FetchRelatedContract
 {
     /**
-     * @var ResourceType|null
+     * @var ResourceType|string|null
      */
-    private ?ResourceType $type = null;
+    private ResourceType|string|null $type = null;
 
     /**
      * @var object|string|null
@@ -54,10 +54,12 @@ class FetchRelated implements FetchRelatedContract
      * FetchRelated constructor
      *
      * @param Route $route
+     * @param FetchRelatedActionInputFactory $factory
      * @param FetchRelatedActionHandler $handler
      */
     public function __construct(
         private readonly Route $route,
+        private readonly FetchRelatedActionInputFactory $factory,
         private readonly FetchRelatedActionHandler $handler,
     ) {
     }
@@ -65,28 +67,10 @@ class FetchRelated implements FetchRelatedContract
     /**
      * @inheritDoc
      */
-    public function withType(string|ResourceType $type): static
+    public function withTarget(ResourceType|string $type, object|string $idOrModel, string $fieldName): static
     {
-        $this->type = ResourceType::cast($type);
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withIdOrModel(object|string $idOrModel): static
-    {
+        $this->type = $type;
         $this->idOrModel = $idOrModel;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withFieldName(string $fieldName): static
-    {
         $this->fieldName = $fieldName;
 
         return $this;
@@ -108,10 +92,11 @@ class FetchRelated implements FetchRelatedContract
     public function execute(Request $request): RelatedResponse
     {
         $type = $this->type ?? $this->route->resourceType();
+        $idOrModel = $this->idOrModel ?? $this->route->modelOrResourceId();
+        $fieldName = $this->fieldName ?? $this->route->fieldName();
 
-        $input = FetchRelatedActionInput::make($request, $type)
-            ->withIdOrModel($this->idOrModel ?? $this->route->modelOrResourceId())
-            ->withFieldName($this->fieldName ?? $this->route->fieldName())
+        $input = $this->factory
+            ->make($request, $type, $idOrModel, $fieldName)
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);

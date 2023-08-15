@@ -24,7 +24,7 @@ use LaravelJsonApi\Contracts\Http\Actions\Store as StoreContract;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionHandler;
-use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
+use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInputFactory;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,10 +44,12 @@ class Store implements StoreContract
      * Store constructor
      *
      * @param Route $route
+     * @param StoreActionInputFactory $factory
      * @param StoreActionHandler $handler
      */
     public function __construct(
         private readonly Route $route,
+        private readonly StoreActionInputFactory $factory,
         private readonly StoreActionHandler $handler,
     ) {
     }
@@ -79,7 +81,8 @@ class Store implements StoreContract
     {
         $type = $this->type ?? $this->route->resourceType();
 
-        $input = StoreActionInput::make($request, $type)
+        $input = $this->factory
+            ->make($request, $type)
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);

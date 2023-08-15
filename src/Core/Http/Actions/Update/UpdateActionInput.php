@@ -20,11 +20,12 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Update;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Bus\Queries\Concerns\Identifiable;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
-use LaravelJsonApi\Core\Http\Actions\IsIdentifiable;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\Identifiable;
+use LaravelJsonApi\Core\Http\Actions\Input\IsIdentifiable;
 
 class UpdateActionInput extends ActionInput implements IsIdentifiable
 {
@@ -36,15 +37,22 @@ class UpdateActionInput extends ActionInput implements IsIdentifiable
     private ?Update $operation = null;
 
     /**
-     * Fluent constructor
+     * UpdateActionInput constructor
      *
      * @param Request $request
-     * @param ResourceType|string $type
-     * @return self
+     * @param ResourceType $type
+     * @param ResourceId $id
+     * @param object|null $model
      */
-    public static function make(Request $request, ResourceType|string $type): self
-    {
-        return new self($request, $type);
+    public function __construct(
+        Request $request,
+        ResourceType $type,
+        ResourceId $id,
+        object $model = null,
+    ) {
+        parent::__construct($request, $type);
+        $this->id = $id;
+        $this->model = $model;
     }
 
     /**
@@ -66,10 +74,8 @@ class UpdateActionInput extends ActionInput implements IsIdentifiable
      */
     public function operation(): Update
     {
-        if ($this->operation !== null) {
-            return $this->operation;
-        }
+        assert($this->operation !== null, 'Expecting an update operation to be set.');
 
-        throw new \LogicException('No update operation set on store action.');
+        return $this->operation;
     }
 }

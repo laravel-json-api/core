@@ -22,19 +22,18 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\FetchOne as FetchOneContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchOne\FetchOneActionHandler;
-use LaravelJsonApi\Core\Http\Actions\FetchOne\FetchOneActionInput;
+use LaravelJsonApi\Core\Http\Actions\FetchOne\FetchOneActionInputFactory;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class FetchOne implements FetchOneContract
 {
     /**
-     * @var ResourceType|null
+     * @var ResourceType|string|null
      */
-    private ?ResourceType $type = null;
+    private ResourceType|string|null $type = null;
 
     /**
      * @var object|string|null
@@ -50,10 +49,12 @@ class FetchOne implements FetchOneContract
      * FetchOne constructor
      *
      * @param Route $route
+     * @param FetchOneActionInputFactory $factory
      * @param FetchOneActionHandler $handler
      */
     public function __construct(
         private readonly Route $route,
+        private readonly FetchOneActionInputFactory $factory,
         private readonly FetchOneActionHandler $handler,
     ) {
     }
@@ -61,18 +62,9 @@ class FetchOne implements FetchOneContract
     /**
      * @inheritDoc
      */
-    public function withType(string|ResourceType $type): static
+    public function withTarget(ResourceType|string $type, object|string $idOrModel): static
     {
-        $this->type = ResourceType::cast($type);
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function withIdOrModel(object|string $idOrModel): static
-    {
+        $this->type = $type;
         $this->idOrModel = $idOrModel;
 
         return $this;
@@ -94,14 +86,14 @@ class FetchOne implements FetchOneContract
     public function execute(Request $request): DataResponse
     {
         $type = $this->type ?? $this->route->resourceType();
+        $idOrModel = $this->idOrModel ?? $this->route->modelOrResourceId();
 
-        $input = FetchOneActionInput::make($request, $type)
-            ->withIdOrModel($this->idOrModel ?? $this->route->modelOrResourceId())
+        $input = $this->factory
+            ->make($request, $type, $idOrModel)
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);
     }
-
 
     /**
      * @inheritDoc

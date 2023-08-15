@@ -19,21 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\FetchMany;
 
-use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Http\Actions\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 
 class FetchManyActionInput extends ActionInput
 {
-    /**
-     * Fluent constructor.
-     *
-     * @param Request $request
-     * @param ResourceType|string $type
-     * @return self
-     */
-    public static function make(Request $request, ResourceType|string $type): self
-    {
-        return new self($request, $type);
-    }
 }

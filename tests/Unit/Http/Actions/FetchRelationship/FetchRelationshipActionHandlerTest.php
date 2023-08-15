@@ -78,10 +78,9 @@ class FetchRelationshipActionHandlerTest extends TestCase
     {
         $request = $this->createMock(Request::class);
         $type = new ResourceType('posts');
+        $id = new ResourceId('123');
 
-        $passed = FetchRelationshipActionInput::make($request, $type)
-            ->withId($id = new ResourceId('123'))
-            ->withFieldName('comments1')
+        $passed = (new FetchRelationshipActionInput($request, $type, $id, 'comments1'))
             ->withHooks($hooks = new \stdClass);
 
         $original = $this->willSendThroughPipeline($passed);
@@ -126,10 +125,12 @@ class FetchRelationshipActionHandlerTest extends TestCase
      */
     public function testItIsSuccessfulWithModel(): void
     {
-        $passed = FetchRelationshipActionInput::make(
+        $passed = (new FetchRelationshipActionInput(
             $request = $this->createMock(Request::class),
             $type = new ResourceType('posts'),
-        )->withModel($model1 = new \stdClass())->withFieldName('comments1');
+            $id = new ResourceId('123'),
+            'comments1',
+        ))->withModel($model1 = new \stdClass());
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -139,10 +140,10 @@ class FetchRelationshipActionHandlerTest extends TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->callback(function (FetchRelationshipQuery $query) use ($request, $type, $model1): bool {
+            ->with($this->callback(function (FetchRelationshipQuery $query) use ($request, $type, $id, $model1): bool {
                 $this->assertSame($request, $query->request());
                 $this->assertSame($type, $query->type());
-                $this->assertNull($query->id());
+                $this->assertSame($id, $query->id());
                 $this->assertSame($model1, $query->model());
                 $this->assertSame('comments1', $query->fieldName());
                 $this->assertTrue($query->mustAuthorize());
@@ -167,10 +168,12 @@ class FetchRelationshipActionHandlerTest extends TestCase
      */
     public function testItIsNotSuccessful(): void
     {
-        $passed = FetchRelationshipActionInput::make(
+        $passed = new FetchRelationshipActionInput(
             $this->createMock(Request::class),
             new ResourceType('posts'),
-        )->withId('123')->withFieldName('tags');
+            new ResourceId('123'),
+            'tags',
+        );
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -194,10 +197,12 @@ class FetchRelationshipActionHandlerTest extends TestCase
      */
     public function testItDoesNotReturnData(): void
     {
-        $passed = FetchRelationshipActionInput::make(
+        $passed = new FetchRelationshipActionInput(
             $this->createMock(Request::class),
             new ResourceType('posts'),
-        )->withId('123')->withFieldName('tags');
+            new ResourceId('123'),
+            'tags',
+        );
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -223,6 +228,8 @@ class FetchRelationshipActionHandlerTest extends TestCase
         $original = new FetchRelationshipActionInput(
             $this->createMock(Request::class),
             new ResourceType('foobar'),
+            new ResourceId('999'),
+            'bazbat',
         );
 
         $sequence = [];

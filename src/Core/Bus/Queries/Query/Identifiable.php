@@ -17,19 +17,32 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands\Concerns;
+namespace LaravelJsonApi\Core\Bus\Queries\Query;
 
-use RuntimeException;
+use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 
 trait Identifiable
 {
+    /**
+     * @var ResourceId
+     */
+    private readonly ResourceId $id;
+
     /**
      * @var object|null
      */
     private ?object $model = null;
 
     /**
-     * Return a new instance with the model set, if known.
+     * @return ResourceId
+     */
+    public function id(): ResourceId
+    {
+        return $this->id;
+    }
+
+    /**
+     * Return a new instance with the model set.
      *
      * @param object|null $model
      * @return static
@@ -43,7 +56,7 @@ trait Identifiable
     }
 
     /**
-     * Get the model for the query.
+     * Get the model.
      *
      * @return object|null
      */
@@ -53,16 +66,14 @@ trait Identifiable
     }
 
     /**
-     * Get the model for the query.
+     * Get the model, or fail.
      *
      * @return object
      */
     public function modelOrFail(): object
     {
-        if ($this->model !== null) {
-            return $this->model;
-        }
+        assert($this->model !== null, 'Expecting a model to be set.');
 
-        throw new RuntimeException('Expecting a model to be set on the query.');
+        return $this->model;
     }
 }

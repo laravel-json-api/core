@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Core\Bus\Commands\Update;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\UpdateImplementation;
-use LaravelJsonApi\Core\Bus\Commands\Command;
-use LaravelJsonApi\Core\Bus\Commands\Concerns\Identifiable;
-use LaravelJsonApi\Core\Bus\Commands\IsIdentifiable;
+use LaravelJsonApi\Core\Bus\Commands\Command\Command;
+use LaravelJsonApi\Core\Bus\Commands\Command\Identifiable;
+use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;

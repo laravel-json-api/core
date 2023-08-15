@@ -71,7 +71,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type)
+        $query = FetchOneQuery::make($request, $this->type, '123')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, null);
@@ -94,7 +94,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
      */
     public function testItPassesAuthorizationWithoutRequest(): void
     {
-        $query = FetchOneQuery::make(null, $this->type)
+        $query = FetchOneQuery::make(null, $this->type, '123')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize(null, $model, null);
@@ -119,7 +119,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type)
+        $query = FetchOneQuery::make($request, $this->type, '456')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorizeAndThrow(
@@ -146,7 +146,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type)
+        $query = FetchOneQuery::make($request, $this->type, '123')
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, $expected = new ErrorList());
@@ -167,7 +167,7 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type)
+        $query = FetchOneQuery::make($request, $this->type, '123')
             ->withModel(new \stdClass())
             ->skipAuthorization();
 

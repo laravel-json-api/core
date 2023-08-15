@@ -24,9 +24,9 @@ use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\FetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQuery;
-use LaravelJsonApi\Core\Bus\Queries\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
-use LaravelJsonApi\Core\Bus\Queries\Query;
+use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
+use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
@@ -67,37 +67,28 @@ class LookupModelIfRequiredTest extends TestCase
         return [
             'fetch-one:authorize' => [
                 static function (): FetchOneQuery {
-                    return FetchOneQuery::make(null, 'posts')
-                        ->withId('123');
+                    return FetchOneQuery::make(null, 'posts', '123');
                 },
             ],
             'fetch-related:authorize' => [
                 static function (): FetchRelatedQuery {
-                    return FetchRelatedQuery::make(null, 'posts')
-                        ->withId('123')
-                        ->withFieldName('comments');
+                    return FetchRelatedQuery::make(null, 'posts', '123', 'comments');
                 },
             ],
             'fetch-related:no authorization' => [
                 static function (): FetchRelatedQuery {
-                    return FetchRelatedQuery::make(null, 'posts')
-                        ->withId('123')
-                        ->withFieldName('comments')
+                    return FetchRelatedQuery::make(null, 'posts', '123', 'comments')
                         ->skipAuthorization();
                 },
             ],
             'fetch-relationship:authorize' => [
                 static function (): FetchRelationshipQuery {
-                    return FetchRelationshipQuery::make(null, 'posts')
-                        ->withId('123')
-                        ->withFieldName('comments');
+                    return FetchRelationshipQuery::make(null, 'posts', '123', 'comments');
                 },
             ],
             'fetch-relationship:no authorization' => [
                 static function (): FetchRelationshipQuery {
-                    return FetchRelationshipQuery::make(null, 'posts')
-                        ->withId('123')
-                        ->withFieldName('comments')
+                    return FetchRelationshipQuery::make(null, 'posts', '123', 'comments')
                         ->skipAuthorization();
                 },
             ],
@@ -112,8 +103,7 @@ class LookupModelIfRequiredTest extends TestCase
         return [
             'fetch-one:no authorization' => [
                 static function (): FetchOneQuery {
-                    return FetchOneQuery::make(null, 'posts')
-                        ->withId('123')
+                    return FetchOneQuery::make(null, 'posts', '123')
                         ->skipAuthorization();
                 },
             ],
@@ -130,7 +120,7 @@ class LookupModelIfRequiredTest extends TestCase
         /** @var Query&IsIdentifiable $query */
         $query = $scenario();
         $type = $query->type();
-        $id = $query->idOrFail();
+        $id = $query->id();
 
         $this->store
             ->expects($this->once())
@@ -191,7 +181,7 @@ class LookupModelIfRequiredTest extends TestCase
         /** @var Query&IsIdentifiable $query */
         $query = $scenario();
         $type = $query->type();
-        $id = $query->idOrFail();
+        $id = $query->id();
 
         $this->store
             ->expects($this->once())

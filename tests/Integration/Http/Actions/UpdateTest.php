@@ -40,13 +40,11 @@ use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryOneValidator;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
-use LaravelJsonApi\Contracts\Validation\StoreValidator;
 use LaravelJsonApi\Contracts\Validation\UpdateValidator;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create as StoreOperation;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update as UpdateOperation;
 use LaravelJsonApi\Core\Http\Actions\Update;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
@@ -77,6 +75,11 @@ class UpdateTest extends TestCase
     private readonly SchemaContainer&MockObject $schemas;
 
     /**
+     * @var MockObject&ResourceContainer
+     */
+    private readonly ResourceContainer&MockObject $resources;
+
+    /**
      * @var ValidatorFactory&MockObject|null
      */
     private ?ValidatorFactory $validatorFactory = null;
@@ -105,6 +108,10 @@ class UpdateTest extends TestCase
             SchemaContainer::class,
             $this->schemas = $this->createMock(SchemaContainer::class),
         );
+        $this->container->instance(
+            ResourceContainer::class,
+            $this->resources = $this->createMock(ResourceContainer::class),
+        );
 
         $this->request = $this->createMock(Request::class);
 
@@ -119,6 +126,7 @@ class UpdateTest extends TestCase
         $this->route->method('resourceType')->willReturn('posts');
         $this->route->method('modelOrResourceId')->willReturn('123');
 
+        $this->willNotLookupResourceId();
         $this->willNegotiateContent();
         $this->willFindModel('posts', '123', $initialModel = new stdClass());
         $this->willAuthorize('posts', $initialModel);
@@ -130,7 +138,6 @@ class UpdateTest extends TestCase
         $resource = $this->willParseOperation('posts', '123');
         $this->willValidateOperation($initialModel, $resource, $validated = ['title' => 'Hello World']);
         $updatedModel = $this->willStore('posts', $validated);
-        $this->willNotLookupResourceId();
         $model = $this->willQueryOne('posts', '123', $queryParams);
 
         $response = $this->action
@@ -180,15 +187,13 @@ class UpdateTest extends TestCase
         $queriedModel = $this->willQueryOne('tags', '999', $queryParams);
 
         $response = $this->action
-            ->withType('tags')
-            ->withIdOrModel($model)
+            ->withTarget('tags', $model)
             ->withHooks($this->withHooks($model, null, $queryParams))
             ->execute($this->request);
 
         $this->assertSame([
             'content-negotiation:supported',
             'content-negotiation:accept',
-            'lookup-id',
             'authorize',
             'compliant',
             'validate:query',
@@ -514,22 +519,14 @@ class UpdateTest extends TestCase
      */
     private function willLookupResourceId(object $model, string $type, string $id): void
     {
-        $this->container->instance(
-            ResourceContainer::class,
-            $resources = $this->createMock(ResourceContainer::class),
-        );
-
-        $resources
+        $this->resources
             ->expects($this->once())
             ->method('idForType')
             ->with(
                 $this->callback(fn ($actual) => $type === (string) $actual),
                 $this->identicalTo($model),
             )
-            ->willReturnCallback(function () use ($id) {
-                $this->sequence[] = 'lookup-id';
-                return new ResourceId($id);
-            });
+            ->willReturn(new ResourceId($id));
     }
 
     /**
@@ -537,12 +534,9 @@ class UpdateTest extends TestCase
      */
     private function willNotLookupResourceId(): void
     {
-        $this->container->instance(
-            ResourceContainer::class,
-            $resources = $this->createMock(ResourceContainer::class),
-        );
-
-        $resources->expects($this->never())->method($this->anything());
+        $this->resources
+            ->expects($this->never())
+            ->method($this->anything());
     }
 
     /**

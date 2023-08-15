@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Bus\Queries;
 
 use Illuminate\Contracts\Container\Container;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as DispatcherContract;
+use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use RuntimeException;
 
 class Dispatcher implements DispatcherContract

@@ -24,7 +24,7 @@ use LaravelJsonApi\Contracts\Http\Actions\FetchMany as FetchManyContract;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchMany\FetchManyActionHandler;
-use LaravelJsonApi\Core\Http\Actions\FetchMany\FetchManyActionInput;
+use LaravelJsonApi\Core\Http\Actions\FetchMany\FetchManyActionInputFactory;
 use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,10 +44,12 @@ class FetchMany implements FetchManyContract
      * FetchOne constructor
      *
      * @param Route $route
+     * @param FetchManyActionInputFactory $factory
      * @param FetchManyActionHandler $handler
      */
     public function __construct(
         private readonly Route $route,
+        private readonly FetchManyActionInputFactory $factory,
         private readonly FetchManyActionHandler $handler,
     ) {
     }
@@ -79,7 +81,8 @@ class FetchMany implements FetchManyContract
     {
         $type = $this->type ?? $this->route->resourceType();
 
-        $input = FetchManyActionInput::make($request, $type)
+        $input = $this->factory
+            ->make($request, $type)
             ->withHooks($this->hooks);
 
         return $this->handler->execute($input);
