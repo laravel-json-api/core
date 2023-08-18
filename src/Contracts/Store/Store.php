@@ -116,11 +116,11 @@ interface Store
     /**
      * Delete an existing resource.
      *
-     * @param string $resourceType
+     * @param ResourceType|string $resourceType
      * @param object|string $modelOrResourceId
      * @return void
      */
-    public function delete(string $resourceType, $modelOrResourceId): void;
+    public function delete(ResourceType|string $resourceType, $modelOrResourceId): void;
 
     /**
      * Modify a to-one relation.

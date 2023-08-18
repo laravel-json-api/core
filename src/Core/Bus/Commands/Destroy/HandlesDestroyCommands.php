@@ -17,32 +17,17 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Bus\Commands\Destroy;
 
-interface Factory
+use Closure;
+use LaravelJsonApi\Core\Bus\Commands\Result;
+
+interface HandlesDestroyCommands
 {
     /**
-     * @return QueryManyValidator
+     * @param DestroyCommand $command
+     * @param Closure $next
+     * @return Result
      */
-    public function queryMany(): QueryManyValidator;
-
-    /**
-     * @return QueryOneValidator
-     */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
-
-    /**
-     * @return UpdateValidator
-     */
-    public function update(): UpdateValidator;
-
-    /**
-     * @return DestroyValidator|null
-     */
-    public function destroy(): ?DestroyValidator;
+    public function handle(DestroyCommand $command, Closure $next): Result;
 }

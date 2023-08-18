@@ -24,6 +24,7 @@ use Closure;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\DestroyImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
@@ -113,6 +114,16 @@ class HooksImplementationTest extends TestCase
             'updated' => [
                 static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
                     $impl->updated(new stdClass(), $request, $query);
+                },
+            ],
+            'deleting' => [
+                static function (HooksImplementation $impl, Request $request): void {
+                    $impl->deleting(new stdClass(), $request);
+                },
+            ],
+            'deleted' => [
+                static function (HooksImplementation $impl, Request $request): void {
+                    $impl->deleted(new stdClass(), $request);
                 },
             ],
             'readingRelated' => [
@@ -1772,6 +1783,214 @@ class HooksImplementationTest extends TestCase
             $this->assertSame($model, $target->model);
             $this->assertSame($this->request, $target->request);
             $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDeletingMethod(): void
+    {
+        $target = new class {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+
+            public function deleting(stdClass $model, Request $request): void
+            {
+                $this->model = $model;
+                $this->request = $request;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+        $implementation->deleting($model, $this->request);
+
+        $this->assertInstanceOf(DestroyImplementation::class, $implementation);
+        $this->assertSame($model, $target->model);
+        $this->assertSame($this->request, $target->request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDeletingMethodAndThrowsResponse(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function deleting(stdClass $model, Request $request): Response
+            {
+                $this->model = $model;
+                $this->request = $request;
+
+                return $this->response;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->deleting($model, $this->request);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDeletingMethodAndThrowsResponseFromResponsable(): void
+    {
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function deleting(stdClass $model, Request $request): Responsable
+            {
+                $this->model = $model;
+                $this->request = $request;
+
+                return $this->result;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->deleting($model, $this->request);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDeletedMethod(): void
+    {
+        $target = new class {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+
+            public function deleted(stdClass $model, Request $request): void
+            {
+                $this->model = $model;
+                $this->request = $request;
+            }
+        };
+
+        $model = new stdClass();
+
+        $implementation = new HooksImplementation($target);
+        $implementation->deleted($model, $this->request, $this->query);
+
+        $this->assertSame($model, $target->model);
+        $this->assertSame($this->request, $target->request);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDeletedMethodAndThrowsResponse(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function deleted(stdClass $model, Request $request): Response
+            {
+                $this->model = $model;
+                $this->request = $request;
+
+                return $this->response;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->deleted($model, $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDeletedMethodAndThrowsResponseFromResponsable(): void
+    {
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function deleted(stdClass $model, Request $request): Responsable
+            {
+                $this->model = $model;
+                $this->request = $request;
+
+                return $this->result;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->deleted($model, $this->request);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
             $this->assertSame($response, $ex->getResponse());
         }
     }

@@ -17,81 +17,75 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands\Update\Middleware;
+namespace LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware;
 
 use Closure;
-use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
-use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
-use LaravelJsonApi\Contracts\Validation\UpdateValidator;
+use LaravelJsonApi\Contracts\Validation\DestroyErrorFactory;
+use LaravelJsonApi\Contracts\Validation\DestroyValidator;
+use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
+use LaravelJsonApi\Core\Bus\Commands\Destroy\HandlesDestroyCommands;
 use LaravelJsonApi\Core\Bus\Commands\Result;
-use LaravelJsonApi\Core\Bus\Commands\Update\HandlesUpdateCommands;
-use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
-class ValidateUpdateCommand implements HandlesUpdateCommands
+class ValidateDestroyCommand implements HandlesDestroyCommands
 {
     /**
-     * ValidateUpdateCommand constructor
+     * ValidateDestroyCommand constructor
      *
      * @param ValidatorContainer $validatorContainer
-     * @param SchemaContainer $schemaContainer
-     * @param ResourceErrorFactory $errorFactory
+     * @param DestroyErrorFactory $errorFactory
      */
     public function __construct(
         private readonly ValidatorContainer $validatorContainer,
-        private readonly SchemaContainer $schemaContainer,
-        private readonly ResourceErrorFactory $errorFactory,
+        private readonly DestroyErrorFactory $errorFactory,
     ) {
     }
 
     /**
      * @inheritDoc
      */
-    public function handle(UpdateCommand $command, Closure $next): Result
+    public function handle(DestroyCommand $command, Closure $next): Result
     {
         $operation = $command->operation();
 
         if ($command->mustValidate()) {
             $validator = $this
                 ->validatorFor($command->type())
-                ->make($command->request(), $command->modelOrFail(), $operation);
+                ?->make($command->request(), $command->modelOrFail(), $operation);
 
-            if ($validator->fails()) {
+            if ($validator?->fails()) {
                 return Result::failed(
-                    $this->errorFactory->make(
-                        $this->schemaContainer->schemaFor($command->type()),
-                        $validator,
-                    ),
+                    $this->errorFactory->make($validator),
                 );
             }
 
             $command = $command->withValidated(
-                $validator->validated(),
+                $validator?->validated() ?? [],
             );
         }
 
         if ($command->isNotValidated()) {
             $data = $this
                 ->validatorFor($command->type())
-                ->extract($command->modelOrFail(), $operation);
+                ?->extract($command->modelOrFail(), $operation);
 
-            $command = $command->withValidated($data);
+            $command = $command->withValidated($data ?? []);
         }
 
         return $next($command);
     }
 
     /**
-     * Make an update validator.
+     * Make a destroy validator.
      *
      * @param ResourceType $type
-     * @return UpdateValidator
+     * @return DestroyValidator|null
      */
-    private function validatorFor(ResourceType $type): UpdateValidator
+    private function validatorFor(ResourceType $type): ?DestroyValidator
     {
         return $this->validatorContainer
             ->validatorsFor($type)
-            ->update();
+            ->destroy();
     }
 }

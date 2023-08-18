@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Http\Controllers\Hooks;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Http\Controllers\Hooks\DestroyImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
@@ -38,6 +39,7 @@ class HooksImplementation implements
     StoreImplementation,
     ShowImplementation,
     UpdateImplementation,
+    DestroyImplementation,
     ShowRelatedImplementation,
     ShowRelationshipImplementation
 {
@@ -176,6 +178,22 @@ class HooksImplementation implements
     public function updated(object $model, Request $request, QueryParameters $query): void
     {
         $this('updated', $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleting(object $model, Request $request): void
+    {
+        $this('deleting', $model, $request);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function deleted(object $model, Request $request): void
+    {
+        $this('deleted', $model, $request);
     }
 
     /**

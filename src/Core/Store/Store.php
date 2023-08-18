@@ -206,7 +206,7 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function delete(string $resourceType, $modelOrResourceId): void
+    public function delete(ResourceType|string $resourceType, $modelOrResourceId): void
     {
         $repository = $this->resources($resourceType);
 

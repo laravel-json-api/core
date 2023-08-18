@@ -17,32 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
 
-interface Factory
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\Request;
+
+interface DestroyImplementation
 {
     /**
-     * @return QueryManyValidator
+     * @param object $model
+     * @param Request $request
+     * @return void
+     * @throws HttpResponseException
      */
-    public function queryMany(): QueryManyValidator;
+    public function deleting(object $model, Request $request): void;
 
     /**
-     * @return QueryOneValidator
+     * @param object $model
+     * @param Request $request
+     * @return void
+     * @throws HttpResponseException
      */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
-
-    /**
-     * @return UpdateValidator
-     */
-    public function update(): UpdateValidator;
-
-    /**
-     * @return DestroyValidator|null
-     */
-    public function destroy(): ?DestroyValidator;
+    public function deleted(object $model, Request $request): void;
 }

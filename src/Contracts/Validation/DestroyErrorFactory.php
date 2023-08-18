@@ -19,30 +19,16 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Validation;
 
-interface Factory
+use Illuminate\Contracts\Validation\Validator;
+use LaravelJsonApi\Core\Document\ErrorList;
+
+interface DestroyErrorFactory
 {
     /**
-     * @return QueryManyValidator
+     * Make JSON:API errors for the provided validator.
+     *
+     * @param Validator $validator
+     * @return ErrorList
      */
-    public function queryMany(): QueryManyValidator;
-
-    /**
-     * @return QueryOneValidator
-     */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
-
-    /**
-     * @return UpdateValidator
-     */
-    public function update(): UpdateValidator;
-
-    /**
-     * @return DestroyValidator|null
-     */
-    public function destroy(): ?DestroyValidator;
+    public function make(Validator $validator): ErrorList;
 }

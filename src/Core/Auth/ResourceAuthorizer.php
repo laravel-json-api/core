@@ -186,6 +186,43 @@ class ResourceAuthorizer
     }
 
     /**
+     * Authorize a JSON:API destroy command.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @return ErrorList|null
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function destroy(?Request $request, object $model): ?ErrorList
+    {
+        $passes = $this->authorizer->destroy(
+            $request,
+            $model,
+        );
+
+        return $passes ? null : $this->failed();
+    }
+
+    /**
+     * Authorize a JSON:API destroy command, or fail.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @return void
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function destroyOrFail(?Request $request, object $model): void
+    {
+        if ($errors = $this->destroy($request, $model)) {
+            throw new JsonApiException($errors);
+        }
+    }
+
+    /**
      * Authorize a JSON:API show related query.
      *
      * @param Request|null $request

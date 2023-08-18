@@ -24,6 +24,14 @@ use LaravelJsonApi\Core\Support\Contracts;
 class Result
 {
     /**
+     * @return self
+     */
+    public static function none(): self
+    {
+        return new self(null, false);
+    }
+
+    /**
      * Result constructor
      *
      * @param mixed $data
