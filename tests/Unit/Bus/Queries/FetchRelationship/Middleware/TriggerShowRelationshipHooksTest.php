@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Bus\Queries\FetchRelationship\Middleware;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelationshipImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\ShowRelationshipImplementation;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\TriggerShowRelationshipHooks;
 use LaravelJsonApi\Core\Bus\Queries\Result;

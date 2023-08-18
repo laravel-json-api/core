@@ -17,25 +17,26 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
+namespace LaravelJsonApi\Contracts\Http\Hooks;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
 
-interface IndexImplementation
+interface DestroyImplementation
 {
     /**
+     * @param object $model
      * @param Request $request
-     * @param QueryParameters $query
      * @return void
+     * @throws HttpResponseException
      */
-    public function searching(Request $request, QueryParameters $query): void;
+    public function deleting(object $model, Request $request): void;
 
     /**
-     * @param mixed $data
+     * @param object $model
      * @param Request $request
-     * @param QueryParameters $query
      * @return void
+     * @throws HttpResponseException
      */
-    public function searched(mixed $data, Request $request, QueryParameters $query): void;
+    public function deleted(object $model, Request $request): void;
 }

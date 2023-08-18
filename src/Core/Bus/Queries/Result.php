@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Queries;
 
-use LaravelJsonApi\Contracts\Support\Result as ResultContract;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Contracts\Support\Result as ResultContract;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;

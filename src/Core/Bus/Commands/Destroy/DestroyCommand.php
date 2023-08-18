@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Destroy;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\DestroyImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\DestroyImplementation;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Command\Identifiable;
 use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;

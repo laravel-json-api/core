@@ -33,7 +33,7 @@ use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\FetchOne\FetchOneActionHandler;
 use LaravelJsonApi\Core\Http\Actions\FetchOne\FetchOneActionInput;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
-use LaravelJsonApi\Core\Http\Controllers\Hooks\HooksImplementation;
+use LaravelJsonApi\Core\Http\Hooks\HooksImplementation;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Responses\DataResponse;

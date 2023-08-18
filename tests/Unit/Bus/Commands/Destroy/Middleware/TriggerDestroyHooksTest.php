@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Bus\Commands\Destroy\Middleware;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\DestroyImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\DestroyImplementation;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\TriggerDestroyHooks;
 use LaravelJsonApi\Core\Bus\Commands\Result;

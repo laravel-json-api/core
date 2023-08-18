@@ -17,28 +17,25 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
+namespace LaravelJsonApi\Contracts\Http\Hooks;
 
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 
-interface StoreImplementation extends SaveImplementation
+interface IndexImplementation
 {
     /**
      * @param Request $request
      * @param QueryParameters $query
      * @return void
-     * @throws HttpResponseException
      */
-    public function creating(Request $request, QueryParameters $query): void;
+    public function searching(Request $request, QueryParameters $query): void;
 
     /**
-     * @param object $model
+     * @param mixed $data
      * @param Request $request
      * @param QueryParameters $query
      * @return void
-     * @throws HttpResponseException
      */
-    public function created(object $model, Request $request, QueryParameters $query): void;
+    public function searched(mixed $data, Request $request, QueryParameters $query): void;
 }

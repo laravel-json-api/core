@@ -45,7 +45,7 @@ use LaravelJsonApi\Core\Http\Actions\Store\Middleware\CheckRequestJsonIsComplian
 use LaravelJsonApi\Core\Http\Actions\Store\Middleware\ParseStoreOperation;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionHandler;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
-use LaravelJsonApi\Core\Http\Controllers\Hooks\HooksImplementation;
+use LaravelJsonApi\Core\Http\Hooks\HooksImplementation;
 use LaravelJsonApi\Core\Query\FieldSets;
 use LaravelJsonApi\Core\Query\IncludePaths;
 use LaravelJsonApi\Core\Responses\DataResponse;

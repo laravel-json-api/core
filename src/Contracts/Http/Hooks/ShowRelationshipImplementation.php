@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Http\Controllers\Hooks;
+namespace LaravelJsonApi\Contracts\Http\Hooks;
 
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;

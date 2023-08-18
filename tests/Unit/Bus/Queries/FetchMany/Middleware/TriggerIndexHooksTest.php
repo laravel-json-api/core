@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Tests\Unit\Bus\Queries\FetchMany\Middleware;
 
 use ArrayIterator;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\IndexImplementation;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\FetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\TriggerIndexHooks;
 use LaravelJsonApi\Core\Bus\Queries\Result;

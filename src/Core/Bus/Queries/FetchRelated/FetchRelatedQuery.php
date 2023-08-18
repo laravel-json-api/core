@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\FetchRelated;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\ShowRelatedImplementation;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsRelatable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;

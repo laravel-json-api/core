@@ -17,18 +17,18 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Http\Controllers\Hooks;
+namespace LaravelJsonApi\Core\Http\Hooks;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\DestroyImplementation;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\IndexImplementation;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelatedImplementation;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowRelationshipImplementation;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\StoreImplementation;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\UpdateImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\DestroyImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\IndexImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\ShowImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\ShowRelatedImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\ShowRelationshipImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\StoreImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\UpdateImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Support\Str;
 use RuntimeException;

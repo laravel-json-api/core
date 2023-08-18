@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\FetchOne;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Contracts\Http\Controllers\Hooks\ShowImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\ShowImplementation;
 use LaravelJsonApi\Core\Bus\Queries\Query\Identifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
