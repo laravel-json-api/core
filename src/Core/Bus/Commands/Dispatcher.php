@@ -22,6 +22,8 @@ namespace LaravelJsonApi\Core\Bus\Commands;
 use Illuminate\Contracts\Container\Container;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as DispatcherContract;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
+use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
+use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommandHandler;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommandHandler;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
@@ -69,6 +71,7 @@ class Dispatcher implements DispatcherContract
         return match ($commandClass) {
             StoreCommand::class => StoreCommandHandler::class,
             UpdateCommand::class => UpdateCommandHandler::class,
+            DestroyCommand::class => DestroyCommandHandler::class,
             default => throw new RuntimeException('Unexpected command class: ' . $commandClass),
         };
     }

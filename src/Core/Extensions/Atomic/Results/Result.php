@@ -24,11 +24,12 @@ use LaravelJsonApi\Core\Support\Contracts;
 class Result
 {
     /**
+     * @param array $meta
      * @return self
      */
-    public static function none(): self
+    public static function none(array $meta = []): self
     {
-        return new self(null, false);
+        return new self(null, false, $meta);
     }
 
     /**

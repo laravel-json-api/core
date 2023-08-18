@@ -17,40 +17,34 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Tests\Unit\Http\Actions\Update\Middleware;
+namespace LaravelJsonApi\Core\Tests\Unit\Http\Actions\Destroy\Middleware;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use LaravelJsonApi\Core\Http\Actions\Update\Middleware\ParseUpdateOperation;
-use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInput;
-use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
+use LaravelJsonApi\Core\Http\Actions\Destroy\DestroyActionInput;
+use LaravelJsonApi\Core\Http\Actions\Destroy\Middleware\ParseDeleteOperation;
+use LaravelJsonApi\Core\Responses\MetaResponse;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ParseUpdateOperationTest extends TestCase
+class ParseDeleteOperationTest extends TestCase
 {
-    /**
-     * @var MockObject&ResourceObjectParser
-     */
-    private ResourceObjectParser&MockObject $parser;
-
     /**
      * @var Request&MockObject
      */
     private Request&MockObject $request;
 
     /**
-     * @var ParseUpdateOperation
+     * @var ParseDeleteOperation
      */
-    private ParseUpdateOperation $middleware;
+    private ParseDeleteOperation $middleware;
 
     /**
-     * @var UpdateActionInput
+     * @var DestroyActionInput
      */
-    private UpdateActionInput $action;
+    private DestroyActionInput $action;
 
     /**
      * @return void
@@ -59,11 +53,9 @@ class ParseUpdateOperationTest extends TestCase
     {
         parent::setUp();
 
-        $this->middleware = new ParseUpdateOperation(
-            $this->parser = $this->createMock(ResourceObjectParser::class),
-        );
+        $this->middleware = new ParseDeleteOperation();
 
-        $this->action = new UpdateActionInput(
+        $this->action = new DestroyActionInput(
             $this->request = $this->createMock(Request::class),
             new ResourceType('tags'),
             new ResourceId('123'),
@@ -75,35 +67,24 @@ class ParseUpdateOperationTest extends TestCase
      */
     public function test(): void
     {
-        $data = ['foo' => 'bar'];
-        $meta = ['baz' => 'bat'];
-
         $this->request
-            ->expects($this->exactly(2))
-            ->method('json')
-            ->willReturnCallback(fn (string $key): array => match ($key) {
-                'data' => $data,
-                'meta' => $meta,
-                default => $this->fail('Unexpected json key: ' . $key),
-            });
-
-        $this->parser
             ->expects($this->once())
-            ->method('parse')
-            ->with($this->identicalTo($data))
-            ->willReturn($resource = new ResourceObject(new ResourceType('tags')));
+            ->method('json')
+            ->with('meta')
+            ->willReturn($meta = ['foo' => 'bar']);
 
-        $expected = new DataResponse(null);
+        $ref = new Ref(type: $this->action->type(), id: $this->action->id());
+        $expected = new MetaResponse($meta);
 
         $actual = $this->middleware->handle(
             $this->action,
-            function (UpdateActionInput $passed) use ($resource, $meta, $expected): DataResponse {
+            function (DestroyActionInput $passed) use ($ref, $meta, $expected): MetaResponse {
                 $op = $passed->operation();
                 $this->assertNotSame($this->action, $passed);
                 $this->assertSame($this->action->request(), $passed->request());
                 $this->assertSame($this->action->type(), $passed->type());
-                $this->assertNull($op->target);
-                $this->assertSame($resource, $op->data);
+                $this->assertSame($this->action->id(), $passed->id());
+                $this->assertEquals($ref, $op->ref());
                 $this->assertSame($meta, $op->meta);
                 return $expected;
             },

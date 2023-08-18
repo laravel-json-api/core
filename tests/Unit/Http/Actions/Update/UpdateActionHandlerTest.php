@@ -58,22 +58,22 @@ class UpdateActionHandlerTest extends TestCase
     /**
      * @var PipelineFactory&MockObject
      */
-    private readonly PipelineFactory&MockObject $pipelineFactory;
+    private PipelineFactory&MockObject $pipelineFactory;
 
     /**
      * @var MockObject&CommandDispatcher
      */
-    private readonly CommandDispatcher&MockObject $commandDispatcher;
+    private CommandDispatcher&MockObject $commandDispatcher;
 
     /**
      * @var MockObject&QueryDispatcher
      */
-    private readonly QueryDispatcher&MockObject $queryDispatcher;
+    private QueryDispatcher&MockObject $queryDispatcher;
 
     /**
      * @var UpdateActionHandler
      */
-    private readonly UpdateActionHandler $handler;
+    private UpdateActionHandler $handler;
 
     /**
      * @return void

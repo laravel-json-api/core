@@ -107,7 +107,7 @@ class UpdateActionHandler
     }
 
     /**
-     * Dispatch the store command.
+     * Dispatch the update command.
      *
      * @param UpdateActionInput $action
      * @return Payload
