@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Commands\Command;
 
-use RuntimeException;
+use LaravelJsonApi\Core\Store\LazyModel;
 
 trait Identifiable
 {
@@ -36,6 +36,8 @@ trait Identifiable
      */
     public function withModel(?object $model): static
     {
+        assert($this->model === null, 'Not expecting existing model to be replaced on a command.');
+
         $copy = clone $this;
         $copy->model = $model;
 
@@ -43,26 +45,30 @@ trait Identifiable
     }
 
     /**
-     * Get the model for the query.
+     * Get the model for the command.
      *
      * @return object|null
      */
     public function model(): ?object
     {
+        if ($this->model instanceof LazyModel) {
+            return $this->model->get();
+        }
+
         return $this->model;
     }
 
     /**
-     * Get the model for the query.
+     * Get the model for the command.
      *
      * @return object
      */
     public function modelOrFail(): object
     {
-        if ($this->model !== null) {
-            return $this->model;
-        }
+        $model = $this->model();
 
-        throw new RuntimeException('Expecting a model to be set on the query.');
+        assert($model !== null, 'Expecting a model to be set on the command.');
+
+        return $model;
     }
 }

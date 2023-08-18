@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\Query;
 
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Store\LazyModel;
 
 trait Identifiable
 {
@@ -49,6 +50,8 @@ trait Identifiable
      */
     public function withModel(?object $model): static
     {
+        assert($this->model === null, 'Not expecting existing model to be replaced on a query.');
+
         $copy = clone $this;
         $copy->model = $model;
 
@@ -62,6 +65,10 @@ trait Identifiable
      */
     public function model(): ?object
     {
+        if ($this->model instanceof LazyModel) {
+            return $this->model->get();
+        }
+
         return $this->model;
     }
 
@@ -72,8 +79,10 @@ trait Identifiable
      */
     public function modelOrFail(): object
     {
-        assert($this->model !== null, 'Expecting a model to be set.');
+        $model = $this->model();
 
-        return $this->model;
+        assert($this->model !== null, 'Expecting a model to be set on the query.');
+
+        return $model;
     }
 }

@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Http\Exceptions;
 
-use LaravelJsonApi\Core\Http\Exceptions\HttpNotAcceptableException;
 use LaravelJsonApi\Core\Http\Exceptions\HttpUnsupportedMediaTypeException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;

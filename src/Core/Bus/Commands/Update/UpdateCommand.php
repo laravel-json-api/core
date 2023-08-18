@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Bus\Commands\Update;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Hooks\UpdateImplementation;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
+use LaravelJsonApi\Core\Bus\Commands\Command\HasQuery;
 use LaravelJsonApi\Core\Bus\Commands\Command\Identifiable;
 use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
@@ -32,6 +33,7 @@ use RuntimeException;
 class UpdateCommand extends Command implements IsIdentifiable
 {
     use Identifiable;
+    use HasQuery;
 
     /**
      * @var UpdateImplementation|null

@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Parsers;
 
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\ListOfOperationsParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
 use PHPUnit\Framework\TestCase;

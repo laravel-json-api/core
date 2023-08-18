@@ -20,7 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Update;
 
 use LaravelJsonApi\Contracts\Store\Store;
-use LaravelJsonApi\Core\Bus\Commands\Middleware\LookupModelIfMissing;
+use LaravelJsonApi\Core\Bus\Commands\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Update\Middleware\AuthorizeUpdateCommand;
 use LaravelJsonApi\Core\Bus\Commands\Update\Middleware\TriggerUpdateHooks;
@@ -52,7 +52,7 @@ class UpdateCommandHandler
     public function execute(UpdateCommand $command): Result
     {
         $pipes = [
-            LookupModelIfMissing::class,
+            SetModelIfMissing::class,
             AuthorizeUpdateCommand::class,
             ValidateUpdateCommand::class,
             TriggerUpdateHooks::class,

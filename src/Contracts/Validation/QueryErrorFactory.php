@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
-use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Core\Document\ErrorList;
 
 interface QueryErrorFactory

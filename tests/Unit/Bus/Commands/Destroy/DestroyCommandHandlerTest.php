@@ -27,7 +27,7 @@ use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommandHandler;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\AuthorizeDestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\TriggerDestroyHooks;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\ValidateDestroyCommand;
-use LaravelJsonApi\Core\Bus\Commands\Middleware\LookupModelIfMissing;
+use LaravelJsonApi\Core\Bus\Commands\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
@@ -95,7 +95,7 @@ class DestroyCommandHandlerTest extends TestCase
             ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
-                    LookupModelIfMissing::class,
+                    SetModelIfMissing::class,
                     AuthorizeDestroyCommand::class,
                     ValidateDestroyCommand::class,
                     TriggerDestroyHooks::class,
@@ -160,7 +160,7 @@ class DestroyCommandHandlerTest extends TestCase
             ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
-                    LookupModelIfMissing::class,
+                    SetModelIfMissing::class,
                     AuthorizeDestroyCommand::class,
                     ValidateDestroyCommand::class,
                     TriggerDestroyHooks::class,

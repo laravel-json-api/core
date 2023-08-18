@@ -33,7 +33,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQueryHand
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\AuthorizeFetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\TriggerShowRelationshipHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\ValidateFetchRelationshipQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
+use LaravelJsonApi\Core\Bus\Queries\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
@@ -196,7 +196,7 @@ class FetchRelationshipQueryHandlerTest extends TestCase
             ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
-                    LookupModelIfRequired::class,
+                    SetModelIfMissing::class,
                     AuthorizeFetchRelationshipQuery::class,
                     ValidateFetchRelationshipQuery::class,
                     TriggerShowRelationshipHooks::class,

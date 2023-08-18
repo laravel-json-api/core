@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Bus\Commands\Command;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\ValidatedInput;
-use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
 use LaravelJsonApi\Core\Support\Contracts;
@@ -42,11 +41,6 @@ abstract class Command
      * @var array|null
      */
     private ?array $validated = null;
-
-    /**
-     * @var QueryParameters|null
-     */
-    private ?QueryParameters $queryParameters = null;
 
     /**
      * Get the primary resource type.
@@ -79,28 +73,6 @@ abstract class Command
     public function request(): ?Request
     {
         return $this->request;
-    }
-
-    /**
-     * Set the query parameters that will be used when processing the result payload.
-     *
-     * @param QueryParameters|null $query
-     * @return $this
-     */
-    public function withQuery(?QueryParameters $query): static
-    {
-        $copy = clone $this;
-        $copy->queryParameters = $query;
-
-        return $copy;
-    }
-
-    /**
-     * @return QueryParameters|null
-     */
-    public function query(): ?QueryParameters
-    {
-        return $this->queryParameters;
     }
 
     /**

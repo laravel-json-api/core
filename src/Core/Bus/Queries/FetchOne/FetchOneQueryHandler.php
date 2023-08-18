@@ -23,7 +23,7 @@ use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\ValidateFetchOneQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
+use LaravelJsonApi\Core\Bus\Queries\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Support\PipelineFactory;
@@ -52,7 +52,7 @@ class FetchOneQueryHandler
     public function execute(FetchOneQuery $query): Result
     {
         $pipes = [
-            LookupModelIfRequired::class,
+            SetModelIfMissing::class,
             AuthorizeFetchOneQuery::class,
             ValidateFetchOneQuery::class,
             TriggerShowHooks::class,

@@ -23,21 +23,21 @@ use Closure;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
-use LaravelJsonApi\Core\Bus\Commands\Middleware\LookupModelIfMissing;
+use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
+use LaravelJsonApi\Core\Bus\Commands\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
-use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use stdClass;
 
-class LookupModelIfMissingTest extends TestCase
+class SetModelIfMissingTest extends TestCase
 {
     /**
      * @var MockObject&Store
@@ -45,9 +45,9 @@ class LookupModelIfMissingTest extends TestCase
     private Store&MockObject $store;
 
     /**
-     * @var LookupModelIfMissing
+     * @var SetModelIfMissing
      */
-    private LookupModelIfMissing $middleware;
+    private SetModelIfMissing $middleware;
 
     /**
      * @return void
@@ -56,7 +56,7 @@ class LookupModelIfMissingTest extends TestCase
     {
         parent::setUp();
 
-        $this->middleware = new LookupModelIfMissing(
+        $this->middleware = new SetModelIfMissing(
             $this->store = $this->createMock(Store::class),
         );
     }
@@ -76,26 +76,31 @@ class LookupModelIfMissingTest extends TestCase
                     return UpdateCommand::make(null, $operation);
                 },
             ],
+            'destroy' => [
+                static function (): DestroyCommand {
+                    return DestroyCommand::make(
+                        null,
+                        new Delete(new Ref(new ResourceType('tags'), new ResourceId('999'))),
+                    );
+                },
+            ],
         ];
     }
 
     /**
-     * @param Closure $scenario
+     * @param Closure<Command&IsIdentifiable> $scenario
      * @return void
      * @dataProvider modelRequiredProvider
      */
-    public function testItFindsModel(Closure $scenario): void
+    public function testItSetsModel(Closure $scenario): void
     {
-        /** @var Command&IsIdentifiable $command */
         $command = $scenario();
-        $type = $command->type();
-        $id = $command->id();
 
         $this->store
             ->expects($this->once())
             ->method('find')
-            ->with($this->identicalTo($type), $this->identicalTo($id))
-            ->willReturn($model = new stdClass());
+            ->with($this->identicalTo($command->type()), $this->identicalTo($command->id()))
+            ->willReturn($model = new \stdClass());
 
         $expected = Result::ok(new Payload(null, true));
 
@@ -103,6 +108,7 @@ class LookupModelIfMissingTest extends TestCase
             $command,
             function (Command&IsIdentifiable $passed) use ($command, $model, $expected): Result {
                 $this->assertNotSame($passed, $command);
+                $this->assertSame($model, $passed->model());
                 $this->assertSame($model, $passed->model());
                 return $expected;
             },
@@ -112,16 +118,14 @@ class LookupModelIfMissingTest extends TestCase
     }
 
     /**
-     * @param Closure $scenario
+     * @param Closure<Command&IsIdentifiable> $scenario
      * @return void
      * @dataProvider modelRequiredProvider
      */
-    public function testItDoesNotFindModelIfAlreadySet(Closure $scenario): void
+    public function testItDoesNotSetModel(Closure $scenario): void
     {
-        /** @var Command&IsIdentifiable $command */
         $command = $scenario();
-        /** @var Command&IsIdentifiable $command */
-        $command = $command->withModel(new \stdClass());
+        $command = $command->withModel($model = new \stdClass());
 
         $this->store
             ->expects($this->never())
@@ -131,39 +135,13 @@ class LookupModelIfMissingTest extends TestCase
 
         $actual = $this->middleware->handle(
             $command,
-            function (Command $passed) use ($command, $expected): Result {
+            function (Command&IsIdentifiable $passed) use ($command, $model, $expected): Result {
                 $this->assertSame($passed, $command);
+                $this->assertSame($model, $passed->model());
                 return $expected;
             },
         );
 
         $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @param Closure $scenario
-     * @return void
-     * @dataProvider modelRequiredProvider
-     */
-    public function testItDoesNotFindModel(Closure $scenario): void
-    {
-        /** @var Command&IsIdentifiable $command */
-        $command = $scenario();
-        $type = $command->type();
-        $id = $command->id();
-
-        $this->store
-            ->expects($this->once())
-            ->method('find')
-            ->with($this->identicalTo($type), $this->identicalTo($id))
-            ->willReturn(null);
-
-        $result = $this->middleware->handle(
-            $command,
-            fn() => $this->fail('Not expecting next middleware to be called.'),
-        );
-
-        $this->assertTrue($result->didFail());
-        $this->assertEquals(new ErrorList(Error::make()->setStatus(404)), $result->errors());
     }
 }

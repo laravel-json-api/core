@@ -23,7 +23,7 @@ use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\AuthorizeDestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\TriggerDestroyHooks;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\ValidateDestroyCommand;
-use LaravelJsonApi\Core\Bus\Commands\Middleware\LookupModelIfMissing;
+use LaravelJsonApi\Core\Bus\Commands\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Support\PipelineFactory;
@@ -51,8 +51,7 @@ class DestroyCommandHandler
     public function execute(DestroyCommand $command): Result
     {
         $pipes = [
-            // @TODO only need to load model if authorizing, validating or have hooks to call.
-            LookupModelIfMissing::class,
+            SetModelIfMissing::class,
             AuthorizeDestroyCommand::class,
             ValidateDestroyCommand::class,
             TriggerDestroyHooks::class,

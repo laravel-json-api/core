@@ -24,7 +24,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\ValidatedInput;
 use LaravelJsonApi\Contracts\Store\ResourceBuilder;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
-use LaravelJsonApi\Core\Bus\Commands\Middleware\LookupModelIfMissing;
+use LaravelJsonApi\Core\Bus\Commands\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Update\Middleware\AuthorizeUpdateCommand;
 use LaravelJsonApi\Core\Bus\Commands\Update\Middleware\TriggerUpdateHooks;
@@ -98,7 +98,7 @@ class UpdateCommandHandlerTest extends TestCase
             ->willReturnCallback(function (array $actual) use (&$sequence, $pipeline): Pipeline {
                 $sequence[] = 'through';
                 $this->assertSame([
-                    LookupModelIfMissing::class,
+                    SetModelIfMissing::class,
                     AuthorizeUpdateCommand::class,
                     ValidateUpdateCommand::class,
                     TriggerUpdateHooks::class,

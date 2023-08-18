@@ -24,13 +24,12 @@ use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Commands\Result;
-use LaravelJsonApi\Core\Document\Error;
-use Symfony\Component\HttpFoundation\Response;
+use LaravelJsonApi\Core\Store\LazyModel;
 
-class LookupModelIfMissing
+class SetModelIfMissing
 {
     /**
-     * LookupModelIfMissing constructor
+     * SetModelIfMissing constructor
      *
      * @param Store $store
      */
@@ -48,18 +47,11 @@ class LookupModelIfMissing
     public function handle(Command&IsIdentifiable $command, Closure $next): Result
     {
         if ($command->model() === null) {
-            $model = $this->store->find(
+            $command = $command->withModel(new LazyModel(
+                $this->store,
                 $command->type(),
                 $command->id(),
-            );
-
-            if ($model === null) {
-                return Result::failed(
-                    Error::make()->setStatus(Response::HTTP_NOT_FOUND)
-                );
-            }
-
-            $command = $command->withModel($model);
+            ));
         }
 
         return $next($command);

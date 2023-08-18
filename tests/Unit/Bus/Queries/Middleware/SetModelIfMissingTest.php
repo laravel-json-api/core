@@ -24,18 +24,16 @@ use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\FetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
+use LaravelJsonApi\Core\Bus\Queries\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Bus\Queries\Result;
-use LaravelJsonApi\Core\Document\Error;
-use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-class LookupModelIfRequiredTest extends TestCase
+class SetModelIfMissingTest extends TestCase
 {
     /**
      * @var MockObject&Store
@@ -43,9 +41,9 @@ class LookupModelIfRequiredTest extends TestCase
     private Store&MockObject $store;
 
     /**
-     * @var LookupModelIfRequired
+     * @var SetModelIfMissing
      */
-    private LookupModelIfRequired $middleware;
+    private SetModelIfMissing $middleware;
 
     /**
      * @return void
@@ -54,7 +52,7 @@ class LookupModelIfRequiredTest extends TestCase
     {
         parent::setUp();
 
-        $this->middleware = new LookupModelIfRequired(
+        $this->middleware = new SetModelIfMissing(
             $this->store = $this->createMock(Store::class),
         );
     }
@@ -65,59 +63,31 @@ class LookupModelIfRequiredTest extends TestCase
     public static function modelRequiredProvider(): array
     {
         return [
-            'fetch-one:authorize' => [
+            'fetch-one' => [
                 static function (): FetchOneQuery {
                     return FetchOneQuery::make(null, 'posts', '123');
                 },
             ],
-            'fetch-related:authorize' => [
+            'fetch-related' => [
                 static function (): FetchRelatedQuery {
                     return FetchRelatedQuery::make(null, 'posts', '123', 'comments');
                 },
             ],
-            'fetch-related:no authorization' => [
-                static function (): FetchRelatedQuery {
-                    return FetchRelatedQuery::make(null, 'posts', '123', 'comments')
-                        ->skipAuthorization();
-                },
-            ],
-            'fetch-relationship:authorize' => [
+            'fetch-relationship' => [
                 static function (): FetchRelationshipQuery {
                     return FetchRelationshipQuery::make(null, 'posts', '123', 'comments');
                 },
             ],
-            'fetch-relationship:no authorization' => [
-                static function (): FetchRelationshipQuery {
-                    return FetchRelationshipQuery::make(null, 'posts', '123', 'comments')
-                        ->skipAuthorization();
-                },
-            ],
         ];
     }
 
     /**
-     * @return array<array<Closure>>
-     */
-    public static function modelNotRequiredProvider(): array
-    {
-        return [
-            'fetch-one:no authorization' => [
-                static function (): FetchOneQuery {
-                    return FetchOneQuery::make(null, 'posts', '123')
-                        ->skipAuthorization();
-                },
-            ],
-        ];
-    }
-
-    /**
-     * @param Closure $scenario
+     * @param Closure<Query&IsIdentifiable> $scenario
      * @return void
      * @dataProvider modelRequiredProvider
      */
     public function testItFindsModel(Closure $scenario): void
     {
-        /** @var Query&IsIdentifiable $query */
         $query = $scenario();
         $type = $query->type();
         $id = $query->id();
@@ -135,6 +105,7 @@ class LookupModelIfRequiredTest extends TestCase
             function (Query&IsIdentifiable $passed) use ($query, $model, $expected): Result {
                 $this->assertNotSame($passed, $query);
                 $this->assertSame($model, $passed->model());
+                $this->assertSame($model, $passed->model());
                 return $expected;
             },
         );
@@ -143,16 +114,14 @@ class LookupModelIfRequiredTest extends TestCase
     }
 
     /**
-     * @param Closure $scenario
+     * @param Closure<Query&IsIdentifiable> $scenario
      * @return void
      * @dataProvider modelRequiredProvider
      */
     public function testItDoesNotFindModelIfAlreadySet(Closure $scenario): void
     {
-        /** @var Query&IsIdentifiable $query */
         $query = $scenario();
-        /** @var Query&IsIdentifiable $query */
-        $query = $query->withModel(new \stdClass());
+        $query = $query->withModel($model = new \stdClass());
 
         $this->store
             ->expects($this->never())
@@ -162,62 +131,9 @@ class LookupModelIfRequiredTest extends TestCase
 
         $actual = $this->middleware->handle(
             $query,
-            function (Query $passed) use ($query, $expected): Result {
+            function (Query $passed) use ($query, $model, $expected): Result {
                 $this->assertSame($passed, $query);
-                return $expected;
-            },
-        );
-
-        $this->assertSame($expected, $actual);
-    }
-
-    /**
-     * @param Closure $scenario
-     * @return void
-     * @dataProvider modelRequiredProvider
-     */
-    public function testItDoesNotFindModel(Closure $scenario): void
-    {
-        /** @var Query&IsIdentifiable $query */
-        $query = $scenario();
-        $type = $query->type();
-        $id = $query->id();
-
-        $this->store
-            ->expects($this->once())
-            ->method('find')
-            ->with($this->identicalTo($type), $this->identicalTo($id))
-            ->willReturn(null);
-
-        $result = $this->middleware->handle(
-            $query,
-            fn() => $this->fail('Not expecting next middleware to be called.'),
-        );
-
-        $this->assertTrue($result->didFail());
-        $this->assertEquals(new ErrorList(Error::make()->setStatus(404)), $result->errors());
-    }
-
-    /**
-     * @param Closure $scenario
-     * @return void
-     * @dataProvider modelNotRequiredProvider
-     */
-    public function testItDoesntLookupModelIfNotRequired(Closure $scenario): void
-    {
-        $this->store
-            ->expects($this->never())
-            ->method($this->anything());
-
-        /** @var Query&IsIdentifiable $query */
-        $query = $scenario();
-
-        $expected = Result::ok(new Payload(null, true));
-
-        $actual = $this->middleware->handle(
-            $query,
-            function (Query $passed) use ($query, $expected): Result {
-                $this->assertSame($passed, $query);
+                $this->assertSame($model, $query->model());
                 return $expected;
             },
         );

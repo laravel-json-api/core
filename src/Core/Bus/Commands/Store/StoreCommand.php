@@ -22,11 +22,14 @@ namespace LaravelJsonApi\Core\Bus\Commands\Store;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Hooks\StoreImplementation;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
+use LaravelJsonApi\Core\Bus\Commands\Command\HasQuery;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 
 class StoreCommand extends Command
 {
+    use HasQuery;
+
     /**
      * @var StoreImplementation|null
      */

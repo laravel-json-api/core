@@ -22,17 +22,14 @@ namespace LaravelJsonApi\Core\Bus\Queries\Middleware;
 use Closure;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
-use LaravelJsonApi\Core\Bus\Queries\Query\IsRelatable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Bus\Queries\Result;
-use LaravelJsonApi\Core\Document\Error;
-use RuntimeException;
-use Symfony\Component\HttpFoundation\Response;
+use LaravelJsonApi\Core\Store\LazyModel;
 
-class LookupModelIfRequired
+class SetModelIfMissing
 {
     /**
-     * LookupModelIfRequired constructor
+     * SetModelIfMissing constructor
      *
      * @param Store $store
      */
@@ -49,37 +46,14 @@ class LookupModelIfRequired
      */
     public function handle(Query&IsIdentifiable $query, Closure $next): Result
     {
-        if ($query->model() === null && $this->mustLoadModel($query)) {
-            $model = $this->store->find(
+        if ($query->model() === null) {
+            $query = $query->withModel(new LazyModel(
+                $this->store,
                 $query->type(),
-                $query->id() ?? throw new RuntimeException('Expecting a resource id to be set.'),
-            );
-
-            if ($model === null) {
-                return Result::failed(
-                    Error::make()->setStatus(Response::HTTP_NOT_FOUND)
-                );
-            }
-
-            $query = $query->withModel($model);
+                $query->id(),
+            ));
         }
 
         return $next($query);
-    }
-
-    /**
-     * Must the model be loaded for the query?
-     *
-     * We must load the model in the following scenarios:
-     *
-     * - If the query is going to be authorized, so we can pass the model to the authorizer.
-     * - If the query is fetching a relationship, as we need the model for the relationship responses.
-     *
-     * @param Query $query
-     * @return bool
-     */
-    private function mustLoadModel(Query $query): bool
-    {
-        return $query->mustAuthorize() || $query instanceof IsRelatable;
     }
 }

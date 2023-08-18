@@ -30,21 +30,6 @@ use Traversable;
 class LazyRelation implements IteratorAggregate
 {
     /**
-     * @var Server
-     */
-    private Server $server;
-
-    /**
-     * @var Relation
-     */
-    protected Relation $relation;
-
-    /**
-     * @var array
-     */
-    private array $json;
-
-    /**
      * The cached to-one resource.
      *
      * @var object|null
@@ -72,11 +57,11 @@ class LazyRelation implements IteratorAggregate
      * @param Relation $relation
      * @param array $json
      */
-    public function __construct(Server $server, Relation $relation, array $json)
-    {
-        $this->server = $server;
-        $this->relation = $relation;
-        $this->json = $json;
+    public function __construct(
+        private readonly Server $server,
+        private readonly Relation $relation,
+        private readonly array $json
+    ) {
     }
 
     /**
@@ -188,7 +173,7 @@ class LazyRelation implements IteratorAggregate
      * @param mixed $identifier
      * @return bool
      */
-    private function isValid($identifier): bool
+    private function isValid(mixed $identifier): bool
     {
         if (is_array($identifier) && isset($identifier['type']) && isset($identifier['id'])) {
             return $this->isType($identifier['type']) && $this->isId($identifier['id']);
@@ -201,7 +186,7 @@ class LazyRelation implements IteratorAggregate
      * @param mixed $type
      * @return bool
      */
-    private function isType($type): bool
+    private function isType(mixed $type): bool
     {
         return in_array($type, $this->relation->allInverse(), true);
     }
@@ -210,7 +195,7 @@ class LazyRelation implements IteratorAggregate
      * @param mixed $id
      * @return bool
      */
-    private function isId($id): bool
+    private function isId(mixed $id): bool
     {
         if (is_string($id)) {
             return !empty($id) || '0' === $id;

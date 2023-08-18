@@ -22,7 +22,6 @@ namespace LaravelJsonApi\Core\Responses\Internal;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LaravelJsonApi\Core\Json\Hash;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Responses\Concerns;
 use LaravelJsonApi\Core\Responses\Concerns\HasRelationship;

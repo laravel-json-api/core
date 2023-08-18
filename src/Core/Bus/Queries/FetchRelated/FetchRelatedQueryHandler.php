@@ -24,7 +24,7 @@ use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\AuthorizeFetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\TriggerShowRelatedHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\ValidateFetchRelatedQuery;
-use LaravelJsonApi\Core\Bus\Queries\Middleware\LookupModelIfRequired;
+use LaravelJsonApi\Core\Bus\Queries\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Support\PipelineFactory;
@@ -55,7 +55,7 @@ class FetchRelatedQueryHandler
     public function execute(FetchRelatedQuery $query): Result
     {
         $pipes = [
-            LookupModelIfRequired::class,
+            SetModelIfMissing::class,
             AuthorizeFetchRelatedQuery::class,
             ValidateFetchRelatedQuery::class,
             TriggerShowRelatedHooks::class,
