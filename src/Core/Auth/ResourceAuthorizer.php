@@ -303,6 +303,46 @@ class ResourceAuthorizer
     }
 
     /**
+     * Authorize a JSON:API update relationship command.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @param string $fieldName
+     * @return ErrorList|null
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function updateRelationship(?Request $request, object $model, string $fieldName): ?ErrorList
+    {
+        $passes = $this->authorizer->updateRelationship(
+            $request,
+            $model,
+            $fieldName,
+        );
+
+        return $passes ? null : $this->failed();
+    }
+
+    /**
+     * Authorize a JSON:API update relationship command, or fail.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @param string $fieldName
+     * @return void
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function updateRelationshipOrFail(?Request $request, object $model, string $fieldName): void
+    {
+        if ($errors = $this->updateRelationship($request, $model, $fieldName)) {
+            throw new JsonApiException($errors);
+        }
+    }
+
+    /**
      * @return ErrorList
      * @throws AuthorizationException
      * @throws AuthenticationException

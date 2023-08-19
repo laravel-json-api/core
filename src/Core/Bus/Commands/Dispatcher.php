@@ -28,6 +28,8 @@ use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommandHandler;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommandHandler;
+use LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\UpdateRelationshipCommand;
+use LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\UpdateRelationshipCommandHandler;
 use RuntimeException;
 
 class Dispatcher implements DispatcherContract
@@ -72,6 +74,7 @@ class Dispatcher implements DispatcherContract
             StoreCommand::class => StoreCommandHandler::class,
             UpdateCommand::class => UpdateCommandHandler::class,
             DestroyCommand::class => DestroyCommandHandler::class,
+            UpdateRelationshipCommand::class => UpdateRelationshipCommandHandler::class,
             default => throw new RuntimeException('Unexpected command class: ' . $commandClass),
         };
     }

@@ -21,26 +21,27 @@ namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 
-interface UpdateValidator
+interface RelationshipValidator
 {
     /**
-     * Extract validation data from the update operation.
+     * Extract validation data from the update relationship operation.
      *
      * @param object $model
-     * @param Update $operation
+     * @param UpdateToOne|UpdateToMany $operation
      * @return array
      */
-    public function extract(object $model, Update $operation): array;
+    public function extract(object $model, UpdateToOne|UpdateToMany $operation): array;
 
     /**
-     * Make a validator for the update operation.
+     * Make a validator for the update relationship operation.
      *
      * @param Request|null $request
      * @param object $model
-     * @param Update $operation
+     * @param UpdateToOne|UpdateToMany $operation
      * @return Validator
      */
-    public function make(?Request $request, object $model, Update $operation): Validator;
+    public function make(?Request $request, object $model, UpdateToOne|UpdateToMany $operation): Validator;
 }

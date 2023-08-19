@@ -88,6 +88,7 @@ class FetchRelationshipQueryHandler
 
         $id = $query->id();
         $params = $query->toQueryParams();
+        $model = $query->modelOrFail();
 
         /**
          * @TODO future improvement - ensure store knows we only want identifiers.
@@ -105,6 +106,6 @@ class FetchRelationshipQueryHandler
         }
 
         return Result::ok(new Payload($related, true), $params)
-            ->withRelatedTo($query->modelOrFail(), $fieldName);
+            ->withRelatedTo($model, $fieldName);
     }
 }

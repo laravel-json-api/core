@@ -17,37 +17,14 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Contracts\Validation;
+namespace LaravelJsonApi\Core\Bus\Commands\Command;
 
-interface Factory
+interface IsRelatable extends IsIdentifiable
 {
     /**
-     * @return QueryManyValidator
+     * Get the JSON:API field name for the relationship the command is targeting.
+     *
+     * @return string
      */
-    public function queryMany(): QueryManyValidator;
-
-    /**
-     * @return QueryOneValidator
-     */
-    public function queryOne(): QueryOneValidator;
-
-    /**
-     * @return StoreValidator
-     */
-    public function store(): StoreValidator;
-
-    /**
-     * @return UpdateValidator
-     */
-    public function update(): UpdateValidator;
-
-    /**
-     * @return DestroyValidator|null
-     */
-    public function destroy(): ?DestroyValidator;
-
-    /**
-     * @return RelationshipValidator
-     */
-    public function relation(): RelationshipValidator;
+    public function fieldName(): string;
 }

@@ -88,6 +88,7 @@ class FetchRelatedQueryHandler
 
         $id = $query->id();
         $params = $query->toQueryParams();
+        $model = $query->modelOrFail();
 
         if ($relation->toOne()) {
             $related = $this->store
@@ -102,6 +103,6 @@ class FetchRelatedQueryHandler
         }
 
         return Result::ok(new Payload($related, true), $params)
-            ->withRelatedTo($query->modelOrFail(), $fieldName);
+            ->withRelatedTo($model, $fieldName);
     }
 }

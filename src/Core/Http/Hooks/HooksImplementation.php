@@ -29,6 +29,7 @@ use LaravelJsonApi\Contracts\Http\Hooks\ShowRelatedImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\StoreImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\UpdateImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\UpdateRelationshipImplementation;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
 use LaravelJsonApi\Core\Support\Str;
 use RuntimeException;
@@ -41,7 +42,8 @@ class HooksImplementation implements
     UpdateImplementation,
     DestroyImplementation,
     ShowRelatedImplementation,
-    ShowRelationshipImplementation
+    ShowRelationshipImplementation,
+    UpdateRelationshipImplementation
 {
     /**
      * HooksImplementation constructor
@@ -244,6 +246,37 @@ class HooksImplementation implements
     ): void
     {
         $method = 'read' . Str::classify($field);
+
+        $this($method, $model, $related, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updatingRelationship(
+        object $model,
+        string $fieldName,
+        Request $request,
+        QueryParameters $query,
+    ): void
+    {
+        $method = 'updating' . Str::classify($fieldName);
+
+        $this($method, $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function updatedRelationship(
+        object $model,
+        string $fieldName,
+        mixed $related,
+        Request $request,
+        QueryParameters $query,
+    ): void
+    {
+        $method = 'updated' . Str::classify($fieldName);
 
         $this($method, $model, $related, $request, $query);
     }

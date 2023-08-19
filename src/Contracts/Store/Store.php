@@ -125,22 +125,30 @@ interface Store
     /**
      * Modify a to-one relation.
      *
-     * @param string $resourceType
+     * @param ResourceType|string $resourceType
      * @param object|string $modelOrResourceId
      * @param string $fieldName
      * @return ToOneBuilder
      */
-    public function modifyToOne(string $resourceType, $modelOrResourceId, string $fieldName): ToOneBuilder;
+    public function modifyToOne(
+        ResourceType|string $resourceType,
+        $modelOrResourceId,
+        string $fieldName,
+    ): ToOneBuilder;
 
     /**
      * Modify a to-many relation.
      *
-     * @param string $resourceType
+     * @param ResourceType|string $resourceType
      * @param object|string $modelOrResourceId
      * @param string $fieldName
      * @return ToManyBuilder
      */
-    public function modifyToMany(string $resourceType, $modelOrResourceId, string $fieldName): ToManyBuilder;
+    public function modifyToMany(
+        ResourceType|string $resourceType,
+        $modelOrResourceId,
+        string $fieldName,
+    ): ToManyBuilder;
 
     /**
      * Access a resource repository by its JSON:API resource type.
