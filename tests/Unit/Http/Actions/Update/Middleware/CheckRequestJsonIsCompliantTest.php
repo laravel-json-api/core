@@ -37,27 +37,27 @@ class CheckRequestJsonIsCompliantTest extends TestCase
     /**
      * @var MockObject&ResourceDocumentComplianceChecker
      */
-    private readonly ResourceDocumentComplianceChecker&MockObject $complianceChecker;
+    private ResourceDocumentComplianceChecker&MockObject $complianceChecker;
 
     /**
      * @var CheckRequestJsonIsCompliant
      */
-    private readonly CheckRequestJsonIsCompliant $middleware;
+    private CheckRequestJsonIsCompliant $middleware;
 
     /**
      * @var UpdateActionInput
      */
-    private readonly UpdateActionInput $action;
+    private UpdateActionInput $action;
 
     /**
      * @var Request
      */
-    private readonly Request $request;
+    private Request $request;
 
     /**
      * @var ResourceId
      */
-    private readonly ResourceId $id;
+    private ResourceId $id;
 
     /**
      * @var Result|null

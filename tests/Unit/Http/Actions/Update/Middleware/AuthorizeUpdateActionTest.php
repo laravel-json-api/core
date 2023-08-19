@@ -41,22 +41,22 @@ class AuthorizeUpdateActionTest extends TestCase
     /**
      * @var AuthorizeUpdateAction
      */
-    private readonly AuthorizeUpdateAction $middleware;
+    private AuthorizeUpdateAction $middleware;
 
     /**
      * @var UpdateActionInput
      */
-    private readonly UpdateActionInput $action;
+    private UpdateActionInput $action;
 
     /**
      * @var Request
      */
-    private readonly Request $request;
+    private Request $request;
 
     /**
      * @var \stdClass
      */
-    private readonly \stdClass $model;
+    private \stdClass $model;
 
     /**
      * @return void

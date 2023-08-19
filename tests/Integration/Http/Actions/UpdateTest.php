@@ -57,27 +57,27 @@ class UpdateTest extends TestCase
     /**
      * @var Route&MockObject
      */
-    private readonly Route&MockObject $route;
+    private Route&MockObject $route;
 
     /**
      * @var Request&MockObject
      */
-    private readonly Request&MockObject $request;
+    private Request&MockObject $request;
 
     /**
      * @var StoreContract&MockObject
      */
-    private readonly StoreContract&MockObject $store;
+    private StoreContract&MockObject $store;
 
     /**
      * @var MockObject&SchemaContainer
      */
-    private readonly SchemaContainer&MockObject $schemas;
+    private SchemaContainer&MockObject $schemas;
 
     /**
      * @var MockObject&ResourceContainer
      */
-    private readonly ResourceContainer&MockObject $resources;
+    private ResourceContainer&MockObject $resources;
 
     /**
      * @var ValidatorFactory&MockObject|null
@@ -87,7 +87,7 @@ class UpdateTest extends TestCase
     /**
      * @var UpdateActionContract
      */
-    private readonly UpdateActionContract $action;
+    private UpdateActionContract $action;
 
     /**
      * @var array

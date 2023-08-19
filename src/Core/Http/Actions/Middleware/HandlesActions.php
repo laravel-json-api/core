@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 use Closure;
 use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use Symfony\Component\HttpFoundation\Response;
 
 interface HandlesActions
 {
@@ -30,7 +31,7 @@ interface HandlesActions
      *
      * @param ActionInput $action
      * @param Closure $next
-     * @return Responsable
+     * @return Responsable|Response
      */
-    public function handle(ActionInput $action, Closure $next): Responsable;
+    public function handle(ActionInput $action, Closure $next): Responsable|Response;
 }

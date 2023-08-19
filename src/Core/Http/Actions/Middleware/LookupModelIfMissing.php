@@ -20,12 +20,12 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Middleware;
 
 use Closure;
+use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\IsIdentifiable;
-use LaravelJsonApi\Core\Responses\DataResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class LookupModelIfMissing
@@ -44,10 +44,10 @@ class LookupModelIfMissing
      *
      * @param IsIdentifiable&ActionInput $action
      * @param Closure $next
-     * @return DataResponse
+     * @return Responsable
      * @throws JsonApiException
      */
-    public function handle(ActionInput&IsIdentifiable $action, Closure $next): DataResponse
+    public function handle(ActionInput&IsIdentifiable $action, Closure $next): Responsable
     {
         if ($action->model() === null) {
             $model = $this->store->find(

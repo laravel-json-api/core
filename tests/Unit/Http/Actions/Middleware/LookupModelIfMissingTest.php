@@ -34,12 +34,12 @@ class LookupModelIfMissingTest extends TestCase
     /**
      * @var MockObject&Store
      */
-    private readonly Store&MockObject $store;
+    private Store&MockObject $store;
 
     /**
      * @var LookupModelIfMissing
      */
-    private readonly LookupModelIfMissing $middleware;
+    private LookupModelIfMissing $middleware;
 
     /**
      * @return void

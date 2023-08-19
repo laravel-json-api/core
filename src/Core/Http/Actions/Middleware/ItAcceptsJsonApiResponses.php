@@ -25,6 +25,7 @@ use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Exceptions\HttpNotAcceptableException;
+use Symfony\Component\HttpFoundation\Response;
 
 class ItAcceptsJsonApiResponses implements HandlesActions
 {
@@ -43,7 +44,7 @@ class ItAcceptsJsonApiResponses implements HandlesActions
     /**
      * @inheritDoc
      */
-    public function handle(ActionInput $action, Closure $next): Responsable
+    public function handle(ActionInput $action, Closure $next): Responsable|Response
     {
         if (!$this->isAcceptable($action->request())) {
             $message = $this->translator->get(
