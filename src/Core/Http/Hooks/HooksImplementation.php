@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Http\Hooks;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Http\Hooks\AttachRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\DestroyImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowImplementation;
@@ -43,7 +44,8 @@ class HooksImplementation implements
     DestroyImplementation,
     ShowRelatedImplementation,
     ShowRelationshipImplementation,
-    UpdateRelationshipImplementation
+    UpdateRelationshipImplementation,
+    AttachRelationshipImplementation
 {
     /**
      * HooksImplementation constructor
@@ -277,6 +279,37 @@ class HooksImplementation implements
     ): void
     {
         $method = 'updated' . Str::classify($fieldName);
+
+        $this($method, $model, $related, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function attachingRelationship(
+        object $model,
+        string $fieldName,
+        Request $request,
+        QueryParameters $query,
+    ): void
+    {
+        $method = 'attaching' . Str::classify($fieldName);
+
+        $this($method, $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function attachedRelationship(
+        object $model,
+        string $fieldName,
+        mixed $related,
+        Request $request,
+        QueryParameters $query,
+    ): void
+    {
+        $method = 'attached' . Str::classify($fieldName);
 
         $this($method, $model, $related, $request, $query);
     }

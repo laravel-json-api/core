@@ -343,6 +343,46 @@ class ResourceAuthorizer
     }
 
     /**
+     * Authorize a JSON:API attach relationship command.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @param string $fieldName
+     * @return ErrorList|null
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function attachRelationship(?Request $request, object $model, string $fieldName): ?ErrorList
+    {
+        $passes = $this->authorizer->attachRelationship(
+            $request,
+            $model,
+            $fieldName,
+        );
+
+        return $passes ? null : $this->failed();
+    }
+
+    /**
+     * Authorize a JSON:API attach relationship command, or fail.
+     *
+     * @param Request|null $request
+     * @param object $model
+     * @param string $fieldName
+     * @return void
+     * @throws AuthorizationException
+     * @throws AuthenticationException
+     * @throws HttpExceptionInterface
+     */
+    public function attachRelationshipOrFail(?Request $request, object $model, string $fieldName): void
+    {
+        if ($errors = $this->attachRelationship($request, $model, $fieldName)) {
+            throw new JsonApiException($errors);
+        }
+    }
+
+    /**
      * @return ErrorList
      * @throws AuthorizationException
      * @throws AuthenticationException

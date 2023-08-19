@@ -221,7 +221,11 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function modifyToOne(string $resourceType, $modelOrResourceId, string $fieldName): ToOneBuilder
+    public function modifyToOne(
+        ResourceType|string $resourceType,
+        $modelOrResourceId,
+        string $fieldName,
+    ): ToOneBuilder
     {
         $repository = $this->resources($resourceType);
 
@@ -235,7 +239,11 @@ class Store implements StoreContract
     /**
      * @inheritDoc
      */
-    public function modifyToMany(string $resourceType, $modelOrResourceId, string $fieldName): ToManyBuilder
+    public function modifyToMany(
+        ResourceType|string $resourceType,
+        $modelOrResourceId,
+        string $fieldName,
+    ): ToManyBuilder
     {
         $repository = $this->resources($resourceType);
 
