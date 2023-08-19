@@ -24,6 +24,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Hooks\AttachRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\DestroyImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\DetachRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowRelatedImplementation;
@@ -45,7 +46,8 @@ class HooksImplementation implements
     ShowRelatedImplementation,
     ShowRelationshipImplementation,
     UpdateRelationshipImplementation,
-    AttachRelationshipImplementation
+    AttachRelationshipImplementation,
+    DetachRelationshipImplementation
 {
     /**
      * HooksImplementation constructor
@@ -310,6 +312,37 @@ class HooksImplementation implements
     ): void
     {
         $method = 'attached' . Str::classify($fieldName);
+
+        $this($method, $model, $related, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function detachingRelationship(
+        object $model,
+        string $fieldName,
+        Request $request,
+        QueryParameters $query,
+    ): void
+    {
+        $method = 'detaching' . Str::classify($fieldName);
+
+        $this($method, $model, $request, $query);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function detachedRelationship(
+        object $model,
+        string $fieldName,
+        mixed $related,
+        Request $request,
+        QueryParameters $query,
+    ): void
+    {
+        $method = 'detached' . Str::classify($fieldName);
 
         $this($method, $model, $related, $request, $query);
     }

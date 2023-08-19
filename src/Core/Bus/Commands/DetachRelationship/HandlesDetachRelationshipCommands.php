@@ -17,22 +17,17 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Commands\Command;
+namespace LaravelJsonApi\Core\Bus\Commands\DetachRelationship;
 
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
-use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
+use Closure;
+use LaravelJsonApi\Core\Bus\Commands\Result;
 
-interface IsRelatable extends IsIdentifiable
+interface HandlesDetachRelationshipCommands
 {
     /**
-     * Get the JSON:API field name for the relationship the command is targeting.
-     *
-     * @return string
+     * @param DetachRelationshipCommand $command
+     * @param Closure $next
+     * @return Result
      */
-    public function fieldName(): string;
-
-    /**
-     * @return UpdateToOne|UpdateToMany
-     */
-    public function operation(): UpdateToOne|UpdateToMany;
+    public function handle(DetachRelationshipCommand $command, Closure $next): Result;
 }

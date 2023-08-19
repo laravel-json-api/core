@@ -29,6 +29,9 @@ use LaravelJsonApi\Contracts\Validation\Factory;
 use LaravelJsonApi\Contracts\Validation\RelationshipValidator;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
 use LaravelJsonApi\Core\Bus\Commands\AttachRelationship\AttachRelationshipCommand;
+use LaravelJsonApi\Core\Bus\Commands\Command\Command;
+use LaravelJsonApi\Core\Bus\Commands\Command\IsRelatable;
+use LaravelJsonApi\Core\Bus\Commands\DetachRelationship\DetachRelationshipCommand;
 use LaravelJsonApi\Core\Bus\Commands\Middleware\ValidateRelationshipCommand;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\UpdateRelationshipCommand;
@@ -130,11 +133,22 @@ class ValidateRelationshipCommandTest extends TestCase
                     return new AttachRelationshipCommand($request, $operation);
                 },
             ],
+            'detach' => [
+                function (ResourceType $type, Request $request = null): DetachRelationshipCommand {
+                    $operation = new UpdateToMany(
+                        OpCodeEnum::Remove,
+                        new Ref(type: $type, id: new ResourceId('123'), relationship: 'tags'),
+                        new ListOfResourceIdentifiers(),
+                    );
+
+                    return new DetachRelationshipCommand($request, $operation);
+                },
+            ],
         ];
     }
 
     /**
-     * @param Closure(ResourceType, ?Request=): (UpdateRelationshipCommand|AttachRelationshipCommand) $factory
+     * @param Closure(ResourceType, ?Request=): (Command&IsRelatable) $factory
      * @return void
      * @dataProvider commandProvider
      */
@@ -168,8 +182,7 @@ class ValidateRelationshipCommandTest extends TestCase
 
         $actual = $this->middleware->handle(
             $command,
-            function (UpdateRelationshipCommand|AttachRelationshipCommand $cmd)
-            use ($command, $validated, $expected): Result {
+            function (Command&IsRelatable $cmd) use ($command, $validated, $expected): Result {
                 $this->assertNotSame($command, $cmd);
                 $this->assertSame($validated, $cmd->validated());
                 return $expected;
@@ -180,7 +193,7 @@ class ValidateRelationshipCommandTest extends TestCase
     }
 
     /**
-     * @param Closure(ResourceType, ?Request=): (UpdateRelationshipCommand|AttachRelationshipCommand) $factory
+     * @param Closure(ResourceType, ?Request=): (Command&IsRelatable) $factory
      * @return void
      * @dataProvider commandProvider
      */
@@ -221,7 +234,7 @@ class ValidateRelationshipCommandTest extends TestCase
     }
 
     /**
-     * @param Closure(ResourceType, ?Request=): (UpdateRelationshipCommand|AttachRelationshipCommand) $factory
+     * @param Closure(ResourceType, ?Request=): (Command&IsRelatable) $factory
      * @return void
      * @dataProvider commandProvider
      */
@@ -245,8 +258,7 @@ class ValidateRelationshipCommandTest extends TestCase
 
         $actual = $this->middleware->handle(
             $command,
-            function (UpdateRelationshipCommand|AttachRelationshipCommand $cmd)
-            use ($command, $validated, $expected): Result {
+            function (Command&IsRelatable $cmd) use ($command, $validated, $expected): Result {
                 $this->assertNotSame($command, $cmd);
                 $this->assertSame($validated, $cmd->validated());
                 return $expected;
@@ -257,7 +269,7 @@ class ValidateRelationshipCommandTest extends TestCase
     }
 
     /**
-     * @param Closure(ResourceType, ?Request=): (UpdateRelationshipCommand|AttachRelationshipCommand) $factory
+     * @param Closure(ResourceType, ?Request=): (Command&IsRelatable) $factory
      * @return void
      * @dataProvider commandProvider
      */
@@ -276,8 +288,7 @@ class ValidateRelationshipCommandTest extends TestCase
 
         $actual = $this->middleware->handle(
             $command,
-            function (UpdateRelationshipCommand|AttachRelationshipCommand $cmd)
-            use ($command, $validated, $expected): Result {
+            function (Command&IsRelatable $cmd) use ($command, $validated, $expected): Result {
                 $this->assertSame($command, $cmd);
                 $this->assertSame($validated, $cmd->validated());
                 return $expected;

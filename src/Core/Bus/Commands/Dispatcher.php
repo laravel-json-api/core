@@ -26,6 +26,8 @@ use LaravelJsonApi\Core\Bus\Commands\AttachRelationship\AttachRelationshipComman
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommandHandler;
+use LaravelJsonApi\Core\Bus\Commands\DetachRelationship\DetachRelationshipCommand;
+use LaravelJsonApi\Core\Bus\Commands\DetachRelationship\DetachRelationshipCommandHandler;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommandHandler;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
@@ -78,6 +80,7 @@ class Dispatcher implements DispatcherContract
             DestroyCommand::class => DestroyCommandHandler::class,
             UpdateRelationshipCommand::class => UpdateRelationshipCommandHandler::class,
             AttachRelationshipCommand::class => AttachRelationshipCommandHandler::class,
+            DetachRelationshipCommand::class => DetachRelationshipCommandHandler::class,
             default => throw new RuntimeException('Unexpected command class: ' . $commandClass),
         };
     }

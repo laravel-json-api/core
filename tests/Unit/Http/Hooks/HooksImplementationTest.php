@@ -26,6 +26,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Hooks\AttachRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\DestroyImplementation;
+use LaravelJsonApi\Contracts\Http\Hooks\DetachRelationshipImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\IndexImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowImplementation;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowRelatedImplementation;
@@ -156,6 +157,26 @@ class HooksImplementationTest extends TestCase
             'updatedRelationship' => [
                 static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
                     $impl->updatedRelationship(new stdClass(), 'comments', [], $request, $query);
+                },
+            ],
+            'attachingRelationship' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->attachingRelationship(new stdClass(), 'comments', $request, $query);
+                },
+            ],
+            'attachedRelationship' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->attachedRelationship(new stdClass(), 'comments', [], $request, $query);
+                },
+            ],
+            'detachingRelationship' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->detachingRelationship(new stdClass(), 'comments', $request, $query);
+                },
+            ],
+            'detachedRelationship' => [
+                static function (HooksImplementation $impl, Request $request, QueryParameters $query): void {
+                    $impl->detachedRelationship(new stdClass(), 'comments', [], $request, $query);
                 },
             ],
         ];
@@ -2529,6 +2550,272 @@ class HooksImplementationTest extends TestCase
 
         try {
             $implementation->attachedRelationship($model, 'tags', $related, $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($related, $target->related);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDetachingRelationshipMethod(): void
+    {
+        $target = new class {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function detachingBlogPosts(
+                stdClass $model,
+                Request $request,
+                QueryParameters $query,
+            ): void
+            {
+                $this->model = $model;
+                $this->request = $request;
+                $this->query = $query;
+            }
+        };
+
+        $model = new stdClass();
+
+        $implementation = new HooksImplementation($target);
+        $implementation->detachingRelationship($model, 'blog-posts', $this->request, $this->query);
+
+        $this->assertInstanceOf(DetachRelationshipImplementation::class, $implementation);
+        $this->assertSame($model, $target->model);
+        $this->assertSame($this->request, $target->request);
+        $this->assertSame($this->query, $target->query);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDetachingRelationshipMethodAndThrowsResponse(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function detachingComments(
+                stdClass $model,
+                Request $request,
+                QueryParameters $query,
+            ): Response
+            {
+                $this->model = $model;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->response;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->detachingRelationship($model, 'comments', $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDetachingRelationshipMethodAndThrowsResponseFromResponsable(): void
+    {
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public ?stdClass $model = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function detachingTags(
+                stdClass $model,
+                Request $request,
+                QueryParameters $query,
+            ): Responsable
+            {
+                $this->model = $model;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->result;
+            }
+        };
+
+        $model = new stdClass();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->detachingRelationship($model, 'tags', $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDetachedRelationshipMethod(): void
+    {
+        $target = new class {
+            public ?stdClass $model = null;
+            public ?ArrayObject $related = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function detachedBlogPosts(
+                stdClass $model,
+                ArrayObject $related,
+                Request $request,
+                QueryParameters $query,
+            ): void
+            {
+                $this->model = $model;
+                $this->related = $related;
+                $this->request = $request;
+                $this->query = $query;
+            }
+        };
+
+        $model = new stdClass();
+        $related = new ArrayObject();
+
+        $implementation = new HooksImplementation($target);
+        $implementation->detachedRelationship($model, 'blog-posts', $related, $this->request, $this->query);
+
+        $this->assertSame($model, $target->model);
+        $this->assertSame($related, $target->related);
+        $this->assertSame($this->request, $target->request);
+        $this->assertSame($this->query, $target->query);
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDetachedRelationshipMethodAndThrowsResponse(): void
+    {
+        $response = $this->createMock(Response::class);
+
+        $target = new class($response) {
+            public ?stdClass $model = null;
+            public ?ArrayObject $related = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Response $response)
+            {
+            }
+
+            public function detachedComments(
+                stdClass $model,
+                ArrayObject $related,
+                Request $request,
+                QueryParameters $query,
+            ): Response
+            {
+                $this->model = $model;
+                $this->related = $related;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->response;
+            }
+        };
+
+        $model = new stdClass();
+        $related = new ArrayObject();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->detachedRelationship($model, 'comments', $related, $this->request, $this->query);
+            $this->fail('No exception thrown.');
+        } catch (HttpResponseException $ex) {
+            $this->assertSame($model, $target->model);
+            $this->assertSame($related, $target->related);
+            $this->assertSame($this->request, $target->request);
+            $this->assertSame($this->query, $target->query);
+            $this->assertSame($response, $ex->getResponse());
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function testItInvokesDetachedRelationshipMethodAndThrowsResponseFromResponsable(): void
+    {
+        $result = $this->createMock(Responsable::class);
+        $result
+            ->expects($this->once())
+            ->method('toResponse')
+            ->with($this->identicalTo($this->request))
+            ->willReturn($response = $this->createMock(Response::class));
+
+        $target = new class($result) {
+            public ?stdClass $model = null;
+            public ?ArrayObject $related = null;
+            public ?Request $request = null;
+            public ?QueryParameters $query = null;
+
+            public function __construct(private readonly Responsable $result)
+            {
+            }
+
+            public function detachedTags(
+                stdClass $model,
+                ArrayObject $related,
+                Request $request,
+                QueryParameters $query,
+            ): Responsable
+            {
+                $this->model = $model;
+                $this->related = $related;
+                $this->request = $request;
+                $this->query = $query;
+
+                return $this->result;
+            }
+        };
+
+        $model = new stdClass();
+        $related = new ArrayObject();
+        $implementation = new HooksImplementation($target);
+
+        try {
+            $implementation->detachedRelationship($model, 'tags', $related, $this->request, $this->query);
             $this->fail('No exception thrown.');
         } catch (HttpResponseException $ex) {
             $this->assertSame($model, $target->model);

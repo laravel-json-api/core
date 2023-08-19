@@ -24,10 +24,10 @@ use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\RelationshipValidator;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
-use LaravelJsonApi\Core\Bus\Commands\AttachRelationship\AttachRelationshipCommand;
+use LaravelJsonApi\Core\Bus\Commands\Command\Command;
+use LaravelJsonApi\Core\Bus\Commands\Command\IsRelatable;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\HandlesUpdateRelationshipCommands;
-use LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\UpdateRelationshipCommand;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 
 class ValidateRelationshipCommand implements HandlesUpdateRelationshipCommands
@@ -49,7 +49,7 @@ class ValidateRelationshipCommand implements HandlesUpdateRelationshipCommands
     /**
      * @inheritDoc
      */
-    public function handle(UpdateRelationshipCommand|AttachRelationshipCommand $command, Closure $next): Result
+    public function handle(Command&IsRelatable $command, Closure $next): Result
     {
         if ($command->mustValidate()) {
             $validator = $this
@@ -82,7 +82,7 @@ class ValidateRelationshipCommand implements HandlesUpdateRelationshipCommands
     }
 
     /**
-     * Make an update relationship validator.
+     * Make a relationship validator.
      *
      * @param ResourceType $type
      * @return RelationshipValidator
