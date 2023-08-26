@@ -60,7 +60,7 @@ class ValidateRelationshipQueryParameters
             ->relationship($action->fieldName());
 
         $factory = $this->validators
-            ->validatorsFor($action->type());
+            ->validatorsFor($relation->inverse());
 
         $validator = $relation->toOne() ?
             $factory->queryOne()->forRequest($action->request()) :

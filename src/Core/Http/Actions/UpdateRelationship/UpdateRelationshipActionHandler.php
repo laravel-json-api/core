@@ -26,11 +26,11 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Http\Actions\Middleware\CheckRelationshipJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItHasJsonApiContent;
 use LaravelJsonApi\Core\Http\Actions\Middleware\LookupModelIfMissing;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateRelationshipQueryParameters;
-use LaravelJsonApi\Core\Http\Actions\Update\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\Middleware\AuthorizeUpdateRelationshipAction;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\Middleware\ParseUpdateRelationshipOperation;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
@@ -66,7 +66,7 @@ class UpdateRelationshipActionHandler
             ItAcceptsJsonApiResponses::class,
             LookupModelIfMissing::class,
             AuthorizeUpdateRelationshipAction::class,
-            CheckRequestJsonIsCompliant::class,
+            CheckRelationshipJsonIsCompliant::class,
             ValidateRelationshipQueryParameters::class,
             ParseUpdateRelationshipOperation::class,
         ];

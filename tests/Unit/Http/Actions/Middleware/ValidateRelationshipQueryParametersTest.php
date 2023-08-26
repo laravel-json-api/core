@@ -64,9 +64,9 @@ class ValidateRelationshipQueryParametersTest extends TestCase
     private Schema&MockObject $schema;
 
     /**
-     * @var ValidatorFactory&MockObject
+     * @var ValidatorContainer&MockObject
      */
-    private ValidatorFactory&MockObject $validatorFactory;
+    private ValidatorContainer&MockObject $validators;
 
     /**
      * @var MockObject&QueryErrorFactory
@@ -96,16 +96,9 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             ->with($this->identicalTo($this->type))
             ->willReturn($this->schema = $this->createMock(Schema::class));
 
-        $validators = $this->createMock(ValidatorContainer::class);
-        $validators
-            ->expects($this->once())
-            ->method('validatorsFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($this->validatorFactory = $this->createMock(ValidatorFactory::class));
-
         $this->middleware = new ValidateRelationshipQueryParameters(
             $schemas,
-            $validators,
+            $this->validators = $this->createMock(ValidatorContainer::class),
             $this->errorFactory = $this->createMock(QueryErrorFactory::class),
         );
     }
@@ -122,8 +115,8 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             'author',
         );
 
-        $this->withRelation('author', true);
-        $this->willValidateToOne($validated = ['include' => 'profile']);
+        $this->withRelation('author', true, 'users');
+        $this->willValidateToOne('users', $validated = ['include' => 'profile']);
 
         $expected = $this->createMock(Responsable::class);
 
@@ -151,8 +144,8 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             'author',
         );
 
-        $this->withRelation('author', true);
-        $this->willValidateToOne(null);
+        $this->withRelation('author', true, 'users');
+        $this->willValidateToOne('users', null);
 
         try {
             $this->middleware->handle(
@@ -177,8 +170,8 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             'tags',
         );
 
-        $this->withRelation('tags', false);
-        $this->willValidateToMany($validated = ['include' => 'profile']);
+        $this->withRelation('tags', false, 'blog-tags');
+        $this->willValidateToMany('blog-tags', $validated = ['include' => 'profile']);
 
         $expected = $this->createMock(Responsable::class);
 
@@ -206,8 +199,8 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             'tags',
         );
 
-        $this->withRelation('tags', false);
-        $this->willValidateToMany(null);
+        $this->withRelation('tags', false, 'blog-tags');
+        $this->willValidateToMany('blog-tags', null);
 
         try {
             $this->middleware->handle(
@@ -225,7 +218,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
      * @param bool $toOne
      * @return void
      */
-    private function withRelation(string $fieldName, bool $toOne): void
+    private function withRelation(string $fieldName, bool $toOne, string $inverse): void
     {
         $this->schema
             ->expects($this->once())
@@ -233,22 +226,30 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             ->with($fieldName)
             ->willReturn($relation = $this->createMock(Relation::class));
 
+        $relation->method('inverse')->willReturn($inverse);
         $relation->method('toOne')->willReturn($toOne);
         $relation->method('toMany')->willReturn(!$toOne);
     }
 
     /**
+     * @param string $type
      * @param array|null $validated
      * @return void
      */
-    private function willValidateToOne(?array $validated): void
+    private function willValidateToOne(string $type, ?array $validated): void
     {
-        $this->validatorFactory
+        $this->validators
+            ->expects($this->once())
+            ->method('validatorsFor')
+            ->with($type)
+            ->willReturn($validatorFactory = $this->createMock(ValidatorFactory::class));
+
+        $validatorFactory
             ->expects($this->once())
             ->method('queryOne')
             ->willReturn($queryOneValidator = $this->createMock(QueryOneValidator::class));
 
-        $this->validatorFactory
+        $validatorFactory
             ->expects($this->never())
             ->method('queryMany');
 
@@ -260,17 +261,24 @@ class ValidateRelationshipQueryParametersTest extends TestCase
     }
 
     /**
+     * @param string $type
      * @param array|null $validated
      * @return void
      */
-    private function willValidateToMany(?array $validated): void
+    private function willValidateToMany(string $type, ?array $validated): void
     {
-        $this->validatorFactory
+        $this->validators
+            ->expects($this->once())
+            ->method('validatorsFor')
+            ->with($type)
+            ->willReturn($validatorFactory = $this->createMock(ValidatorFactory::class));
+
+        $validatorFactory
             ->expects($this->once())
             ->method('queryMany')
             ->willReturn($queryOneValidator = $this->createMock(QueryManyValidator::class));
 
-        $this->validatorFactory
+        $validatorFactory
             ->expects($this->never())
             ->method('queryOne');
 
