@@ -24,8 +24,8 @@ use LaravelJsonApi\Contracts\Http\Hooks\ShowRelationshipImplementation;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsRelatable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchRelationshipQuery extends Query implements IsRelatable
 {

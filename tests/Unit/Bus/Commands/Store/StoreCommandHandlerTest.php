@@ -31,10 +31,10 @@ use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\ValidateStoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommandHandler;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Support\PipelineFactory;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

@@ -26,7 +26,7 @@ use LaravelJsonApi\Contracts\Validation\DestroyValidator;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\HandlesDestroyCommands;
 use LaravelJsonApi\Core\Bus\Commands\Result;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class ValidateDestroyCommand implements HandlesDestroyCommands
 {

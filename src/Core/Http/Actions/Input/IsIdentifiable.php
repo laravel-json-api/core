@@ -19,7 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\Input;
 
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceId;
 
 interface IsIdentifiable
 {

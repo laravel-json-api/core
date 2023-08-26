@@ -24,9 +24,9 @@ use LaravelJsonApi\Contracts\Http\Hooks\DestroyImplementation;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Command\Identifiable;
 use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class DestroyCommand extends Command implements IsIdentifiable
 {

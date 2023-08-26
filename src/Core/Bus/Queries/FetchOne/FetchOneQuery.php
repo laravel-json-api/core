@@ -24,8 +24,8 @@ use LaravelJsonApi\Contracts\Http\Hooks\ShowImplementation;
 use LaravelJsonApi\Core\Bus\Queries\Query\Identifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchOneQuery extends Query implements IsIdentifiable
 {

@@ -21,10 +21,10 @@ namespace LaravelJsonApi\Core\Http\Actions\FetchRelationship;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\IsRelatable;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchRelationshipActionInput extends ActionInput implements IsRelatable
 {

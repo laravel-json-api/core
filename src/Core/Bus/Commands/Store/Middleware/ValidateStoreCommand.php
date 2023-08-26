@@ -27,7 +27,7 @@ use LaravelJsonApi\Contracts\Validation\StoreValidator;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class ValidateStoreCommand implements HandlesStoreCommands
 {

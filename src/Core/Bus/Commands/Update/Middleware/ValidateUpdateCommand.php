@@ -27,7 +27,7 @@ use LaravelJsonApi\Contracts\Validation\UpdateValidator;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Update\HandlesUpdateCommands;
 use LaravelJsonApi\Core\Bus\Commands\Update\UpdateCommand;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class ValidateUpdateCommand implements HandlesUpdateCommands
 {

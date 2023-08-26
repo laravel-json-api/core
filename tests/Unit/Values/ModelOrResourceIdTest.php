@@ -17,10 +17,10 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Tests\Unit\Document\Input\Values;
+namespace LaravelJsonApi\Core\Tests\Unit\Values;
 
-use LaravelJsonApi\Core\Document\Input\Values\ModelOrResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ModelOrResourceId;
+use LaravelJsonApi\Core\Values\ResourceId;
 use PHPUnit\Framework\TestCase;
 
 class ModelOrResourceIdTest extends TestCase

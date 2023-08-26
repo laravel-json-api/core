@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Bus\Queries\Query;
 
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Store\LazyModel;
+use LaravelJsonApi\Core\Values\ResourceId;
 
 trait Identifiable
 {

@@ -31,13 +31,13 @@ use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryManyValidator;
 use LaravelJsonApi\Contracts\Validation\QueryOneValidator;
 use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\IsRelatable;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateRelationshipQueryParameters;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\UpdateRelationshipActionInput;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

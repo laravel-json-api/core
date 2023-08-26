@@ -34,10 +34,10 @@ use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryManyValidator;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchMany;
 use LaravelJsonApi\Core\Store\QueryAllHandler;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 

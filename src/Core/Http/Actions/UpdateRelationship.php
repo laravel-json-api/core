@@ -22,10 +22,10 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\UpdateRelationship as UpdateRelationshipContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\UpdateRelationshipActionHandler;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\UpdateRelationshipActionInputFactory;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateRelationship implements UpdateRelationshipContract

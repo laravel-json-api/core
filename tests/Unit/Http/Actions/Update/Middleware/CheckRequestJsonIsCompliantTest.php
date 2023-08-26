@@ -23,12 +23,12 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Spec\ResourceDocumentComplianceChecker;
 use LaravelJsonApi\Contracts\Support\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Http\Actions\Update\Middleware\CheckRequestJsonIsCompliant;
 use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInput;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

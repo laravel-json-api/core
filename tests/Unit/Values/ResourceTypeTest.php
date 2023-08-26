@@ -17,10 +17,10 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Tests\Unit\Document\Input\Values;
+namespace LaravelJsonApi\Core\Tests\Unit\Values;
 
 use LaravelJsonApi\Contracts\Support\Stringable;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
 class ResourceTypeTest extends TestCase

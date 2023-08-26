@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Store;
 
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class LazyModel
 {

@@ -21,7 +21,7 @@ namespace LaravelJsonApi\Core\Auth;
 
 use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class ResourceAuthorizerFactory
 {

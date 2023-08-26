@@ -23,9 +23,9 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ListOfResourceIdentifiersParser;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierOrListOfIdentifiersParser;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierParser;
 use LaravelJsonApi\Core\Document\Input\Values\ListOfResourceIdentifiers;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceIdentifier;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

@@ -22,10 +22,10 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\FetchRelated as FetchRelatedContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchRelated\FetchRelatedActionHandler;
 use LaravelJsonApi\Core\Http\Actions\FetchRelated\FetchRelatedActionInputFactory;
 use LaravelJsonApi\Core\Responses\RelatedResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 use Symfony\Component\HttpFoundation\Response;
 
 class FetchRelated implements FetchRelatedContract

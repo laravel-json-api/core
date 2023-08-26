@@ -22,11 +22,11 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\Destroy as DestroyContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Destroy\DestroyActionHandler;
 use LaravelJsonApi\Core\Http\Actions\Destroy\DestroyActionInputFactory;
 use LaravelJsonApi\Core\Responses\MetaResponse;
 use LaravelJsonApi\Core\Responses\NoContentResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 use Symfony\Component\HttpFoundation\Response;
 
 class Destroy implements DestroyContract

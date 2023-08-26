@@ -22,11 +22,11 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\DetachRelationship as DetachRelationshipContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\DetachRelationship\DetachRelationshipActionHandler;
 use LaravelJsonApi\Core\Http\Actions\DetachRelationship\DetachRelationshipActionInputFactory;
 use LaravelJsonApi\Core\Responses\NoContentResponse;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 use Symfony\Component\HttpFoundation\Response;
 
 class DetachRelationship implements DetachRelationshipContract

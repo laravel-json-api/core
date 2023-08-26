@@ -23,11 +23,11 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Auth\ResourceAuthorizer;
 use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\AttachRelationship\AttachRelationshipActionInput;
 use LaravelJsonApi\Core\Http\Actions\AttachRelationship\Middleware\AuthorizeAttachRelationshipAction;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

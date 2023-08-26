@@ -26,8 +26,6 @@ use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Result as CommandResult;
 use LaravelJsonApi\Core\Document\ErrorList;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
@@ -40,6 +38,8 @@ use LaravelJsonApi\Core\Http\Hooks\HooksImplementation;
 use LaravelJsonApi\Core\Responses\MetaResponse;
 use LaravelJsonApi\Core\Responses\NoContentResponse;
 use LaravelJsonApi\Core\Support\PipelineFactory;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

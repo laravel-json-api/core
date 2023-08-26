@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Core\Bus\Commands\Command;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\ValidatedInput;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Operation;
 use LaravelJsonApi\Core\Support\Contracts;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 abstract class Command
 {

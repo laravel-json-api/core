@@ -21,8 +21,8 @@ namespace LaravelJsonApi\Core\Http\Actions\Input;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Hooks\HooksImplementation;
+use LaravelJsonApi\Core\Values\ResourceType;
 use RuntimeException;
 
 abstract class ActionInput

@@ -20,9 +20,9 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Extensions\Atomic\Values;
 
 use Illuminate\Contracts\Support\Arrayable;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
 class RefTest extends TestCase

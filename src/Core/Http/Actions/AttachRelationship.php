@@ -22,11 +22,11 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\AttachRelationship as AttachRelationshipContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\AttachRelationship\AttachRelationshipActionHandler;
 use LaravelJsonApi\Core\Http\Actions\AttachRelationship\AttachRelationshipActionInputFactory;
 use LaravelJsonApi\Core\Responses\NoContentResponse;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 use Symfony\Component\HttpFoundation\Response;
 
 class AttachRelationship implements AttachRelationshipContract

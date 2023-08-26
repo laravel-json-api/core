@@ -21,8 +21,8 @@ namespace LaravelJsonApi\Contracts\Http\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Responses\RelatedResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 interface FetchRelated extends Responsable
 {

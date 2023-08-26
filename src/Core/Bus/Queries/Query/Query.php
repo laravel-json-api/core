@@ -22,9 +22,9 @@ namespace LaravelJsonApi\Core\Bus\Queries\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\ValidatedInput;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Support\Contracts;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 abstract class Query
 {

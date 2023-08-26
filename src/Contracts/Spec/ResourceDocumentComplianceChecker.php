@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Spec;
 
 use LaravelJsonApi\Contracts\Support\Result;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 interface ResourceDocumentComplianceChecker
 {

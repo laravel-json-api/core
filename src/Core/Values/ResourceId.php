@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Document\Input\Values;
+namespace LaravelJsonApi\Core\Values;
 
 use JsonSerializable;
 use LaravelJsonApi\Contracts\Support\Stringable;
@@ -52,6 +52,15 @@ class ResourceId implements Stringable, JsonSerializable
     }
 
     /**
+     * @param string|null $value
+     * @return bool
+     */
+    public static function isNotEmpty(?string $value): bool
+    {
+        return '0' === $value || !empty(trim($value));
+    }
+
+    /**
      * ResourceId constructor
      *
      * @param string $value
@@ -59,7 +68,7 @@ class ResourceId implements Stringable, JsonSerializable
     public function __construct(public readonly string $value)
     {
         Contracts::assert(
-            '0' === $this->value || !empty(trim($this->value)),
+            self::isNotEmpty($this->value),
             'Resource id must be a non-empty string.',
         );
     }

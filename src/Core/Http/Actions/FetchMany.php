@@ -22,10 +22,10 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\FetchMany as FetchManyContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\FetchMany\FetchManyActionHandler;
 use LaravelJsonApi\Core\Http\Actions\FetchMany\FetchManyActionInputFactory;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 use Symfony\Component\HttpFoundation\Response;
 
 class FetchMany implements FetchManyContract

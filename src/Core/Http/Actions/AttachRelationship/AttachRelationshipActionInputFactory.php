@@ -21,8 +21,8 @@ namespace LaravelJsonApi\Core\Http\Actions\AttachRelationship;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Resources\Container;
-use LaravelJsonApi\Core\Document\Input\Values\ModelOrResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ModelOrResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class AttachRelationshipActionInputFactory
 {

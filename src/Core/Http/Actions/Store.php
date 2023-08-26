@@ -22,10 +22,10 @@ namespace LaravelJsonApi\Core\Http\Actions;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\Store as StoreContract;
 use LaravelJsonApi\Contracts\Routing\Route;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionHandler;
 use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInputFactory;
 use LaravelJsonApi\Core\Responses\DataResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 use Symfony\Component\HttpFoundation\Response;
 
 class Store implements StoreContract

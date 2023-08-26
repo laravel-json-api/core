@@ -20,9 +20,9 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Store;
 
 use LaravelJsonApi\Contracts\Store\Store;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Store\LazyModel;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

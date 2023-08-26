@@ -20,9 +20,9 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Document\Input\Values;
 
 use LaravelJsonApi\Core\Document\Input\Values\ListOfResourceIdentifiers;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceIdentifier;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
 class ListOfResourceIdentifiersTest extends TestCase

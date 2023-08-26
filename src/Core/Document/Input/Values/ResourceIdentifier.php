@@ -22,6 +22,8 @@ namespace LaravelJsonApi\Core\Document\Input\Values;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 use LaravelJsonApi\Core\Support\Contracts;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class ResourceIdentifier implements JsonSerializable, Arrayable
 {

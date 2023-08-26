@@ -20,13 +20,13 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\UpdateRelationship;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\IsRelatable;
 use LaravelJsonApi\Core\Http\Actions\Input\Relatable;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class UpdateRelationshipActionInput extends ActionInput implements IsRelatable
 {

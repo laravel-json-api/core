@@ -17,7 +17,7 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Document\Input\Values;
+namespace LaravelJsonApi\Core\Values;
 
 use JsonSerializable;
 use LaravelJsonApi\Contracts\Support\Stringable;

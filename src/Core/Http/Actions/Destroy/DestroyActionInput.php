@@ -20,12 +20,12 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Destroy;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\Identifiable;
 use LaravelJsonApi\Core\Http\Actions\Input\IsIdentifiable;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class DestroyActionInput extends ActionInput implements IsIdentifiable
 {

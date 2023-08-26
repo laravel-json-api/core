@@ -21,9 +21,9 @@ namespace LaravelJsonApi\Contracts\Http\Actions;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Responses\MetaResponse;
 use LaravelJsonApi\Core\Responses\NoContentResponse;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 interface Destroy extends Responsable
 {
