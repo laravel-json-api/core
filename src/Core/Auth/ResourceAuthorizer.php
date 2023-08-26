@@ -395,7 +395,7 @@ class ResourceAuthorizer
      */
     public function detachRelationship(?Request $request, object $model, string $fieldName): ?ErrorList
     {
-        $passes = $this->authorizer->attachRelationship(
+        $passes = $this->authorizer->detachRelationship(
             $request,
             $model,
             $fieldName,
@@ -417,7 +417,7 @@ class ResourceAuthorizer
      */
     public function detachRelationshipOrFail(?Request $request, object $model, string $fieldName): void
     {
-        if ($errors = $this->attachRelationship($request, $model, $fieldName)) {
+        if ($errors = $this->detachRelationship($request, $model, $fieldName)) {
             throw new JsonApiException($errors);
         }
     }

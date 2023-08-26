@@ -29,6 +29,7 @@ use function array_merge;
 trait IsResponsable
 {
     use ServerAware;
+    use HasHeaders;
 
     /**
      * @var JsonApi|null
@@ -49,11 +50,6 @@ trait IsResponsable
      * @var int
      */
     public int $encodeOptions = 0;
-
-    /**
-     * @var array
-     */
-    public array $headers = [];
 
     /**
      * Add the top-level JSON:API member to the response.
@@ -139,33 +135,6 @@ trait IsResponsable
     public function withEncodeOptions(int $options): static
     {
         $this->encodeOptions = $options;
-
-        return $this;
-    }
-
-    /**
-     * Set a header.
-     *
-     * @param string $name
-     * @param string|null $value
-     * @return $this
-     */
-    public function withHeader(string $name, string $value = null): static
-    {
-        $this->headers[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Set response headers.
-     *
-     * @param array $headers
-     * @return $this
-     */
-    public function withHeaders(array $headers): static
-    {
-        $this->headers = $headers;
 
         return $this;
     }
