@@ -19,7 +19,6 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions\Destroy;
 
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
@@ -28,9 +27,9 @@ use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
 use LaravelJsonApi\Core\Http\Actions\Destroy\Middleware\ParseDeleteOperation;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Responses\MetaResponse;
+use LaravelJsonApi\Core\Responses\NoContentResponse;
 use LaravelJsonApi\Core\Support\PipelineFactory;
 use Symfony\Component\HttpFoundation\Response;
-use UnexpectedValueException;
 
 class DestroyActionHandler
 {
@@ -39,12 +38,10 @@ class DestroyActionHandler
      *
      * @param PipelineFactory $pipelines
      * @param CommandDispatcher $commands
-     * @param ResponseFactory $responseFactory
      */
     public function __construct(
         private readonly PipelineFactory $pipelines,
         private readonly CommandDispatcher $commands,
-        private readonly ResponseFactory $responseFactory,
     ) {
     }
 
@@ -52,9 +49,9 @@ class DestroyActionHandler
      * Execute a update action.
      *
      * @param DestroyActionInput $action
-     * @return Responsable|Response
+     * @return MetaResponse|NoContentResponse
      */
-    public function execute(DestroyActionInput $action): Responsable|Response
+    public function execute(DestroyActionInput $action): MetaResponse|NoContentResponse
     {
         $pipes = [
             ItAcceptsJsonApiResponses::class,
@@ -67,32 +64,29 @@ class DestroyActionHandler
             ->via('handle')
             ->then(fn(DestroyActionInput $passed): Responsable|Response => $this->handle($passed));
 
-        if ($response instanceof Responsable || $response instanceof Response) {
-            return $response;
-        }
+        assert(
+            ($response instanceof MetaResponse) || ($response instanceof NoContentResponse),
+            'Expecting action pipeline to return a response.',
+        );
 
-        throw new UnexpectedValueException('Expecting action pipeline to return a response.');
+        return $response;
     }
 
     /**
      * Handle the destroy action.
      *
      * @param DestroyActionInput $action
-     * @return Responsable|Response
+     * @return MetaResponse|NoContentResponse
      * @throws JsonApiException
      */
-    private function handle(DestroyActionInput $action): Responsable|Response
+    private function handle(DestroyActionInput $action): MetaResponse|NoContentResponse
     {
         $payload = $this->dispatch($action);
 
         assert($payload->hasData === false, 'Expecting command result to not have data.');
 
-        if (!empty($payload->meta)) {
-            return new MetaResponse($payload->meta);
-        }
-
-        return $this->responseFactory->noContent();
-    }
+        return empty($payload->meta) ? new NoContentResponse() : new MetaResponse($payload->meta);
+     }
 
     /**
      * Dispatch the destroy command.

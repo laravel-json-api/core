@@ -19,13 +19,14 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Http\Actions;
 
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Actions\Destroy as DestroyContract;
 use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Http\Actions\Destroy\DestroyActionHandler;
 use LaravelJsonApi\Core\Http\Actions\Destroy\DestroyActionInputFactory;
+use LaravelJsonApi\Core\Responses\MetaResponse;
+use LaravelJsonApi\Core\Responses\NoContentResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class Destroy implements DestroyContract
@@ -84,7 +85,7 @@ class Destroy implements DestroyContract
     /**
      * @inheritDoc
      */
-    public function execute(Request $request): Responsable|Response
+    public function execute(Request $request): MetaResponse|NoContentResponse
     {
         $type = $this->type ?? $this->route->resourceType();
         $idOrModel = $this->idOrModel ?? $this->route->modelOrResourceId();
@@ -101,12 +102,8 @@ class Destroy implements DestroyContract
      */
     public function toResponse($request): Response
     {
-        $response = $this->execute($request);
-
-        if ($response instanceof Responsable) {
-            return $response->toResponse($request);
-        }
-
-        return $response;
+        return $this
+            ->execute($request)
+            ->toResponse($request);
     }
 }

@@ -20,19 +20,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Destroy\Middleware;
 
 use Closure;
-use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
 use LaravelJsonApi\Core\Http\Actions\Destroy\DestroyActionInput;
 use LaravelJsonApi\Core\Http\Actions\Destroy\HandlesDestroyActions;
-use Symfony\Component\HttpFoundation\Response;
+use LaravelJsonApi\Core\Responses\MetaResponse;
+use LaravelJsonApi\Core\Responses\NoContentResponse;
 
 class ParseDeleteOperation implements HandlesDestroyActions
 {
     /**
      * @inheritDoc
      */
-    public function handle(DestroyActionInput $action, Closure $next): Responsable|Response
+    public function handle(DestroyActionInput $action, Closure $next): MetaResponse|NoContentResponse
     {
         $request = $action->request();
 

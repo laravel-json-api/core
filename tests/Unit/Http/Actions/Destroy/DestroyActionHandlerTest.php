@@ -21,8 +21,6 @@ namespace LaravelJsonApi\Core\Tests\Unit\Http\Actions\Destroy;
 
 use Closure;
 use Illuminate\Contracts\Pipeline\Pipeline;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
@@ -40,10 +38,10 @@ use LaravelJsonApi\Core\Http\Actions\Destroy\Middleware\ParseDeleteOperation;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ItAcceptsJsonApiResponses;
 use LaravelJsonApi\Core\Http\Hooks\HooksImplementation;
 use LaravelJsonApi\Core\Responses\MetaResponse;
+use LaravelJsonApi\Core\Responses\NoContentResponse;
 use LaravelJsonApi\Core\Support\PipelineFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 class DestroyActionHandlerTest extends TestCase
 {
@@ -56,11 +54,6 @@ class DestroyActionHandlerTest extends TestCase
      * @var MockObject&CommandDispatcher
      */
     private CommandDispatcher&MockObject $commandDispatcher;
-
-    /**
-     * @var MockObject&ResponseFactory
-     */
-    private ResponseFactory&MockObject $responseFactory;
 
     /**
      * @var DestroyActionHandler
@@ -77,7 +70,6 @@ class DestroyActionHandlerTest extends TestCase
         $this->handler = new DestroyActionHandler(
             $this->pipelineFactory = $this->createMock(PipelineFactory::class),
             $this->commandDispatcher = $this->createMock(CommandDispatcher::class),
-            $this->responseFactory = $this->createMock(ResponseFactory::class),
         );
     }
 
@@ -113,14 +105,9 @@ class DestroyActionHandlerTest extends TestCase
             ))
             ->willReturn(CommandResult::ok(Payload::none()));
 
-        $this->responseFactory
-            ->expects($this->once())
-            ->method('noContent')
-            ->willReturn($noContent = $this->createMock(Response::class));
-
         $response = $this->handler->execute($original);
 
-        $this->assertSame($noContent, $response);
+        $this->assertInstanceOf(NoContentResponse::class, $response);
     }
 
     /**
@@ -155,10 +142,6 @@ class DestroyActionHandlerTest extends TestCase
             ))
             ->willReturn(CommandResult::ok(Payload::none($meta = ['foo' => 'bar'])));
 
-        $this->responseFactory
-            ->expects($this->never())
-            ->method($this->anything());
-
         $response = $this->handler->execute($original);
 
         $this->assertInstanceOf(MetaResponse::class, $response);
@@ -184,10 +167,6 @@ class DestroyActionHandlerTest extends TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->willReturn(CommandResult::failed($expected = new ErrorList()));
-
-        $this->responseFactory
-            ->expects($this->never())
-            ->method($this->anything());
 
         try {
             $this->handler->execute($original);
@@ -241,7 +220,7 @@ class DestroyActionHandlerTest extends TestCase
         $pipeline
             ->expects($this->once())
             ->method('then')
-            ->willReturnCallback(function (Closure $fn) use ($passed, &$sequence): Responsable|Response {
+            ->willReturnCallback(function (Closure $fn) use ($passed, &$sequence): MetaResponse|NoContentResponse {
                 $this->assertSame(['through', 'via'], $sequence);
                 return $fn($passed);
             });

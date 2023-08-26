@@ -22,7 +22,8 @@ namespace LaravelJsonApi\Contracts\Http\Actions;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
-use Symfony\Component\HttpFoundation\Response;
+use LaravelJsonApi\Core\Responses\MetaResponse;
+use LaravelJsonApi\Core\Responses\NoContentResponse;
 
 interface Destroy extends Responsable
 {
@@ -50,7 +51,7 @@ interface Destroy extends Responsable
      * Execute the action and return the JSON:API data response.
      *
      * @param Request $request
-     * @return Responsable|Response
+     * @return MetaResponse|NoContentResponse
      */
-    public function execute(Request $request): Responsable|Response;
+    public function execute(Request $request): MetaResponse|NoContentResponse;
 }

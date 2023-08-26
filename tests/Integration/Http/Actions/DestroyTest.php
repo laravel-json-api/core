@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Integration\Http\Actions;
 
 use Closure;
-use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer;
@@ -38,11 +37,11 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceId;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceType;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Http\Actions\Destroy;
+use LaravelJsonApi\Core\Responses\NoContentResponse;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
-use Symfony\Component\HttpFoundation\Response;
 
 class DestroyTest extends TestCase
 {
@@ -65,11 +64,6 @@ class DestroyTest extends TestCase
      * @var MockObject&ResourceContainer
      */
     private ResourceContainer&MockObject $resources;
-
-    /**
-     * @var ResponseFactory&MockObject
-     */
-    private ResponseFactory&MockObject $responseFactory;
 
     /**
      * @var DestroyContract
@@ -99,10 +93,6 @@ class DestroyTest extends TestCase
             ResourceContainer::class,
             $this->resources = $this->createMock(ResourceContainer::class),
         );
-        $this->container->instance(
-            ResponseFactory::class,
-            $this->responseFactory = $this->createMock(ResponseFactory::class),
-        );
 
         $this->request = $this->createMock(Request::class);
 
@@ -123,7 +113,6 @@ class DestroyTest extends TestCase
         $this->willAuthorize('posts', $model);
         $this->willValidate($model, 'posts', '123');
         $this->willDelete('posts', $model);
-        $expected = $this->willHaveNoContent();
 
         $response = $this->action
             ->withHooks($this->withHooks($model))
@@ -138,7 +127,7 @@ class DestroyTest extends TestCase
             'delete',
             'hook:deleted',
         ], $this->sequence);
-        $this->assertSame($expected, $response);
+        $this->assertInstanceOf(NoContentResponse::class, $response);
     }
 
     /**
@@ -158,7 +147,6 @@ class DestroyTest extends TestCase
         $this->willAuthorize('tags', $model);
         $this->willValidate($model, 'tags', '999',);
         $this->willDelete('tags', $model);
-        $expected = $this->willHaveNoContent();
 
         $response = $this->action
             ->withTarget('tags', $model)
@@ -170,7 +158,7 @@ class DestroyTest extends TestCase
             'validate',
             'delete',
         ], $this->sequence);
-        $this->assertSame($response, $expected);
+        $this->assertInstanceOf(NoContentResponse::class, $response);
     }
 
     /**
@@ -383,18 +371,5 @@ class DestroyTest extends TestCase
                 ($this->sequence)('hook:deleted');
             }
         };
-    }
-
-    /**
-     * @return Response
-     */
-    private function willHaveNoContent(): Response
-    {
-        $this->responseFactory
-            ->expects($this->once())
-            ->method('noContent')
-            ->willReturn($response = $this->createMock(Response::class));
-
-        return $response;
     }
 }

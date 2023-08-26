@@ -20,8 +20,8 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\Destroy;
 
 use Closure;
-use Illuminate\Contracts\Support\Responsable;
-use Symfony\Component\HttpFoundation\Response;
+use LaravelJsonApi\Core\Responses\MetaResponse;
+use LaravelJsonApi\Core\Responses\NoContentResponse;
 
 interface HandlesDestroyActions
 {
@@ -30,7 +30,7 @@ interface HandlesDestroyActions
      *
      * @param DestroyActionInput $action
      * @param Closure $next
-     * @return Responsable|Response
+     * @return MetaResponse|NoContentResponse
      */
-    public function handle(DestroyActionInput $action, Closure $next): Responsable|Response;
+    public function handle(DestroyActionInput $action, Closure $next): MetaResponse|NoContentResponse;
 }
