@@ -201,13 +201,13 @@ class ValidateStoreCommandTest extends TestCase
             data: new ResourceObject(type: $this->type),
         );
 
-        $command = StoreCommand::make(null, $operation)
+        $command = StoreCommand::make($request = $this->createMock(Request::class), $operation)
             ->skipValidation();
 
         $this->storeValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($operation))
+            ->with($this->identicalTo($request), $this->identicalTo($operation))
             ->willReturn($validated = ['foo' => 'bar']);
 
         $this->storeValidator

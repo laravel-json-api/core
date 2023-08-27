@@ -28,11 +28,12 @@ interface DestroyValidator
     /**
      * Extract validation data for a destroy operation.
      *
+     * @param Request|null $request
      * @param object $model
      * @param Delete $operation
      * @return array
      */
-    public function extract(object $model, Delete $operation): array;
+    public function extract(?Request $request, object $model, Delete $operation): array;
 
     /**
      * Make a validator for the destroy operation.

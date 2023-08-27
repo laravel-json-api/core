@@ -28,10 +28,11 @@ interface StoreValidator
     /**
      * Extract validation data from the store operation.
      *
+     * @param Request|null $request
      * @param Create $operation
      * @return array
      */
-    public function extract(Create $operation): array;
+    public function extract(?Request $request, Create $operation): array;
 
     /**
      * Make a validator for the store operation.

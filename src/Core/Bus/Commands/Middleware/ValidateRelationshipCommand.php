@@ -73,7 +73,7 @@ class ValidateRelationshipCommand implements HandlesUpdateRelationshipCommands
         if ($command->isNotValidated()) {
             $data = $this
                 ->validatorFor($command->type())
-                ->extract($command->modelOrFail(), $command->operation());
+                ->extract($command->request(), $command->modelOrFail(), $command->operation());
 
             $command = $command->withValidated($data);
         }

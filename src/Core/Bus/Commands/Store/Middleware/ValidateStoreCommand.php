@@ -50,12 +50,10 @@ class ValidateStoreCommand implements HandlesStoreCommands
      */
     public function handle(StoreCommand $command, Closure $next): Result
     {
-        $operation = $command->operation();
-
         if ($command->mustValidate()) {
             $validator = $this
                 ->validatorFor($command->type())
-                ->make($command->request(), $operation);
+                ->make($command->request(), $command->operation());
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -74,7 +72,7 @@ class ValidateStoreCommand implements HandlesStoreCommands
         if ($command->isNotValidated()) {
             $data = $this
                 ->validatorFor($command->type())
-                ->extract($operation);
+                ->extract($command->request(), $command->operation());
 
             $command = $command->withValidated($data);
         }

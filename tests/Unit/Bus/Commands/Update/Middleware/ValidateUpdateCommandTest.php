@@ -202,14 +202,14 @@ class ValidateUpdateCommandTest extends TestCase
             data: new ResourceObject(type: $this->type, id: new ResourceId('123')),
         );
 
-        $command = UpdateCommand::make(null, $operation)
+        $command = UpdateCommand::make($request = $this->createMock(Request::class), $operation)
             ->withModel($model = new stdClass())
             ->skipValidation();
 
         $this->updateValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
             ->willReturn($validated = ['foo' => 'bar']);
 
         $this->updateValidator

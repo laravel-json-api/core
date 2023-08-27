@@ -240,14 +240,14 @@ class ValidateRelationshipCommandTest extends TestCase
      */
     public function testItSetsValidatedDataIfNotValidating(Closure $factory): void
     {
-        $command = $factory($this->type);
+        $command = $factory($this->type, $request = $this->createMock(Request::class));
         $command = $command->withModel($model = new \stdClass())->skipValidation();
         $operation = $command->operation();
 
         $this->relationshipValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
             ->willReturn($validated = ['foo' => 'bar']);
 
         $this->relationshipValidator

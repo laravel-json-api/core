@@ -28,11 +28,12 @@ interface UpdateValidator
     /**
      * Extract validation data from the update operation.
      *
+     * @param Request|null $request
      * @param object $model
      * @param Update $operation
      * @return array
      */
-    public function extract(object $model, Update $operation): array;
+    public function extract(?Request $request, object $model, Update $operation): array;
 
     /**
      * Make a validator for the update operation.

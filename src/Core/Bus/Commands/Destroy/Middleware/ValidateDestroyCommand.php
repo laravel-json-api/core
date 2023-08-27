@@ -47,12 +47,10 @@ class ValidateDestroyCommand implements HandlesDestroyCommands
      */
     public function handle(DestroyCommand $command, Closure $next): Result
     {
-        $operation = $command->operation();
-
         if ($command->mustValidate()) {
             $validator = $this
                 ->validatorFor($command->type())
-                ?->make($command->request(), $command->modelOrFail(), $operation);
+                ?->make($command->request(), $command->modelOrFail(), $command->operation());
 
             if ($validator?->fails()) {
                 return Result::failed(
@@ -68,7 +66,7 @@ class ValidateDestroyCommand implements HandlesDestroyCommands
         if ($command->isNotValidated()) {
             $data = $this
                 ->validatorFor($command->type())
-                ?->extract($command->modelOrFail(), $operation);
+                ?->extract($command->request(), $command->modelOrFail(), $command->operation());
 
             $command = $command->withValidated($data ?? []);
         }

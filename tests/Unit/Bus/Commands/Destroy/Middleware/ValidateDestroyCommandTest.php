@@ -210,7 +210,7 @@ class ValidateDestroyCommandTest extends TestCase
         );
 
         $command = DestroyCommand::make(
-            $this->createMock(Request::class),
+            $request = $this->createMock(Request::class),
             $operation,
         )->withModel($model = new stdClass())->skipValidation();
 
@@ -219,7 +219,7 @@ class ValidateDestroyCommandTest extends TestCase
         $destroyValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
             ->willReturn($validated = ['foo' => 'bar']);
 
         $destroyValidator

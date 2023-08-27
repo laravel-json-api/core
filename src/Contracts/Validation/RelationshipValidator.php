@@ -29,11 +29,12 @@ interface RelationshipValidator
     /**
      * Extract validation data from the update relationship operation.
      *
+     * @param Request|null $request
      * @param object $model
      * @param UpdateToOne|UpdateToMany $operation
      * @return array
      */
-    public function extract(object $model, UpdateToOne|UpdateToMany $operation): array;
+    public function extract(?Request $request, object $model, UpdateToOne|UpdateToMany $operation): array;
 
     /**
      * Make a validator for the update relationship operation.
