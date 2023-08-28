@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Update\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
@@ -52,8 +53,8 @@ class ValidateUpdateCommand implements HandlesUpdateCommands
     {
         if ($command->mustValidate()) {
             $validator = $this
-                ->validatorFor($command->type())
-                ->make($command->request(), $command->modelOrFail(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ->make($command->operation(), $command->modelOrFail());
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -71,8 +72,8 @@ class ValidateUpdateCommand implements HandlesUpdateCommands
 
         if ($command->isNotValidated()) {
             $data = $this
-                ->validatorFor($command->type())
-                ->extract($command->request(), $command->modelOrFail(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ->extract($command->operation(), $command->modelOrFail());
 
             $command = $command->withValidated($data);
         }
@@ -84,12 +85,14 @@ class ValidateUpdateCommand implements HandlesUpdateCommands
      * Make an update validator.
      *
      * @param ResourceType $type
+     * @param Request|null $request
      * @return UpdateValidator
      */
-    private function validatorFor(ResourceType $type): UpdateValidator
+    private function validatorFor(ResourceType $type, ?Request $request): UpdateValidator
     {
         return $this->validatorContainer
             ->validatorsFor($type)
+            ->withRequest($request)
             ->update();
     }
 }

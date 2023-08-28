@@ -46,9 +46,9 @@ class ValidateStoreCommandTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var StoreValidator&MockObject
+     * @var ValidatorContainer&MockObject
      */
-    private StoreValidator $storeValidator;
+    private ValidatorContainer&MockObject $validators;
 
     /**
      * @var Schema&MockObject
@@ -74,16 +74,6 @@ class ValidateStoreCommandTest extends TestCase
 
         $this->type = new ResourceType('posts');
 
-        $validators = $this->createMock(ValidatorContainer::class);
-        $validators
-            ->method('validatorsFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($factory = $this->createMock(Factory::class));
-
-        $factory
-            ->method('store')
-            ->willReturn($this->storeValidator = $this->createMock(StoreValidator::class));
-
         $schemas = $this->createMock(SchemaContainer::class);
         $schemas
             ->method('schemaFor')
@@ -91,7 +81,7 @@ class ValidateStoreCommandTest extends TestCase
             ->willReturn($this->schema = $this->createMock(Schema::class));
 
         $this->middleware = new ValidateStoreCommand(
-            $validators,
+            $this->validators = $this->createMock(ValidatorContainer::class),
             $schemas,
             $this->errorFactory = $this->createMock(ResourceErrorFactory::class),
         );
@@ -112,13 +102,15 @@ class ValidateStoreCommandTest extends TestCase
             $operation,
         );
 
-        $this->storeValidator
+        $storeValidator = $this->willValidate($request);
+
+        $storeValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation))
             ->willReturn($validator = $this->createMock(Validator::class));
 
-        $this->storeValidator
+        $storeValidator
             ->expects($this->never())
             ->method('extract');
 
@@ -161,13 +153,15 @@ class ValidateStoreCommandTest extends TestCase
             $operation,
         );
 
-        $this->storeValidator
+        $storeValidator = $this->willValidate($request);
+
+        $storeValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation))
             ->willReturn($validator = $this->createMock(Validator::class));
 
-        $this->storeValidator
+        $storeValidator
             ->expects($this->never())
             ->method('extract');
 
@@ -204,13 +198,15 @@ class ValidateStoreCommandTest extends TestCase
         $command = StoreCommand::make($request = $this->createMock(Request::class), $operation)
             ->skipValidation();
 
-        $this->storeValidator
+        $storeValidator = $this->willValidate($request);
+
+        $storeValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($request), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation))
             ->willReturn($validated = ['foo' => 'bar']);
 
-        $this->storeValidator
+        $storeValidator
             ->expects($this->never())
             ->method('make');
 
@@ -241,7 +237,7 @@ class ValidateStoreCommandTest extends TestCase
         $command = StoreCommand::make(null, $operation)
             ->withValidated($validated = ['foo' => 'bar']);
 
-        $this->storeValidator
+        $this->validators
             ->expects($this->never())
             ->method($this->anything());
 
@@ -257,5 +253,31 @@ class ValidateStoreCommandTest extends TestCase
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param Request|null $request
+     * @return MockObject&StoreValidator
+     */
+    private function willValidate(?Request $request): StoreValidator&MockObject
+    {
+        $this->validators
+            ->expects($this->once())
+            ->method('validatorsFor')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($factory = $this->createMock(Factory::class));
+
+        $factory
+            ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
+
+        $factory
+            ->expects($this->once())
+            ->method('store')
+            ->willReturn($storeValidator = $this->createMock(StoreValidator::class));
+
+        return $storeValidator;
     }
 }

@@ -52,8 +52,9 @@ class ValidateQueryOneParameters
     {
         $validator = $this->validatorContainer
             ->validatorsFor($action->type())
+            ->withRequest($action->request())
             ->queryOne()
-            ->make($action->request(), $action->query());
+            ->make($action->query());
 
         if ($validator->fails()) {
             throw new JsonApiException($this->errorFactory->make($validator));

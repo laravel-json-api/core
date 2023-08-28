@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Store\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
@@ -52,8 +53,8 @@ class ValidateStoreCommand implements HandlesStoreCommands
     {
         if ($command->mustValidate()) {
             $validator = $this
-                ->validatorFor($command->type())
-                ->make($command->request(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ->make($command->operation());
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -71,8 +72,8 @@ class ValidateStoreCommand implements HandlesStoreCommands
 
         if ($command->isNotValidated()) {
             $data = $this
-                ->validatorFor($command->type())
-                ->extract($command->request(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ->extract($command->operation());
 
             $command = $command->withValidated($data);
         }
@@ -84,12 +85,14 @@ class ValidateStoreCommand implements HandlesStoreCommands
      * Make a store validator.
      *
      * @param ResourceType $type
+     * @param Request|null $request
      * @return StoreValidator
      */
-    private function validatorFor(ResourceType $type): StoreValidator
+    private function validatorFor(ResourceType $type, ?Request $request): StoreValidator
     {
         return $this->validatorContainer
             ->validatorsFor($type)
+            ->withRequest($request)
             ->store();
     }
 }

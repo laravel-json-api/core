@@ -88,12 +88,12 @@ class ValidateDestroyCommandTest extends TestCase
             $operation,
         )->withModel($model = new stdClass());
 
-        $destroyValidator = $this->withDestroyValidator();
+        $destroyValidator = $this->withDestroyValidator($request);
 
         $destroyValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $destroyValidator
@@ -138,12 +138,12 @@ class ValidateDestroyCommandTest extends TestCase
             $operation,
         )->withModel($model = new stdClass());
 
-        $destroyValidator = $this->withDestroyValidator();
+        $destroyValidator = $this->withDestroyValidator($request);
 
         $destroyValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $destroyValidator
@@ -214,12 +214,12 @@ class ValidateDestroyCommandTest extends TestCase
             $operation,
         )->withModel($model = new stdClass())->skipValidation();
 
-        $destroyValidator = $this->withDestroyValidator();
+        $destroyValidator = $this->withDestroyValidator($request);
 
         $destroyValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validated = ['foo' => 'bar']);
 
         $destroyValidator
@@ -305,12 +305,18 @@ class ValidateDestroyCommandTest extends TestCase
     /**
      * @return MockObject&DestroyValidator
      */
-    private function withDestroyValidator(): DestroyValidator&MockObject
+    private function withDestroyValidator(?Request $request): DestroyValidator&MockObject
     {
         $this->validators
             ->method('validatorsFor')
             ->with($this->identicalTo($this->type))
             ->willReturn($factory = $this->createMock(Factory::class));
+
+        $factory
+            ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
 
         $factory
             ->method('destroy')

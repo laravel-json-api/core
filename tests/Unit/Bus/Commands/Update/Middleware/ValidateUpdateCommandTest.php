@@ -47,9 +47,9 @@ class ValidateUpdateCommandTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var UpdateValidator&MockObject
+     * @var ValidatorContainer&MockObject
      */
-    private UpdateValidator $updateValidator;
+    private ValidatorContainer&MockObject $validators;
 
     /**
      * @var Schema&MockObject
@@ -75,16 +75,6 @@ class ValidateUpdateCommandTest extends TestCase
 
         $this->type = new ResourceType('posts');
 
-        $validators = $this->createMock(ValidatorContainer::class);
-        $validators
-            ->method('validatorsFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($factory = $this->createMock(Factory::class));
-
-        $factory
-            ->method('update')
-            ->willReturn($this->updateValidator = $this->createMock(UpdateValidator::class));
-
         $schemas = $this->createMock(SchemaContainer::class);
         $schemas
             ->method('schemaFor')
@@ -92,7 +82,7 @@ class ValidateUpdateCommandTest extends TestCase
             ->willReturn($this->schema = $this->createMock(Schema::class));
 
         $this->middleware = new ValidateUpdateCommand(
-            $validators,
+            $this->validators = $this->createMock(ValidatorContainer::class),
             $schemas,
             $this->errorFactory = $this->createMock(ResourceErrorFactory::class),
         );
@@ -113,13 +103,15 @@ class ValidateUpdateCommandTest extends TestCase
             $operation,
         )->withModel($model = new stdClass());
 
-        $this->updateValidator
+        $updateValidator = $this->willValidate($request);
+
+        $updateValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validator = $this->createMock(Validator::class));
 
-        $this->updateValidator
+        $updateValidator
             ->expects($this->never())
             ->method('extract');
 
@@ -162,13 +154,15 @@ class ValidateUpdateCommandTest extends TestCase
             $operation,
         )->withModel($model = new stdClass());
 
-        $this->updateValidator
+        $updateValidator = $this->willValidate($request);
+
+        $updateValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validator = $this->createMock(Validator::class));
 
-        $this->updateValidator
+        $updateValidator
             ->expects($this->never())
             ->method('extract');
 
@@ -206,13 +200,15 @@ class ValidateUpdateCommandTest extends TestCase
             ->withModel($model = new stdClass())
             ->skipValidation();
 
-        $this->updateValidator
+        $updateValidator = $this->willValidate($request);
+
+        $updateValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validated = ['foo' => 'bar']);
 
-        $this->updateValidator
+        $updateValidator
             ->expects($this->never())
             ->method('make');
 
@@ -235,6 +231,10 @@ class ValidateUpdateCommandTest extends TestCase
      */
     public function testItDoesNotValidateIfAlreadyValidated(): void
     {
+        $this->validators
+            ->expects($this->never())
+            ->method($this->anything());
+
         $operation = new Update(
             target: null,
             data: new ResourceObject(type: $this->type, id: new ResourceId('123')),
@@ -243,10 +243,6 @@ class ValidateUpdateCommandTest extends TestCase
         $command = UpdateCommand::make(null, $operation)
             ->withModel(new stdClass())
             ->withValidated($validated = ['foo' => 'bar']);
-
-        $this->updateValidator
-            ->expects($this->never())
-            ->method($this->anything());
 
         $expected = Result::ok();
 
@@ -260,5 +256,31 @@ class ValidateUpdateCommandTest extends TestCase
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param Request|null $request
+     * @return MockObject&UpdateValidator
+     */
+    private function willValidate(?Request $request): UpdateValidator&MockObject
+    {
+        $this->validators
+            ->expects($this->once())
+            ->method('validatorsFor')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($factory = $this->createMock(Factory::class));
+
+        $factory
+            ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
+
+        $factory
+            ->expects($this->once())
+            ->method('update')
+            ->willReturn($updateValidator = $this->createMock(UpdateValidator::class));
+
+        return $updateValidator;
     }
 }

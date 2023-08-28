@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 
@@ -29,20 +28,18 @@ interface RelationshipValidator
     /**
      * Extract validation data from the update relationship operation.
      *
-     * @param Request|null $request
-     * @param object $model
      * @param UpdateToOne|UpdateToMany $operation
+     * @param object $model
      * @return array
      */
-    public function extract(?Request $request, object $model, UpdateToOne|UpdateToMany $operation): array;
+    public function extract(UpdateToOne|UpdateToMany $operation, object $model): array;
 
     /**
      * Make a validator for the update relationship operation.
      *
-     * @param Request|null $request
-     * @param object $model
      * @param UpdateToOne|UpdateToMany $operation
+     * @param object $model
      * @return Validator
      */
-    public function make(?Request $request, object $model, UpdateToOne|UpdateToMany $operation): Validator;
+    public function make(UpdateToOne|UpdateToMany $operation, object $model): Validator;
 }

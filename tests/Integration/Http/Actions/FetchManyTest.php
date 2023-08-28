@@ -191,13 +191,19 @@ class FetchManyTest extends TestCase
 
         $validatorFactory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $validatorFactory
+            ->expects($this->once())
             ->method('queryMany')
             ->willReturn($queryManyValidator = $this->createMock(QueryManyValidator::class));
 
         $queryManyValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->equalTo($input))
+            ->with($this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

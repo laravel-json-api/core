@@ -55,9 +55,9 @@ class ValidateRelationshipCommandTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var RelationshipValidator&MockObject
+     * @var ValidatorContainer&MockObject
      */
-    private RelationshipValidator $relationshipValidator;
+    private ValidatorContainer&MockObject $validators;
 
     /**
      * @var Schema&MockObject
@@ -83,16 +83,6 @@ class ValidateRelationshipCommandTest extends TestCase
 
         $this->type = new ResourceType('posts');
 
-        $validators = $this->createMock(ValidatorContainer::class);
-        $validators
-            ->method('validatorsFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($factory = $this->createMock(Factory::class));
-
-        $factory
-            ->method('relation')
-            ->willReturn($this->relationshipValidator = $this->createMock(RelationshipValidator::class));
-
         $schemas = $this->createMock(SchemaContainer::class);
         $schemas
             ->method('schemaFor')
@@ -100,7 +90,7 @@ class ValidateRelationshipCommandTest extends TestCase
             ->willReturn($this->schema = $this->createMock(Schema::class));
 
         $this->middleware = new ValidateRelationshipCommand(
-            $validators,
+            $this->validators = $this->createMock(ValidatorContainer::class),
             $schemas,
             $this->errorFactory = $this->createMock(ResourceErrorFactory::class),
         );
@@ -158,13 +148,15 @@ class ValidateRelationshipCommandTest extends TestCase
         $command = $command->withModel($model = new \stdClass());
         $operation = $command->operation();
 
-        $this->relationshipValidator
+        $relationshipValidator = $this->willValidate($request);
+
+        $relationshipValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validator = $this->createMock(Validator::class));
 
-        $this->relationshipValidator
+        $relationshipValidator
             ->expects($this->never())
             ->method('extract');
 
@@ -203,13 +195,15 @@ class ValidateRelationshipCommandTest extends TestCase
         $command = $command->withModel($model = new \stdClass());
         $operation = $command->operation();
 
-        $this->relationshipValidator
+        $relationshipValidator = $this->willValidate(null);
+
+        $relationshipValidator
             ->expects($this->once())
             ->method('make')
-            ->with(null, $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validator = $this->createMock(Validator::class));
 
-        $this->relationshipValidator
+        $relationshipValidator
             ->expects($this->never())
             ->method('extract');
 
@@ -244,13 +238,15 @@ class ValidateRelationshipCommandTest extends TestCase
         $command = $command->withModel($model = new \stdClass())->skipValidation();
         $operation = $command->operation();
 
-        $this->relationshipValidator
+        $relationshipValidator = $this->willValidate($request);
+
+        $relationshipValidator
             ->expects($this->once())
             ->method('extract')
-            ->with($this->identicalTo($request), $this->identicalTo($model), $this->identicalTo($operation))
+            ->with($this->identicalTo($operation), $this->identicalTo($model))
             ->willReturn($validated = ['foo' => 'bar']);
 
-        $this->relationshipValidator
+        $relationshipValidator
             ->expects($this->never())
             ->method('make');
 
@@ -280,7 +276,7 @@ class ValidateRelationshipCommandTest extends TestCase
             ->withModel(new \stdClass())
             ->withValidated($validated = ['foo' => 'bar']);
 
-        $this->relationshipValidator
+        $this->validators
             ->expects($this->never())
             ->method($this->anything());
 
@@ -296,5 +292,31 @@ class ValidateRelationshipCommandTest extends TestCase
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param Request|null $request
+     * @return MockObject&RelationshipValidator
+     */
+    private function willValidate(?Request $request): RelationshipValidator&MockObject
+    {
+        $this->validators
+            ->expects($this->once())
+            ->method('validatorsFor')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($factory = $this->createMock(Factory::class));
+
+        $factory
+            ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
+
+        $factory
+            ->expects($this->once())
+            ->method('relation')
+            ->willReturn($relationshipValidator = $this->createMock(RelationshipValidator::class));
+
+        return $relationshipValidator;
     }
 }

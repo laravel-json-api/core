@@ -83,13 +83,19 @@ class ValidateQueryOneParametersTest extends TestCase
 
         $factory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
+
+        $factory
+            ->expects($this->once())
             ->method('queryOne')
             ->willReturn($queryOneValidator = $this->createMock(QueryOneValidator::class));
 
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($this->action->query()))
+            ->with($this->identicalTo($this->action->query()))
             ->willReturn($this->validator);
     }
 

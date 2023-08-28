@@ -83,13 +83,13 @@ class ValidateFetchRelationshipQuery implements HandlesFetchRelationshipQueries
             ->relationship($query->fieldName());
 
         $factory = $this->validatorContainer
-            ->validatorsFor($relation->inverse());
+            ->validatorsFor($relation->inverse())
+            ->withRequest($query->request());
 
-        $request = $query->request();
         $input = $query->input();
 
         return $relation->toOne() ?
-            $factory->queryOne()->make($request, $input) :
-            $factory->queryMany()->make($request, $input);
+            $factory->queryOne()->make($input) :
+            $factory->queryMany()->make($input);
     }
 }

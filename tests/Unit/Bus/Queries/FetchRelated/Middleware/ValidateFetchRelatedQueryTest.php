@@ -303,7 +303,8 @@ class ValidateFetchRelatedQueryTest extends TestCase
      */
     private function willValidateToOne(string $fieldName, ?Request $request, QueryRelated $input): Validator&MockObject
     {
-        $factory = $this->willValidateField($fieldName, true);
+        $factory = $this->willValidateField($fieldName, true, $request);
+
 
         $factory
             ->expects($this->once())
@@ -317,7 +318,7 @@ class ValidateFetchRelatedQueryTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($input))
+            ->with($this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         return $validator;
@@ -331,7 +332,7 @@ class ValidateFetchRelatedQueryTest extends TestCase
      */
     private function willValidateToMany(string $fieldName, ?Request $request, QueryRelated $input): Validator&MockObject
     {
-        $factory = $this->willValidateField($fieldName, false);
+        $factory = $this->willValidateField($fieldName, false, $request);
 
         $factory
             ->expects($this->once())
@@ -345,7 +346,7 @@ class ValidateFetchRelatedQueryTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($input))
+            ->with($this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         return $validator;
@@ -354,9 +355,10 @@ class ValidateFetchRelatedQueryTest extends TestCase
     /**
      * @param string $fieldName
      * @param bool $toOne
+     * @param Request|null $request
      * @return MockObject&Factory
      */
-    private function willValidateField(string $fieldName, bool $toOne): Factory&MockObject
+    private function willValidateField(string $fieldName, bool $toOne, ?Request $request): Factory&MockObject
     {
         $this->schemas
             ->expects($this->once())
@@ -383,6 +385,12 @@ class ValidateFetchRelatedQueryTest extends TestCase
             ->method('validatorsFor')
             ->with($this->identicalTo($inverse))
             ->willReturn($factory = $this->createMock(Factory::class));
+
+        $factory
+            ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
 
         return $factory;
     }

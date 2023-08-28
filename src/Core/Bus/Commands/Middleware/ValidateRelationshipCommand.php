@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\RelationshipValidator;
@@ -53,8 +54,8 @@ class ValidateRelationshipCommand implements HandlesUpdateRelationshipCommands
     {
         if ($command->mustValidate()) {
             $validator = $this
-                ->validatorFor($command->type())
-                ->make($command->request(), $command->modelOrFail(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ->make($command->operation(), $command->modelOrFail());
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -72,8 +73,8 @@ class ValidateRelationshipCommand implements HandlesUpdateRelationshipCommands
 
         if ($command->isNotValidated()) {
             $data = $this
-                ->validatorFor($command->type())
-                ->extract($command->request(), $command->modelOrFail(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ->extract($command->operation(), $command->modelOrFail());
 
             $command = $command->withValidated($data);
         }
@@ -85,12 +86,14 @@ class ValidateRelationshipCommand implements HandlesUpdateRelationshipCommands
      * Make a relationship validator.
      *
      * @param ResourceType $type
+     * @param Request|null $request
      * @return RelationshipValidator
      */
-    private function validatorFor(ResourceType $type): RelationshipValidator
+    private function validatorFor(ResourceType $type, ?Request $request): RelationshipValidator
     {
         return $this->validatorContainer
             ->validatorsFor($type)
+            ->withRequest($request)
             ->relation();
     }
 }

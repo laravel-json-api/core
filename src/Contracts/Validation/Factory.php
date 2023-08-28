@@ -19,8 +19,18 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Contracts\Validation;
 
+use Illuminate\Http\Request;
+
 interface Factory
 {
+    /**
+     * Set the request context for the validation.
+     *
+     * @param Request|null $request
+     * @return $this
+     */
+    public function withRequest(?Request $request): static;
+
     /**
      * Get a validator to use when querying zero-to-many resources.
      *

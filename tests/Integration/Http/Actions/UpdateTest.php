@@ -377,6 +377,12 @@ class UpdateTest extends TestCase
             ->willReturn($this->validatorFactory = $this->createMock(ValidatorFactory::class));
 
         $this->validatorFactory
+            ->expects($this->atMost(2))
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $this->validatorFactory
             ->expects($this->once())
             ->method('queryOne')
             ->willReturn($queryOneValidator = $this->createMock(QueryOneValidator::class));
@@ -384,7 +390,7 @@ class UpdateTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->equalTo($input))
+            ->with($this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -473,9 +479,8 @@ class UpdateTest extends TestCase
             ->expects($this->once())
             ->method('make')
             ->with(
-                $this->identicalTo($this->request),
-                $this->identicalTo($model),
                 $this->callback(fn(UpdateOperation $op): bool => $op->data === $resource),
+                $this->identicalTo($model),
             )
             ->willReturn($validator = $this->createMock(Validator::class));
 

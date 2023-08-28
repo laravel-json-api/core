@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Query\Input\QueryMany;
 use LaravelJsonApi\Core\Query\Input\QueryRelated;
 use LaravelJsonApi\Core\Query\Input\QueryRelationship;
@@ -30,9 +29,8 @@ interface QueryManyValidator
     /**
      * Make a validator for query parameters when fetching zero-to-many resources.
      *
-     * @param Request|null $request
      * @param QueryMany|QueryRelated|QueryRelationship $query
      * @return Validator
      */
-    public function make(?Request $request, QueryMany|QueryRelated|QueryRelationship $query): Validator;
+    public function make(QueryMany|QueryRelated|QueryRelationship $query): Validator;
 }

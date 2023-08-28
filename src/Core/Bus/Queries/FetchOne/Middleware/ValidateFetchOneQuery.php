@@ -48,8 +48,9 @@ class ValidateFetchOneQuery implements HandlesFetchOneQueries
         if ($query->mustValidate()) {
             $validator = $this->validatorContainer
                 ->validatorsFor($query->type())
+                ->withRequest($query->request())
                 ->queryOne()
-                ->make($query->request(), $query->input());
+                ->make($query->input());
 
             if ($validator->fails()) {
                 return Result::failed(

@@ -249,6 +249,12 @@ class ValidateRelationshipQueryParametersTest extends TestCase
 
         $validatorFactory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $validatorFactory
+            ->expects($this->once())
             ->method('queryOne')
             ->willReturn($queryOneValidator = $this->createMock(QueryOneValidator::class));
 
@@ -259,7 +265,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->identicalTo($query))
+            ->with($this->identicalTo($query))
             ->willReturn($this->withValidator($validated));
     }
 
@@ -279,6 +285,12 @@ class ValidateRelationshipQueryParametersTest extends TestCase
 
         $validatorFactory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $validatorFactory
+            ->expects($this->once())
             ->method('queryMany')
             ->willReturn($queryOneValidator = $this->createMock(QueryManyValidator::class));
 
@@ -289,7 +301,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->identicalTo($query))
+            ->with($this->identicalTo($query))
             ->willReturn($this->withValidator($validated));
     }
 

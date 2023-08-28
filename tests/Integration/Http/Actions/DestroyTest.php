@@ -261,6 +261,12 @@ class DestroyTest extends TestCase
 
         $validatorFactory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $validatorFactory
+            ->expects($this->once())
             ->method('destroy')
             ->willReturn($destroyValidator = $this->createMock(DestroyValidator::class));
 
@@ -268,14 +274,13 @@ class DestroyTest extends TestCase
             ->expects($this->once())
             ->method('make')
             ->with(
-                $this->identicalTo($this->request),
-                $this->identicalTo($model),
                 $this->callback(function (Delete $op) use ($type, $id): bool {
                     $ref = $op->ref();
                     $this->assertSame($type, $ref?->type->value);
                     $this->assertSame($id, $ref?->id->value);
                     return true;
                 }),
+                $this->identicalTo($model),
             )
             ->willReturn($validator = $this->createMock(Validator::class));
 

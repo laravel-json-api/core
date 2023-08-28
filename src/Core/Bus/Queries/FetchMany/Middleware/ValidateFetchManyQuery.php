@@ -48,8 +48,9 @@ class ValidateFetchManyQuery implements HandlesFetchManyQueries
         if ($query->mustValidate()) {
             $validator = $this->validatorContainer
                 ->validatorsFor($query->type())
+                ->withRequest($query->request())
                 ->queryMany()
-                ->make($query->request(), $query->input());
+                ->make($query->input());
 
             if ($validator->fails()) {
                 return Result::failed(

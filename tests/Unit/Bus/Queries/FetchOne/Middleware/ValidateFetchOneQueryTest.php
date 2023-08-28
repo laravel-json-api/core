@@ -44,9 +44,9 @@ class ValidateFetchOneQueryTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var QueryOneValidator&MockObject
+     * @var ValidatorContainer&MockObject
      */
-    private QueryOneValidator&MockObject $validator;
+    private ValidatorContainer&MockObject $validators;
 
     /**
      * @var QueryErrorFactory&MockObject
@@ -67,18 +67,8 @@ class ValidateFetchOneQueryTest extends TestCase
 
         $this->type = new ResourceType('posts');
 
-        $validators = $this->createMock(ValidatorContainer::class);
-        $validators
-            ->method('validatorsFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($factory = $this->createMock(Factory::class));
-
-        $factory
-            ->method('queryOne')
-            ->willReturn($this->validator = $this->createMock(QueryOneValidator::class));
-
         $this->middleware = new ValidateFetchOneQuery(
-            $validators,
+            $this->validators = $this->createMock(ValidatorContainer::class),
             $this->errorFactory = $this->createMock(QueryErrorFactory::class),
         );
     }
@@ -93,10 +83,12 @@ class ValidateFetchOneQueryTest extends TestCase
             $input = new QueryOne($this->type, new ResourceId('123'), ['foo' => 'bar']),
         );
 
-        $this->validator
+        $queryValidator = $this->willValidate($request);
+
+        $queryValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($input))
+            ->with($this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -135,10 +127,12 @@ class ValidateFetchOneQueryTest extends TestCase
             $input = new QueryOne($this->type, new ResourceId('123'), ['foo' => 'bar']),
         );
 
-        $this->validator
+        $queryValidator = $this->willValidate($request);
+
+        $queryValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($input))
+            ->with($this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -172,9 +166,9 @@ class ValidateFetchOneQueryTest extends TestCase
         $query = FetchOneQuery::make($request, $input)
             ->skipValidation();
 
-        $this->validator
+        $this->validators
             ->expects($this->never())
-            ->method('make');
+            ->method($this->anything());
 
         $expected = Result::ok(new Payload(null, true));
 
@@ -201,7 +195,7 @@ class ValidateFetchOneQueryTest extends TestCase
         $query = FetchOneQuery::make($request, $input)
             ->withValidated($validated = ['foo' => 'bar']);
 
-        $this->validator
+        $this->validators
             ->expects($this->never())
             ->method($this->anything());
 
@@ -217,5 +211,29 @@ class ValidateFetchOneQueryTest extends TestCase
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param Request|null $request
+     * @return QueryOneValidator&MockObject
+     */
+    private function willValidate(?Request $request): QueryOneValidator&MockObject
+    {
+        $this->validators
+            ->method('validatorsFor')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($factory = $this->createMock(Factory::class));
+
+        $factory
+            ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
+
+        $factory
+            ->method('queryOne')
+            ->willReturn($validator = $this->createMock(QueryOneValidator::class));
+
+        return $validator;
     }
 }

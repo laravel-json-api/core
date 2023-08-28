@@ -407,13 +407,19 @@ class AttachToManyTest extends TestCase
 
         $validatorFactory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $validatorFactory
+            ->expects($this->once())
             ->method('queryMany')
             ->willReturn($queryValidator = $this->createMock(QueryManyValidator::class));
 
         $queryValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->equalTo($input))
+            ->with($this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -498,6 +504,12 @@ class AttachToManyTest extends TestCase
 
         $validatorFactory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $validatorFactory
+            ->expects($this->once())
             ->method('relation')
             ->willReturn($relationshipValidator = $this->createMock(RelationshipValidator::class));
 
@@ -505,9 +517,8 @@ class AttachToManyTest extends TestCase
             ->expects($this->once())
             ->method('make')
             ->with(
-                $this->identicalTo($this->request),
-                $this->identicalTo($model),
                 $this->callback(fn(UpdateToMany $op): bool => $op->data === $identifiers),
+                $this->identicalTo($model),
             )
             ->willReturn($validator = $this->createMock(Validator::class));
 

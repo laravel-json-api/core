@@ -284,13 +284,19 @@ class FetchOneTest extends TestCase
 
         $validatorFactory
             ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($this->request))
+            ->willReturnSelf();
+
+        $validatorFactory
+            ->expects($this->once())
             ->method('queryOne')
             ->willReturn($queryOneValidator = $this->createMock(QueryOneValidator::class));
 
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->equalTo($input))
+            ->with($this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

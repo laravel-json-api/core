@@ -20,7 +20,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Query\Input\QueryRelated;
 use LaravelJsonApi\Core\Query\Input\QueryRelationship;
@@ -31,12 +30,8 @@ interface QueryOneValidator
     /**
      * Make a validator for query parameters when fetching zero-to-one resources.
      *
-     * @param Request|null $request
      * @param QueryOne|WillQueryOne|QueryRelated|QueryRelationship $query
      * @return Validator
      */
-    public function make(
-        ?Request $request,
-        QueryOne|WillQueryOne|QueryRelated|QueryRelationship $query,
-    ): Validator;
+    public function make(QueryOne|WillQueryOne|QueryRelated|QueryRelationship $query): Validator;
 }

@@ -295,6 +295,11 @@ class StoreTest extends TestCase
             ->willReturn($this->validatorFactory = $this->createMock(ValidatorFactory::class));
 
         $this->validatorFactory
+            ->expects($this->atMost(2))
+            ->method('withRequest')
+            ->willReturnSelf();
+
+        $this->validatorFactory
             ->expects($this->once())
             ->method('queryOne')
             ->willReturn($queryOneValidator = $this->createMock(QueryOneValidator::class));
@@ -302,7 +307,7 @@ class StoreTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->equalTo($input))
+            ->with($this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -387,12 +392,7 @@ class StoreTest extends TestCase
         $storeValidator
             ->expects($this->once())
             ->method('make')
-            ->with(
-                $this->identicalTo($this->request),
-                $this->callback(function (StoreOperation $op) use ($resource): bool {
-                    return $op->data === $resource;
-                }),
-            )
+            ->with($this->callback(fn(StoreOperation $op): bool => $op->data === $resource))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

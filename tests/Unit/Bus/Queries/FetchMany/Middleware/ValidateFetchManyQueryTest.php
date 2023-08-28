@@ -43,9 +43,9 @@ class ValidateFetchManyQueryTest extends TestCase
     private ResourceType $type;
 
     /**
-     * @var QueryManyValidator&MockObject
+     * @var ValidatorContainer&MockObject
      */
-    private QueryManyValidator&MockObject $validator;
+    private ValidatorContainer&MockObject $validators;
 
     /**
      * @var QueryErrorFactory&MockObject
@@ -66,18 +66,8 @@ class ValidateFetchManyQueryTest extends TestCase
 
         $this->type = new ResourceType('posts');
 
-        $validators = $this->createMock(ValidatorContainer::class);
-        $validators
-            ->method('validatorsFor')
-            ->with($this->identicalTo($this->type))
-            ->willReturn($factory = $this->createMock(Factory::class));
-
-        $factory
-            ->method('queryMany')
-            ->willReturn($this->validator = $this->createMock(QueryManyValidator::class));
-
         $this->middleware = new ValidateFetchManyQuery(
-            $validators,
+            $this->validators = $this->createMock(ValidatorContainer::class),
             $this->errorFactory = $this->createMock(QueryErrorFactory::class),
         );
     }
@@ -92,10 +82,12 @@ class ValidateFetchManyQueryTest extends TestCase
             $input = new QueryMany($this->type, ['foo' => 'bar']),
         );
 
-        $this->validator
+        $queryValidator = $this->willValidate($request);
+
+        $queryValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($input))
+            ->with($this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -134,10 +126,12 @@ class ValidateFetchManyQueryTest extends TestCase
             $input = new QueryMany($this->type, ['foo' => 'bar']),
         );
 
-        $this->validator
+        $queryValidator = $this->willValidate($request);
+
+        $queryValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($input))
+            ->with($this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -170,9 +164,9 @@ class ValidateFetchManyQueryTest extends TestCase
         $query = FetchManyQuery::make($request, new QueryMany($this->type, $params = ['foo' => 'bar']))
             ->skipValidation();
 
-        $this->validator
+        $this->validators
             ->expects($this->never())
-            ->method('make');
+            ->method($this->anything());
 
         $expected = Result::ok(new Payload(null, true));
 
@@ -198,7 +192,7 @@ class ValidateFetchManyQueryTest extends TestCase
         $query = FetchManyQuery::make($request, new QueryMany($this->type, ['blah' => 'blah']),)
             ->withValidated($validated = ['foo' => 'bar']);
 
-        $this->validator
+        $this->validators
             ->expects($this->never())
             ->method($this->anything());
 
@@ -214,5 +208,30 @@ class ValidateFetchManyQueryTest extends TestCase
         );
 
         $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * @param Request|null $request
+     * @return QueryManyValidator&MockObject
+     */
+    private function willValidate(?Request $request): QueryManyValidator&MockObject
+    {
+        $this->validators
+            ->method('validatorsFor')
+            ->with($this->identicalTo($this->type))
+            ->willReturn($factory = $this->createMock(Factory::class));
+
+        $factory
+            ->expects($this->once())
+            ->method('withRequest')
+            ->with($this->identicalTo($request))
+            ->willReturnSelf();
+
+        $factory
+            ->expects($this->once())
+            ->method('queryMany')
+            ->willReturn($validator = $this->createMock(QueryManyValidator::class));
+
+        return $validator;
     }
 }

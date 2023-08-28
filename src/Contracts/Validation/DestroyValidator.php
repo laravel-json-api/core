@@ -20,28 +20,25 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 
 interface DestroyValidator
 {
     /**
-     * Extract validation data for a destroy operation.
+     * Extract validation data for a delete operation.
      *
-     * @param Request|null $request
-     * @param object $model
      * @param Delete $operation
+     * @param object $model
      * @return array
      */
-    public function extract(?Request $request, object $model, Delete $operation): array;
+    public function extract(Delete $operation, object $model): array;
 
     /**
-     * Make a validator for the destroy operation.
+     * Make a validator for the delete operation.
      *
-     * @param Request|null $request
-     * @param object $model
      * @param Delete $operation
+     * @param object $model
      * @return Validator
      */
-    public function make(?Request $request, object $model, Delete $operation): Validator;
+    public function make(Delete $operation, object $model): Validator;
 }

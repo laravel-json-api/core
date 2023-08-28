@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\DestroyErrorFactory;
 use LaravelJsonApi\Contracts\Validation\DestroyValidator;
@@ -49,8 +50,8 @@ class ValidateDestroyCommand implements HandlesDestroyCommands
     {
         if ($command->mustValidate()) {
             $validator = $this
-                ->validatorFor($command->type())
-                ?->make($command->request(), $command->modelOrFail(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ?->make($command->operation(), $command->modelOrFail());
 
             if ($validator?->fails()) {
                 return Result::failed(
@@ -65,8 +66,8 @@ class ValidateDestroyCommand implements HandlesDestroyCommands
 
         if ($command->isNotValidated()) {
             $data = $this
-                ->validatorFor($command->type())
-                ?->extract($command->request(), $command->modelOrFail(), $command->operation());
+                ->validatorFor($command->type(), $command->request())
+                ?->extract($command->operation(), $command->modelOrFail());
 
             $command = $command->withValidated($data ?? []);
         }
@@ -78,12 +79,14 @@ class ValidateDestroyCommand implements HandlesDestroyCommands
      * Make a destroy validator.
      *
      * @param ResourceType $type
+     * @param Request|null $request
      * @return DestroyValidator|null
      */
-    private function validatorFor(ResourceType $type): ?DestroyValidator
+    private function validatorFor(ResourceType $type, ?Request $request): ?DestroyValidator
     {
         return $this->validatorContainer
             ->validatorsFor($type)
+            ->withRequest($request)
             ->destroy();
     }
 }
