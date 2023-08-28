@@ -54,6 +54,18 @@ class UpdateToOne extends Operation
     }
 
     /**
+     * @return string
+     */
+    public function getFieldName(): string
+    {
+        $name = parent::getFieldName();
+
+        assert(!empty($name), 'Expecting a field name to be set.');
+
+        return $name;
+    }
+
+    /**
      * @inheritDoc
      */
     public function toArray(): array

@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Schema;
 
+use Generator;
 use Illuminate\Support\Collection;
 use IteratorAggregate;
 use LaravelJsonApi\Contracts\Pagination\Paginator;
@@ -26,6 +27,7 @@ use LaravelJsonApi\Contracts\Schema\Attribute;
 use LaravelJsonApi\Contracts\Schema\Field;
 use LaravelJsonApi\Contracts\Schema\Filter;
 use LaravelJsonApi\Contracts\Schema\ID;
+use LaravelJsonApi\Contracts\Schema\Query as QueryContract;
 use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
@@ -43,7 +45,6 @@ use function sprintf;
 
 abstract class Schema implements SchemaContract, IteratorAggregate
 {
-
     /**
      * @var Server
      */
@@ -76,6 +77,13 @@ abstract class Schema implements SchemaContract, IteratorAggregate
      * @var bool
      */
     protected bool $selfLink = true;
+
+    /**
+     * The query schema instance.
+     *
+     * @var QueryContract|null
+     */
+    protected QueryContract|null $query = null;
 
     /**
      * @var array|null
@@ -350,6 +358,20 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
+    public function query(): QueryContract
+    {
+        if ($this->query) {
+            return $this->query;
+        }
+
+        $queryClass = QueryResolver::getInstance()($this::class);
+
+        return $this->query = new $queryClass($this);
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function includePaths(): iterable
     {
         if (0 < $this->maxDepth) {
@@ -533,9 +555,9 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * Iterate through all the sort fields.
      *
-     * @return iterable
+     * @return Generator<string,ID|Attribute|Sortable>
      */
-    private function allSortFields(): iterable
+    private function allSortFields(): Generator
     {
         $id = $this->id();
 

@@ -182,17 +182,26 @@ interface Schema extends Traversable
     public function isRelationship(string $name): bool;
 
     /**
+     * Get the query schema.
+     *
+     * @return Query
+     */
+    public function query(): Query;
+
+    /**
      * Is the provided name a filter parameter?
      *
      * @param string $name
      * @return bool
+     * @deprecated 4.0 access via the query() method.
      */
     public function isFilter(string $name): bool;
 
     /**
      * Get the filters for the resource.
      *
-     * @return Filter[]|iterable
+     * @return iterable<Filter>
+     * @deprecated 4.0 access via the query() method.
      */
     public function filters(): iterable;
 
@@ -200,13 +209,15 @@ interface Schema extends Traversable
      * Get the paginator to use when fetching collections of this resource.
      *
      * @return Paginator|null
+     * @deprecated 4.0 access via the query() method.
      */
      public function pagination(): ?Paginator;
 
     /**
      * Get the include paths supported by this resource.
      *
-     * @return string[]|iterable
+     * @return iterable<string>
+     * @deprecated 4.0 access via the query() method.
      */
      public function includePaths(): iterable;
 
@@ -215,13 +226,15 @@ interface Schema extends Traversable
      *
      * @param string $fieldName
      * @return bool
+     * @deprecated 4.0 access via the query() method.
      */
      public function isSparseField(string $fieldName): bool;
 
     /**
      * Get the sparse fields that are supported by this resource.
      *
-     * @return string[]|iterable
+     * @return iterable<string>
+     * @deprecated 4.0 access via the query() method.
      */
      public function sparseFields(): iterable;
 
@@ -230,13 +243,15 @@ interface Schema extends Traversable
      *
      * @param string $name
      * @return bool
+     * @deprecated 4.0 access via the query() method.
      */
      public function isSortField(string $name): bool;
 
     /**
      * Get the parameter names that can be used to sort this resource.
      *
-     * @return string[]|iterable
+     * @return iterable<string>
+     * @deprecated 4.0 access via the query() method.
      */
      public function sortFields(): iterable;
 
@@ -245,6 +260,7 @@ interface Schema extends Traversable
      *
      * @param string $name
      * @return ID|Attribute|Sortable
+     * @deprecated 4.0 access via the query() method.
      */
      public function sortField(string $name);
 
@@ -253,7 +269,8 @@ interface Schema extends Traversable
      *
      * Get sortables that are not the resource ID or a resource attribute.
      *
-     * @return Sortable[]|iterable
+     * @return iterable<Sortable>
+     * @deprecated 4.0 access via the query() method.
      */
      public function sortables(): iterable;
 

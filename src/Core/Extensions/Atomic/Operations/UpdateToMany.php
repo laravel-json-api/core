@@ -48,6 +48,18 @@ class UpdateToMany extends Operation
     }
 
     /**
+     * @return string
+     */
+    public function getFieldName(): string
+    {
+        $name = parent::getFieldName();
+
+        assert(!empty($name), 'Expecting a field name to be set.');
+
+        return $name;
+    }
+
+    /**
      * @return bool
      */
     public function isAttachingRelationship(): bool
