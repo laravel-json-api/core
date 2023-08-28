@@ -35,6 +35,7 @@ use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryManyValidator;
 use LaravelJsonApi\Core\Http\Actions\FetchMany;
+use LaravelJsonApi\Core\Query\Input\QueryMany;
 use LaravelJsonApi\Core\Store\QueryAllHandler;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -174,11 +175,13 @@ class FetchManyTest extends TestCase
             $errorFactory = $this->createMock(QueryErrorFactory::class),
         );
 
+        $input = new QueryMany(new ResourceType($type), ['foo' => 'bar']);
+
         $this->request
             ->expects($this->once())
             ->method('query')
             ->with(null)
-            ->willReturn($params = ['foo' => 'bar']);
+            ->willReturn($input->parameters);
 
         $validators
             ->expects($this->once())
@@ -194,7 +197,7 @@ class FetchManyTest extends TestCase
         $queryManyValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->identicalTo($params))
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

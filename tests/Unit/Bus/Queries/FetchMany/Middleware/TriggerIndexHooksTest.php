@@ -26,7 +26,9 @@ use LaravelJsonApi\Core\Bus\Queries\FetchMany\FetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\TriggerIndexHooks;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryMany;
 use LaravelJsonApi\Core\Query\QueryParameters;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
 class TriggerIndexHooksTest extends TestCase
@@ -59,7 +61,7 @@ class TriggerIndexHooksTest extends TestCase
     public function testItHasNoHooks(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchManyQuery::make($request, 'tags');
+        $query = FetchManyQuery::make($request, new QueryMany(new ResourceType('tags')));
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -86,7 +88,7 @@ class TriggerIndexHooksTest extends TestCase
         $models = new ArrayIterator([]);
         $sequence = [];
 
-        $query = FetchManyQuery::make($request, 'tags')
+        $query = FetchManyQuery::make($request, new QueryMany(new ResourceType('tags')))
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 
@@ -136,7 +138,7 @@ class TriggerIndexHooksTest extends TestCase
         $hooks = $this->createMock(IndexImplementation::class);
         $sequence = [];
 
-        $query = FetchManyQuery::make($request, 'tags')
+        $query = FetchManyQuery::make($request, new QueryMany(new ResourceType('tags')))
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 

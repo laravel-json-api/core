@@ -15,24 +15,12 @@
  * limitations under the License.
  */
 
-declare(strict_types=1);
+namespace LaravelJsonApi\Core\Query\Input;
 
-namespace LaravelJsonApi\Core\Http\Actions\Input;
-
-use LaravelJsonApi\Core\Query\Input\QueryRelated;
-use LaravelJsonApi\Core\Query\Input\QueryRelationship;
-
-interface IsRelatable extends IsIdentifiable
+enum QueryCodeEnum: string
 {
-    /**
-     * Get the JSON:API field name for the target relationship.
-     *
-     * @return string
-     */
-    public function fieldName(): string;
-
-    /**
-     * @return QueryRelated|QueryRelationship
-     */
-    public function query(): QueryRelated|QueryRelationship;
+    case Many = 'many';
+    case One = 'one';
+    case Related = 'related';
+    case Relationship = 'relationship';
 }

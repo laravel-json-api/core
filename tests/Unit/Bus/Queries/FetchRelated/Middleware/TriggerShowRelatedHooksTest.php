@@ -25,7 +25,10 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelated\FetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\TriggerShowRelatedHooks;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryRelated;
 use LaravelJsonApi\Core\Query\QueryParameters;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
 class TriggerShowRelatedHooksTest extends TestCase
@@ -58,7 +61,8 @@ class TriggerShowRelatedHooksTest extends TestCase
     public function testItHasNoHooks(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelatedQuery::make($request, 'tags', '456', 'videos');
+        $input = new QueryRelated(new ResourceType('tags'), new ResourceId('456'), 'videos');
+        $query = FetchRelatedQuery::make($request, $input);
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -86,7 +90,8 @@ class TriggerShowRelatedHooksTest extends TestCase
         $related = new \ArrayObject();
         $sequence = [];
 
-        $query = FetchRelatedQuery::make($request, 'posts', '123', 'tags')
+        $input = new QueryRelated(new ResourceType('posts'), new ResourceId('123'), 'tags');
+        $query = FetchRelatedQuery::make($request, $input)
             ->withModel($model)
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
@@ -141,7 +146,8 @@ class TriggerShowRelatedHooksTest extends TestCase
         $hooks = $this->createMock(ShowRelatedImplementation::class);
         $sequence = [];
 
-        $query = FetchRelatedQuery::make($request, 'tags', '123', 'createdBy')
+        $input = new QueryRelated(new ResourceType('tags'), new ResourceId('123'), 'createdBy');
+        $query = FetchRelatedQuery::make($request, $input)
             ->withModel($model = new \stdClass())
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);

@@ -62,15 +62,18 @@ class ValidateRelationshipQueryParameters
         $factory = $this->validators
             ->validatorsFor($relation->inverse());
 
+        $request = $action->request();
+        $query = $action->query();
+
         $validator = $relation->toOne() ?
-            $factory->queryOne()->forRequest($action->request()) :
-            $factory->queryMany()->forRequest($action->request());
+            $factory->queryOne()->make($request, $query) :
+            $factory->queryMany()->make($request, $query);
 
         if ($validator->fails()) {
             throw new JsonApiException($this->errorFactory->make($validator));
         }
 
-        $action = $action->withQuery(
+        $action = $action->withQueryParameters(
             QueryParameters::fromArray($validator->validated()),
         );
 

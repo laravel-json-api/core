@@ -25,7 +25,10 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\FetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Query\QueryParameters;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
 class TriggerShowHooksTest extends TestCase
@@ -58,7 +61,8 @@ class TriggerShowHooksTest extends TestCase
     public function testItHasNoHooks(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchOneQuery::make($request, 'tags', '123');
+        $input = new QueryOne(new ResourceType('tags'), new ResourceId('123'));
+        $query = FetchOneQuery::make($request, $input);
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -85,7 +89,8 @@ class TriggerShowHooksTest extends TestCase
         $model = new \stdClass();
         $sequence = [];
 
-        $query = FetchOneQuery::make($request, 'tags', '123')
+        $input = new QueryOne(new ResourceType('tags'), new ResourceId('123'));
+        $query = FetchOneQuery::make($request, $input)
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 
@@ -135,7 +140,8 @@ class TriggerShowHooksTest extends TestCase
         $hooks = $this->createMock(ShowImplementation::class);
         $sequence = [];
 
-        $query = FetchOneQuery::make($request, 'tags', '123')
+        $input = new QueryOne(new ResourceType('tags'), new ResourceId('123'));
+        $query = FetchOneQuery::make($request, $input)
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
 

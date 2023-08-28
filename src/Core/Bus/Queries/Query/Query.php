@@ -22,6 +22,7 @@ namespace LaravelJsonApi\Core\Bus\Queries\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\ValidatedInput;
 use LaravelJsonApi\Contracts\Query\QueryParameters as QueryParametersContract;
+use LaravelJsonApi\Core\Query\Input\Query as QueryInput;
 use LaravelJsonApi\Core\Query\QueryParameters;
 use LaravelJsonApi\Core\Support\Contracts;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -29,19 +30,9 @@ use LaravelJsonApi\Core\Values\ResourceType;
 abstract class Query
 {
     /**
-     * @var ResourceType
-     */
-    private readonly ResourceType $type;
-
-    /**
      * @var bool
      */
     private bool $authorize = true;
-
-    /**
-     * @var array|null
-     */
-    private ?array $parameters = null;
 
     /**
      * @var bool
@@ -59,16 +50,17 @@ abstract class Query
     private ?QueryParametersContract $validatedParameters = null;
 
     /**
+     * @return QueryInput
+     */
+    abstract public function input(): QueryInput;
+
+    /**
      * Query constructor
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
      */
-    public function __construct(
-        private readonly ?Request $request,
-        ResourceType|string $type,
-    ) {
-        $this->type = ResourceType::cast($type);
+    public function __construct(private readonly ?Request $request)
+    {
     }
 
     /**
@@ -78,7 +70,7 @@ abstract class Query
      */
     public function type(): ResourceType
     {
-        return $this->type;
+        return $this->input()->type;
     }
 
     /**
@@ -89,35 +81,6 @@ abstract class Query
     public function request(): ?Request
     {
         return $this->request;
-    }
-
-    /**
-     * Set the raw query parameters.
-     *
-     * @param array $params
-     * @return $this
-     */
-    public function withParameters(array $params): static
-    {
-        $copy = clone $this;
-        $copy->parameters = $params;
-
-        return $copy;
-    }
-
-    /**
-     * Get the raw query parameters.
-     *
-     * @return array
-     */
-    public function parameters(): array
-    {
-        if ($this->parameters === null) {
-            $parameters = $this->request?->query();
-            $this->parameters = $parameters ?? [];
-        }
-
-        return $this->parameters;
     }
 
     /**

@@ -30,6 +30,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\AuthorizeFetchManyQuery
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\TriggerIndexHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\ValidateFetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
+use LaravelJsonApi\Core\Query\Input\QueryMany;
 use LaravelJsonApi\Core\Store\QueryAllHandler;
 use LaravelJsonApi\Core\Support\PipelineFactory;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -73,10 +74,10 @@ class FetchManyQueryHandlerTest extends TestCase
     {
         $original = new FetchManyQuery(
             $request = $this->createMock(Request::class),
-            $type = new ResourceType('comments'),
+            $input = new QueryMany($type = new ResourceType('comments')),
         );
 
-        $passed = FetchManyQuery::make($request, $type)
+        $passed = FetchManyQuery::make($request, $input)
             ->withValidated($validated = ['include' => 'user', 'page' => ['number' => 2]]);
 
         $sequence = [];

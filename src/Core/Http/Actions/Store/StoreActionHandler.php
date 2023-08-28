@@ -124,7 +124,7 @@ class StoreActionHandler
     private function dispatch(StoreActionInput $action): Payload
     {
         $command = StoreCommand::make($action->request(), $action->operation())
-            ->withQuery($action->query())
+            ->withQuery($action->queryParameters())
             ->withHooks($action->hooks())
             ->skipAuthorization();
 
@@ -152,9 +152,9 @@ class StoreActionHandler
             $model,
         );
 
-        $query = FetchOneQuery::make($action->request(), $action->type(), $id)
+        $query = FetchOneQuery::make($action->request(), $action->query()->withId($id))
             ->withModel($model)
-            ->withValidated($action->query())
+            ->withValidated($action->queryParameters())
             ->skipAuthorization();
 
         $result = $this->queries->dispatch($query);

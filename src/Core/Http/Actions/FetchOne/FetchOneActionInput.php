@@ -23,12 +23,18 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\Identifiable;
 use LaravelJsonApi\Core\Http\Actions\Input\IsIdentifiable;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchOneActionInput extends ActionInput implements IsIdentifiable
 {
     use Identifiable;
+
+    /**
+     * @var QueryOne|null
+     */
+    private ?QueryOne $query = null;
 
     /**
      * FetchOneActionInput constructor
@@ -47,5 +53,21 @@ class FetchOneActionInput extends ActionInput implements IsIdentifiable
         parent::__construct($request, $type);
         $this->id = $id;
         $this->model = $model;
+    }
+
+    /**
+     * @return QueryOne
+     */
+    public function query(): QueryOne
+    {
+        if ($this->query) {
+            return $this->query;
+        }
+
+        return $this->query = new QueryOne(
+            $this->type,
+            $this->id,
+            (array) $this->request->query(),
+        );
     }
 }

@@ -35,6 +35,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\TriggerShowRela
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\ValidateFetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Queries\Result;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Store\QueryManyHandler;
 use LaravelJsonApi\Core\Support\PipelineFactory;
 use LaravelJsonApi\Core\Values\ResourceId;
@@ -84,13 +85,15 @@ class FetchRelationshipQueryHandlerTest extends TestCase
     public function testItFetchesToOne(): void
     {
         $original = new FetchRelationshipQuery(
-            request: $request = $this->createMock(Request::class),
-            type: $type = new ResourceType('comments'),
-            id: $id = new ResourceId('123'),
-            fieldName: 'author',
+            $request = $this->createMock(Request::class),
+            new QueryRelationship(
+                type: $type = new ResourceType('comments'),
+                id: $id = new ResourceId('123'),
+                fieldName: 'author',
+            ),
         );
 
-        $passed = FetchRelationshipQuery::make($request, $type, $id, $fieldName = 'createdBy')
+        $passed = FetchRelationshipQuery::make($request, new QueryRelationship($type, $id, $fieldName = 'createdBy'))
             ->withModel($model = new \stdClass())
             ->withValidated($validated = ['include' => 'profile']);
 
@@ -132,13 +135,15 @@ class FetchRelationshipQueryHandlerTest extends TestCase
     public function testItFetchesToMany(): void
     {
         $original = new FetchRelationshipQuery(
-            request: $request = $this->createMock(Request::class),
-            type: $type = new ResourceType('posts'),
-            id: $id = new ResourceId('123'),
-            fieldName: 'comments',
+            $request = $this->createMock(Request::class),
+            new QueryRelationship(
+                type: $type = new ResourceType('posts'),
+                id: $id = new ResourceId('123'),
+                fieldName: 'comments',
+            ),
         );
 
-        $passed = FetchRelationshipQuery::make($request, $type, $id, $fieldName = 'tags')
+        $passed = FetchRelationshipQuery::make($request, new QueryRelationship($type, $id, $fieldName = 'tags'))
             ->withModel($model = new \stdClass())
             ->withValidated($validated = ['include' => 'parent', 'page' => ['number' => 2]]);
 

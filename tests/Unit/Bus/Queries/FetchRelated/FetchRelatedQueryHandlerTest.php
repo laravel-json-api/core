@@ -35,6 +35,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\TriggerShowRelatedHo
 use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\ValidateFetchRelatedQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Queries\Result;
+use LaravelJsonApi\Core\Query\Input\QueryRelated;
 use LaravelJsonApi\Core\Store\QueryManyHandler;
 use LaravelJsonApi\Core\Support\PipelineFactory;
 use LaravelJsonApi\Core\Values\ResourceId;
@@ -84,13 +85,15 @@ class FetchRelatedQueryHandlerTest extends TestCase
     public function testItFetchesToOne(): void
     {
         $original = new FetchRelatedQuery(
-            request: $request = $this->createMock(Request::class),
-            type: $type = new ResourceType('comments'),
-            id: $id = new ResourceId('123'),
-            fieldName: 'author',
+            $request = $this->createMock(Request::class),
+            new QueryRelated(
+                $type = new ResourceType('comments'),
+                $id = new ResourceId('123'),
+                'author',
+            ),
         );
 
-        $passed = FetchRelatedQuery::make($request, $type, $id, $fieldName = 'createdBy')
+        $passed = FetchRelatedQuery::make($request, new QueryRelated($type, $id, $fieldName = 'createdBy'))
             ->withModel($model = new \stdClass())
             ->withValidated($validated = ['include' => 'profile']);
 
@@ -132,13 +135,15 @@ class FetchRelatedQueryHandlerTest extends TestCase
     public function testItFetchesToMany(): void
     {
         $original = new FetchRelatedQuery(
-            request: $request = $this->createMock(Request::class),
-            type: $type = new ResourceType('posts'),
-            id: $id = new ResourceId('123'),
-            fieldName: 'comments'
+            $request = $this->createMock(Request::class),
+            new QueryRelated(
+                $type = new ResourceType('posts'),
+                $id = new ResourceId('123'),
+                'comments',
+            ),
         );
 
-        $passed = FetchRelatedQuery::make($request, $type, $id, $fieldName = 'tags')
+        $passed = FetchRelatedQuery::make($request, new QueryRelated($type, $id, $fieldName = 'tags'))
             ->withModel($model = new \stdClass())
             ->withValidated($validated = ['include' => 'parent', 'page' => ['number' => 2]]);
 

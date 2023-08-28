@@ -45,6 +45,7 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create as StoreOperation;
 use LaravelJsonApi\Core\Http\Actions\Store;
+use LaravelJsonApi\Core\Query\Input\WillQueryOne;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -125,21 +126,26 @@ class StoreTest extends TestCase
     {
         $this->route->method('resourceType')->willReturn('posts');
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'author',
+        ];
+
         $this->willNegotiateContent();
         $this->willAuthorize('posts', 'App\Models\Post');
         $this->willBeCompliant('posts');
-        $this->willValidateQueryParams('posts', $queryParams = [
-            'fields' => ['posts' => 'title,content,author'],
-            'include' => 'author',
-        ]);
+        $this->willValidateQueryParams('posts', new WillQueryOne(
+            new ResourceType('posts'),
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
         $resource = $this->willParseOperation('posts');
         $this->willValidateOperation($resource, $validated = ['title' => 'Hello World']);
         $createdModel = $this->willStore('posts', $validated);
         $this->willLookupResourceId($createdModel, 'posts', '123');
-        $model = $this->willQueryOne('posts', '123', $queryParams);
+        $model = $this->willQueryOne('posts', '123', $validatedQueryParams);
 
         $response = $this->action
-            ->withHooks($this->withHooks($createdModel, $queryParams))
+            ->withHooks($this->withHooks($createdModel, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -261,10 +267,11 @@ class StoreTest extends TestCase
 
     /**
      * @param string $type
+     * @param WillQueryOne $input
      * @param array $validated
      * @return void
      */
-    private function willValidateQueryParams(string $type, array $validated = []): void
+    private function willValidateQueryParams(string $type, WillQueryOne $input, array $validated = []): void
     {
         $this->container->instance(
             ValidatorContainer::class,
@@ -275,6 +282,11 @@ class StoreTest extends TestCase
             QueryErrorFactory::class,
             $errorFactory = $this->createMock(QueryErrorFactory::class),
         );
+
+        $this->request
+            ->expects($this->once())
+            ->method('query')
+            ->willReturn($input->parameters);
 
         $validators
             ->expects($this->atMost(2))
@@ -289,8 +301,8 @@ class StoreTest extends TestCase
 
         $queryOneValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($this->request))
+            ->method('make')
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

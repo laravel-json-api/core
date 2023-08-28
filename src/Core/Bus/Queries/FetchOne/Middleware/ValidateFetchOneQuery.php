@@ -49,7 +49,7 @@ class ValidateFetchOneQuery implements HandlesFetchOneQueries
             $validator = $this->validatorContainer
                 ->validatorsFor($query->type())
                 ->queryOne()
-                ->make($query->request(), $query->parameters());
+                ->make($query->request(), $query->input());
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -64,7 +64,7 @@ class ValidateFetchOneQuery implements HandlesFetchOneQueries
 
         if ($query->isNotValidated()) {
             $query = $query->withValidated(
-                $query->parameters(),
+                $query->input()->parameters,
             );
         }
 

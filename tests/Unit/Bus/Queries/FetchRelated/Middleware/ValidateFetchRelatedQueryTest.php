@@ -34,6 +34,8 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\ValidateFetchRelated
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryRelated;
+use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -87,10 +89,14 @@ class ValidateFetchRelatedQueryTest extends TestCase
     public function testItPassesToOneValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelatedQuery::make($request, $this->type, '123', $fieldName = 'author')
-            ->withParameters($params = ['foo' => 'bar']);
+        $query = FetchRelatedQuery::make($request, $input = new QueryRelated(
+            $this->type,
+            new ResourceId('123'),
+            $fieldName = 'author',
+            ['foo' => 'bar'],
+        ));
 
-        $validator = $this->willValidateToOne($fieldName, $request, $params);
+        $validator = $this->willValidateToOne($fieldName, $request, $input);
 
         $validator
             ->expects($this->once())
@@ -124,10 +130,14 @@ class ValidateFetchRelatedQueryTest extends TestCase
     public function testItFailsToOneValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelatedQuery::make($request, $this->type, '456', $fieldName = 'image')
-            ->withParameters($params = ['foo' => 'bar']);
+        $query = FetchRelatedQuery::make($request, $input = new QueryRelated(
+            $this->type,
+            new ResourceId('456'),
+            $fieldName = 'image',
+            ['foo' => 'bar'],
+        ));
 
-        $validator = $this->willValidateToOne($fieldName, $request, $params);
+        $validator = $this->willValidateToOne($fieldName, $request, $input);
 
         $validator
             ->expects($this->once())
@@ -155,10 +165,14 @@ class ValidateFetchRelatedQueryTest extends TestCase
     public function testItPassesToManyValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelatedQuery::make($request, $this->type, '123', $fieldName = 'comments')
-            ->withParameters($params = ['foo' => 'bar']);
+        $query = FetchRelatedQuery::make($request, $input = new QueryRelated(
+            $this->type,
+            new ResourceId('123'),
+            $fieldName = 'comments',
+            ['foo' => 'bar'],
+        ));
 
-        $validator = $this->willValidateToMany($fieldName, $request, $params);
+        $validator = $this->willValidateToMany($fieldName, $request, $input);
 
         $validator
             ->expects($this->once())
@@ -192,10 +206,14 @@ class ValidateFetchRelatedQueryTest extends TestCase
     public function testItFailsToManyValidation(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelatedQuery::make($request, $this->type, '123', $fieldName = 'tags')
-            ->withParameters($params = ['foo' => 'bar']);
+        $query = FetchRelatedQuery::make($request, $input = new QueryRelated(
+            $this->type,
+            new ResourceId('123'),
+            $fieldName = 'tags',
+            ['foo' => 'bar'],
+        ));
 
-        $validator = $this->willValidateToMany($fieldName, $request, $params);
+        $validator = $this->willValidateToMany($fieldName, $request, $input);
 
         $validator
             ->expects($this->once())
@@ -224,9 +242,12 @@ class ValidateFetchRelatedQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelatedQuery::make($request, $this->type, '123', 'comments')
-            ->withParameters($params = ['foo' => 'bar'])
-            ->skipValidation();
+        $query = FetchRelatedQuery::make($request, $input = new QueryRelated(
+            $this->type,
+            new ResourceId('123'),
+            'comments',
+            $params = ['foo' => 'bar'],
+        ))->skipValidation();
 
         $this->willNotValidate();
 
@@ -251,8 +272,12 @@ class ValidateFetchRelatedQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelatedQuery::make($request, $this->type, '123', 'tags')
-            ->withValidated($validated = ['foo' => 'bar']);
+        $query = FetchRelatedQuery::make($request, $input = new QueryRelated(
+            $this->type,
+            new ResourceId('123'),
+            'author',
+            ['blah' => 'blah'],
+        ))->withValidated($validated = ['foo' => 'bar']);
 
         $this->willNotValidate();
 
@@ -273,10 +298,10 @@ class ValidateFetchRelatedQueryTest extends TestCase
     /**
      * @param string $fieldName
      * @param Request|null $request
-     * @param array $params
+     * @param QueryRelated $input
      * @return Validator&MockObject
      */
-    private function willValidateToOne(string $fieldName, ?Request $request, array $params): Validator&MockObject
+    private function willValidateToOne(string $fieldName, ?Request $request, QueryRelated $input): Validator&MockObject
     {
         $factory = $this->willValidateField($fieldName, true);
 
@@ -292,7 +317,7 @@ class ValidateFetchRelatedQueryTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($params))
+            ->with($this->identicalTo($request), $this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         return $validator;
@@ -301,10 +326,10 @@ class ValidateFetchRelatedQueryTest extends TestCase
     /**
      * @param string $fieldName
      * @param Request|null $request
-     * @param array $params
+     * @param QueryRelated $input
      * @return Validator&MockObject
      */
-    private function willValidateToMany(string $fieldName, ?Request $request, array $params): Validator&MockObject
+    private function willValidateToMany(string $fieldName, ?Request $request, QueryRelated $input): Validator&MockObject
     {
         $factory = $this->willValidateField($fieldName, false);
 
@@ -320,7 +345,7 @@ class ValidateFetchRelatedQueryTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($params))
+            ->with($this->identicalTo($request), $this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         return $validator;

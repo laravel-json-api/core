@@ -37,6 +37,7 @@ use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryManyValidator;
 use LaravelJsonApi\Core\Http\Actions\FetchRelationship;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Store\QueryManyHandler;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
@@ -115,20 +116,27 @@ class FetchRelationshipToManyTest extends TestCase
         $this->route->method('modelOrResourceId')->willReturn('123');
         $this->route->method('fieldName')->willReturn('comments');
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'createdBy',
+            'page' => ['number' => '2'],
+        ];
+
         $this->willNotLookupResourceId();
         $this->willNegotiateContent();
         $this->withSchema('posts', 'comments', 'blog-comments');
         $this->willFindModel('posts', '123', $model = new stdClass());
         $this->willAuthorize('posts', 'comments', $model);
-        $this->willValidate('blog-comments', $queryParams = [
-            'fields' => ['posts' => 'title,content,author'],
-            'include' => 'createdBy',
-            'page' => ['number' => '2'],
-        ]);
-        $related = $this->willQueryToMany('posts', '123', 'comments', $queryParams);
+        $this->willValidate('blog-comments', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('123'),
+            'comments',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
+        $related = $this->willQueryToMany('posts', '123', 'comments', $validatedQueryParams);
 
         $response = $this->action
-            ->withHooks($this->withHooks($model, $related, $queryParams))
+            ->withHooks($this->withHooks($model, $related, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -154,18 +162,29 @@ class FetchRelationshipToManyTest extends TestCase
             ->expects($this->never())
             ->method($this->anything());
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'createdBy',
+            'page' => ['number' => '2'],
+        ];
+
         $this->willLookupResourceId($model = new stdClass(), 'posts', '456');
         $this->willNegotiateContent();
         $this->withSchema('posts', 'comments', 'blog-comments');
         $this->willNotFindModel();
         $this->willAuthorize('posts', 'comments', $model);
-        $this->willValidate('blog-comments');
+        $this->willValidate('blog-comments', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('456'),
+            'comments',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
 
-        $related = $this->willQueryToMany('posts', '456', 'comments');
+        $related = $this->willQueryToMany('posts', '456', 'comments', $validatedQueryParams);
 
         $response = $this->action
             ->withTarget('posts', $model, 'comments')
-            ->withHooks($this->withHooks($model, $related))
+            ->withHooks($this->withHooks($model, $related, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -282,10 +301,11 @@ class FetchRelationshipToManyTest extends TestCase
 
     /**
      * @param string $type
+     * @param QueryRelationship $input
      * @param array $validated
      * @return void
      */
-    private function willValidate(string $type, array $validated = []): void
+    private function willValidate(string $type, QueryRelationship $input, array $validated = []): void
     {
         $this->container->instance(
             ValidatorContainer::class,
@@ -301,7 +321,7 @@ class FetchRelationshipToManyTest extends TestCase
             ->expects($this->once())
             ->method('query')
             ->with(null)
-            ->willReturn($params = ['foo' => 'bar']);
+            ->willReturn($input->parameters);
 
         $validators
             ->expects($this->once())
@@ -317,7 +337,7 @@ class FetchRelationshipToManyTest extends TestCase
         $queryManyValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->identicalTo($params))
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

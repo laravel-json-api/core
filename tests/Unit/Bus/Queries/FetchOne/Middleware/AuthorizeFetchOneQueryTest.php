@@ -29,6 +29,8 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\AuthorizeFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
+use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -71,7 +73,8 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type, '123')
+        $input = new QueryOne($this->type, new ResourceId('123'));
+        $query = FetchOneQuery::make($request, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, null);
@@ -94,7 +97,8 @@ class AuthorizeFetchOneQueryTest extends TestCase
      */
     public function testItPassesAuthorizationWithoutRequest(): void
     {
-        $query = FetchOneQuery::make(null, $this->type, '123')
+        $input = new QueryOne($this->type, new ResourceId('123'));
+        $query = FetchOneQuery::make(null, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize(null, $model, null);
@@ -119,7 +123,8 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type, '456')
+        $input = new QueryOne($this->type, new ResourceId('123'));
+        $query = FetchOneQuery::make($request, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorizeAndThrow(
@@ -146,7 +151,8 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type, '123')
+        $input = new QueryOne($this->type, new ResourceId('123'));
+        $query = FetchOneQuery::make($request, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, $expected = new ErrorList());
@@ -167,7 +173,8 @@ class AuthorizeFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type, '123')
+        $input = new QueryOne($this->type, new ResourceId('123'));
+        $query = FetchOneQuery::make($request, $input)
             ->withModel(new \stdClass())
             ->skipAuthorization();
 

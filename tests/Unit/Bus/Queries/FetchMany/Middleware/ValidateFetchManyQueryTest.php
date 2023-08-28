@@ -30,6 +30,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\ValidateFetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryMany;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -88,13 +89,13 @@ class ValidateFetchManyQueryTest extends TestCase
     {
         $query = FetchManyQuery::make(
             $request = $this->createMock(Request::class),
-            $this->type,
-        )->withParameters($params = ['foo' => 'bar']);
+            $input = new QueryMany($this->type, ['foo' => 'bar']),
+        );
 
         $this->validator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($params))
+            ->with($this->identicalTo($request), $this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -130,13 +131,13 @@ class ValidateFetchManyQueryTest extends TestCase
     {
         $query = FetchManyQuery::make(
             $request = $this->createMock(Request::class),
-            $this->type,
-        )->withParameters($params = ['foo' => 'bar']);
+            $input = new QueryMany($this->type, ['foo' => 'bar']),
+        );
 
         $this->validator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($params))
+            ->with($this->identicalTo($request), $this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -166,8 +167,7 @@ class ValidateFetchManyQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchManyQuery::make($request, $this->type)
-            ->withParameters($params = ['foo' => 'bar'])
+        $query = FetchManyQuery::make($request, new QueryMany($this->type, $params = ['foo' => 'bar']))
             ->skipValidation();
 
         $this->validator
@@ -195,7 +195,7 @@ class ValidateFetchManyQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchManyQuery::make($request, $this->type)
+        $query = FetchManyQuery::make($request, new QueryMany($this->type, ['blah' => 'blah']),)
             ->withValidated($validated = ['foo' => 'bar']);
 
         $this->validator

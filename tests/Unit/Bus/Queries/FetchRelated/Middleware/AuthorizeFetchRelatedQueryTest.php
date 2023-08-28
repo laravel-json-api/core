@@ -29,6 +29,8 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelated\Middleware\AuthorizeFetchRelate
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryRelated;
+use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -71,7 +73,8 @@ class AuthorizeFetchRelatedQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelatedQuery::make($request, $this->type, '123', 'comments')
+        $input = new QueryRelated($this->type, new ResourceId('123'), 'comments');
+        $query = FetchRelatedQuery::make($request, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, 'comments');
@@ -94,7 +97,8 @@ class AuthorizeFetchRelatedQueryTest extends TestCase
      */
     public function testItPassesAuthorizationWithoutRequest(): void
     {
-        $query = FetchRelatedQuery::make(null, $this->type, '456', 'tags')
+        $input = new QueryRelated($this->type, new ResourceId('123'), 'tags');
+        $query = FetchRelatedQuery::make(null, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize(null, $model, 'tags');
@@ -119,7 +123,8 @@ class AuthorizeFetchRelatedQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelatedQuery::make($request, $this->type, '123', 'comments')
+        $input = new QueryRelated($this->type, new ResourceId('123'), 'comments');
+        $query = FetchRelatedQuery::make($request, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorizeAndThrow(
@@ -147,7 +152,8 @@ class AuthorizeFetchRelatedQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelatedQuery::make($request, $this->type, '123', 'tags')
+        $input = new QueryRelated($this->type, new ResourceId('123'), 'tags');
+        $query = FetchRelatedQuery::make($request, $input)
             ->withModel($model = new \stdClass());
 
         $this->willAuthorize($request, $model, 'tags', $expected = new ErrorList());
@@ -168,7 +174,8 @@ class AuthorizeFetchRelatedQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchRelatedQuery::make($request, $this->type, '456', 'videos')
+        $input = new QueryRelated($this->type, new ResourceId('123'), 'comments');
+        $query = FetchRelatedQuery::make($request, $input)
             ->withModel(new \stdClass())
             ->skipAuthorization();
 

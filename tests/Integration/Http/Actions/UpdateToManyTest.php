@@ -45,6 +45,7 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierOrListOfIdentif
 use LaravelJsonApi\Core\Document\Input\Values\ListOfResourceIdentifiers;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Store\QueryManyHandler;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
@@ -138,15 +139,22 @@ class UpdateToManyTest extends TestCase
         $this->route->method('modelOrResourceId')->willReturn('123');
         $this->route->method('fieldName')->willReturn('tags');
 
+        $validatedQueryParams = [
+            'filter' => ['archived' => 'false'],
+        ];
+
         $this->withSchema('posts', 'tags', 'blog-tags');
         $this->willNotLookupResourceId();
         $this->willNegotiateContent();
         $this->willFindModel('posts', '123', $post = new stdClass());
         $this->willAuthorize('posts', $post, 'tags');
         $this->willBeCompliant('posts', 'tags');
-        $this->willValidateQueryParams('blog-tags', $queryParams = [
-            'filter' => ['archived' => 'false'],
-        ]);
+        $this->willValidateQueryParams('blog-tags', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('123'),
+            'tags',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
         $identifiers = $this->willParseOperation('posts', '123');
         $this->willValidateOperation('posts', $post, $identifiers, $validated = [
             'tags' => [
@@ -155,10 +163,10 @@ class UpdateToManyTest extends TestCase
             ],
         ]);
         $modifiedRelated = $this->willModify('posts', $post, 'tags', $validated['tags']);
-        $related = $this->willQueryToMany('posts', '123', 'tags', $queryParams);
+        $related = $this->willQueryToMany('posts', '123', 'tags', $validatedQueryParams);
 
         $response = $this->action
-            ->withHooks($this->withHooks($post, $modifiedRelated, $queryParams))
+            ->withHooks($this->withHooks($post, $modifiedRelated, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -189,6 +197,10 @@ class UpdateToManyTest extends TestCase
             ->expects($this->never())
             ->method($this->anything());
 
+        $validatedQueryParams = [
+            'filter' => ['archived' => 'false'],
+        ];
+
         $model = new \stdClass();
 
         $this->withSchema('posts', 'tags', 'blog-tags');
@@ -197,7 +209,12 @@ class UpdateToManyTest extends TestCase
         $this->willLookupResourceId($model, 'posts', '999');
         $this->willAuthorize('posts', $model, 'tags');
         $this->willBeCompliant('posts', 'tags');
-        $this->willValidateQueryParams('blog-tags', $queryParams = []);
+        $this->willValidateQueryParams('blog-tags', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('999'),
+            'tags',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
         $identifiers = $this->willParseOperation('posts', '999');
         $this->willValidateOperation('posts', $model, $identifiers, $validated = [
             'tags' => [
@@ -206,7 +223,7 @@ class UpdateToManyTest extends TestCase
             ],
         ]);
         $this->willModify('posts', $model, 'tags', $validated['tags']);
-        $related = $this->willQueryToMany('posts', '999', 'tags', $queryParams);
+        $related = $this->willQueryToMany('posts', '999', 'tags', $validatedQueryParams);
 
         $response = $this->action
             ->withTarget('posts', $model, 'tags')
@@ -376,10 +393,12 @@ class UpdateToManyTest extends TestCase
     }
 
     /**
+     * @param string $inverse
+     * @param QueryRelationship $input
      * @param array $validated
      * @return void
      */
-    private function willValidateQueryParams(string $inverse, array $validated = []): void
+    private function willValidateQueryParams(string $inverse, QueryRelationship $input, array $validated = []): void
     {
         $this->container->instance(
             QueryErrorFactory::class,
@@ -389,6 +408,11 @@ class UpdateToManyTest extends TestCase
         $validatorFactory = $this->createMock(ValidatorFactory::class);
         $this->validatorFactories[$inverse] = $validatorFactory;
 
+        $this->request
+            ->expects($this->once())
+            ->method('query')
+            ->willReturn($input->parameters);
+
         $validatorFactory
             ->expects($this->once())
             ->method('queryMany')
@@ -396,8 +420,8 @@ class UpdateToManyTest extends TestCase
 
         $queryValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($this->request))
+            ->method('make')
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

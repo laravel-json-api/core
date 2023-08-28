@@ -21,15 +21,15 @@ namespace LaravelJsonApi\Core\Bus\Queries\FetchRelated;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowRelatedImplementation;
+use LaravelJsonApi\Core\Bus\Queries\Query\Identifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsRelatable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
-use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;
+use LaravelJsonApi\Core\Query\Input\QueryRelated;
 use LaravelJsonApi\Core\Values\ResourceId;
-use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchRelatedQuery extends Query implements IsRelatable
 {
-    use Relatable;
+    use Identifiable;
 
     /**
      * @var ShowRelatedImplementation|null
@@ -40,38 +40,49 @@ class FetchRelatedQuery extends Query implements IsRelatable
      * Fluent constructor.
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
-     * @param ResourceId|string $id
-     * @param string $fieldName
+     * @param QueryRelated $input
      * @return self
      */
-    public static function make(
-        ?Request $request,
-        ResourceType|string $type,
-        ResourceId|string $id,
-        string $fieldName,
-    ): self
+    public static function make(?Request $request, QueryRelated $input): self
     {
-        return new self($request, $type, $id, $fieldName);
+        return new self($request, $input);
     }
 
     /**
      * FetchRelatedQuery constructor
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
-     * @param ResourceId|string $id
-     * @param string $fieldName
+     * @param QueryRelated $input
      */
     public function __construct(
         ?Request $request,
-        ResourceType|string $type,
-        ResourceId|string $id,
-        string $fieldName,
+        private readonly QueryRelated $input,
     ) {
-        parent::__construct($request, $type);
-        $this->id = ResourceId::cast($id);
-        $this->fieldName = $fieldName ?: null;
+        parent::__construct($request);
+    }
+
+    /**
+     * @return ResourceId
+     */
+    public function id(): ResourceId
+    {
+        return $this->input->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function fieldName(): string
+    {
+        return $this->input->fieldName;
+    }
+
+    /**
+     * @return QueryRelated
+     */
+    public function input(): QueryRelated
+    {
+        return $this->input;
     }
 
     /**

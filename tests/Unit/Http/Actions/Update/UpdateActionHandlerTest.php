@@ -105,7 +105,7 @@ class UpdateActionHandlerTest extends TestCase
         $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel($model = new \stdClass())
             ->withOperation($op = new Update(null, new ResourceObject($type)))
-            ->withQuery($queryParams)
+            ->withQueryParameters($queryParams)
             ->withHooks($hooks = new \stdClass());
 
         $original = $this->willSendThroughPipeline($passed);
@@ -171,7 +171,7 @@ class UpdateActionHandlerTest extends TestCase
         $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel(new \stdClass())
             ->withOperation(new Update(null, new ResourceObject($type)))
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -217,7 +217,7 @@ class UpdateActionHandlerTest extends TestCase
         $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel($model = new \stdClass())
             ->withOperation(new Update(null, new ResourceObject($type)))
-            ->withQuery($queryParams = $this->createMock(QueryParameters::class));
+            ->withQueryParameters($queryParams = $this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -267,7 +267,7 @@ class UpdateActionHandlerTest extends TestCase
         $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel(new \stdClass())
             ->withOperation(new Update(null, new ResourceObject($type)))
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -301,7 +301,7 @@ class UpdateActionHandlerTest extends TestCase
         $passed = (new UpdateActionInput($request, $type, $id))
             ->withModel(new \stdClass())
             ->withOperation(new Update(null, new ResourceObject($type)))
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 

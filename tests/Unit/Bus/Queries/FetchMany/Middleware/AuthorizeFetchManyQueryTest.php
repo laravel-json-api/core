@@ -29,6 +29,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\AuthorizeFetchManyQuery
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryMany;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -71,7 +72,7 @@ class AuthorizeFetchManyQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchManyQuery::make($request, $this->type);
+        $query = FetchManyQuery::make($request, new QueryMany($this->type));
 
         $this->willAuthorize($request);
 
@@ -93,7 +94,7 @@ class AuthorizeFetchManyQueryTest extends TestCase
      */
     public function testItPassesAuthorizationWithoutRequest(): void
     {
-        $query = FetchManyQuery::make(null, $this->type);
+        $query = FetchManyQuery::make(null, new QueryMany($this->type));
 
         $this->willAuthorize(null);
 
@@ -117,7 +118,7 @@ class AuthorizeFetchManyQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchManyQuery::make($request, $this->type);
+        $query = FetchManyQuery::make($request, new QueryMany($this->type));
 
         $this->willAuthorizeAndThrow(
             $request,
@@ -142,7 +143,7 @@ class AuthorizeFetchManyQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchManyQuery::make($request, $this->type);
+        $query = FetchManyQuery::make($request, new QueryMany($this->type));
 
         $this->willAuthorize($request, $expected = new ErrorList());
 
@@ -162,7 +163,7 @@ class AuthorizeFetchManyQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchManyQuery::make($request, $this->type)
+        $query = FetchManyQuery::make($request, new QueryMany($this->type))
             ->skipAuthorization();
 
         $this->authorizerFactory

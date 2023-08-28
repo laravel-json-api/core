@@ -20,15 +20,21 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\FetchRelated;
 
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\IsRelatable;
+use LaravelJsonApi\Core\Http\Actions\Input\Relatable;
+use LaravelJsonApi\Core\Query\Input\QueryRelated;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchRelatedActionInput extends ActionInput implements IsRelatable
 {
     use Relatable;
+
+    /**
+     * @var QueryRelated|null
+     */
+    private ?QueryRelated $query = null;
 
     /**
      * FetchRelatedActionInput constructor
@@ -50,5 +56,22 @@ class FetchRelatedActionInput extends ActionInput implements IsRelatable
         $this->id = $id;
         $this->fieldName = $fieldName;
         $this->model = $model;
+    }
+
+    /**
+     * @return QueryRelated
+     */
+    public function query(): QueryRelated
+    {
+        if ($this->query) {
+            return $this->query;
+        }
+
+        return $this->query = new QueryRelated(
+            $this->type,
+            $this->id,
+            $this->fieldName,
+            (array) $this->request->query(),
+        );
     }
 }

@@ -21,6 +21,7 @@ namespace LaravelJsonApi\Core\Http\Actions\Store;
 
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use LaravelJsonApi\Core\Query\Input\WillQueryOne;
 
 class StoreActionInput extends ActionInput
 {
@@ -28,6 +29,11 @@ class StoreActionInput extends ActionInput
      * @var Create|null
      */
     private ?Create $operation = null;
+
+    /**
+     * @var WillQueryOne|null
+     */
+    private ?WillQueryOne $query = null;
 
     /**
      * Return a new instance with the store operation set.
@@ -53,5 +59,20 @@ class StoreActionInput extends ActionInput
         }
 
         throw new \LogicException('No store operation set on store action.');
+    }
+
+    /**
+     * @return WillQueryOne
+     */
+    public function query(): WillQueryOne
+    {
+        if ($this->query) {
+            return $this->query;
+        }
+
+        return $this->query = new WillQueryOne(
+            $this->type,
+            (array) $this->request->query(),
+        );
     }
 }

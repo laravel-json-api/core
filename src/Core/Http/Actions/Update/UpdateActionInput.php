@@ -24,6 +24,7 @@ use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\Identifiable;
 use LaravelJsonApi\Core\Http\Actions\Input\IsIdentifiable;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 
@@ -35,6 +36,11 @@ class UpdateActionInput extends ActionInput implements IsIdentifiable
      * @var Update|null
      */
     private ?Update $operation = null;
+
+    /**
+     * @var QueryOne|null
+     */
+    private ?QueryOne $query = null;
 
     /**
      * UpdateActionInput constructor
@@ -77,5 +83,21 @@ class UpdateActionInput extends ActionInput implements IsIdentifiable
         assert($this->operation !== null, 'Expecting an update operation to be set.');
 
         return $this->operation;
+    }
+
+    /**
+     * @return QueryOne
+     */
+    public function query(): QueryOne
+    {
+        if ($this->query) {
+            return $this->query;
+        }
+
+        return $this->query = new QueryOne(
+            $this->type,
+            $this->id,
+            (array) $this->request->query(),
+        );
     }
 }

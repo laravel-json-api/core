@@ -29,6 +29,11 @@ use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
+use LaravelJsonApi\Core\Query\Input\QueryRelated;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -65,17 +70,28 @@ class SetModelIfMissingTest extends TestCase
         return [
             'fetch-one' => [
                 static function (): FetchOneQuery {
-                    return FetchOneQuery::make(null, 'posts', '123');
+                    return FetchOneQuery::make(null, new QueryOne(
+                        new ResourceType('posts'),
+                        new ResourceId('123'),
+                    ));
                 },
             ],
             'fetch-related' => [
                 static function (): FetchRelatedQuery {
-                    return FetchRelatedQuery::make(null, 'posts', '123', 'comments');
+                    return FetchRelatedQuery::make(null, new QueryRelated(
+                        new ResourceType('posts'),
+                        new ResourceId('123'),
+                        'comments',
+                    ));
                 },
             ],
             'fetch-relationship' => [
                 static function (): FetchRelationshipQuery {
-                    return FetchRelationshipQuery::make(null, 'posts', '123', 'comments');
+                    return FetchRelationshipQuery::make(null, new QueryRelationship(
+                        new ResourceType('posts'),
+                        new ResourceId('123'),
+                        'comments',
+                    ));
                 },
             ],
         ];

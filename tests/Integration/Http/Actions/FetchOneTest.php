@@ -36,6 +36,7 @@ use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryOneValidator;
 use LaravelJsonApi\Core\Http\Actions\FetchOne;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -115,7 +116,7 @@ class FetchOneTest extends TestCase
         $this->willNegotiateContent();
         $this->willFindModel('posts', '123', $authModel = new stdClass());
         $this->willAuthorize('posts', $authModel);
-        $this->willValidate('posts', $queryParams = [
+        $this->willValidate('posts', '123', $queryParams = [
             'fields' => ['posts' => 'title,content,author'],
             'include' => 'author',
         ]);
@@ -153,7 +154,7 @@ class FetchOneTest extends TestCase
         $this->willNegotiateContent();
         $this->willNotFindModel();
         $this->willAuthorize('comments', $authModel);
-        $this->willValidate('comments');
+        $this->willValidate('comments', '456');
         $model = $this->willQueryOne('comments', '456');
 
         $response = $this->action
@@ -251,7 +252,7 @@ class FetchOneTest extends TestCase
      * @param array $validated
      * @return void
      */
-    private function willValidate(string $type, array $validated = []): void
+    private function willValidate(string $type, string $id, array $validated = []): void
     {
         $this->container->instance(
             ValidatorContainer::class,
@@ -263,11 +264,17 @@ class FetchOneTest extends TestCase
             $errorFactory = $this->createMock(QueryErrorFactory::class),
         );
 
+        $input = new QueryOne(
+            new ResourceType($type),
+            new ResourceId($id),
+            ['foo' => 'bar'],
+        );
+
         $this->request
             ->expects($this->once())
             ->method('query')
             ->with(null)
-            ->willReturn($params = ['foo' => 'bar']);
+            ->willReturn($input->parameters);
 
         $validators
             ->expects($this->once())
@@ -283,7 +290,7 @@ class FetchOneTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->identicalTo($params))
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

@@ -30,6 +30,8 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\ValidateFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
+use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -88,14 +90,13 @@ class ValidateFetchOneQueryTest extends TestCase
     {
         $query = FetchOneQuery::make(
             $request = $this->createMock(Request::class),
-            $this->type,
-            '123',
-        )->withParameters($params = ['foo' => 'bar']);
+            $input = new QueryOne($this->type, new ResourceId('123'), ['foo' => 'bar']),
+        );
 
         $this->validator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($params))
+            ->with($this->identicalTo($request), $this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -131,14 +132,13 @@ class ValidateFetchOneQueryTest extends TestCase
     {
         $query = FetchOneQuery::make(
             $request = $this->createMock(Request::class),
-            $this->type,
-            '123',
-        )->withParameters($params = ['foo' => 'bar']);
+            $input = new QueryOne($this->type, new ResourceId('123'), ['foo' => 'bar']),
+        );
 
         $this->validator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($request), $this->identicalTo($params))
+            ->with($this->identicalTo($request), $this->identicalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator
@@ -168,8 +168,8 @@ class ValidateFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type, '456')
-            ->withParameters($params = ['foo' => 'bar'])
+        $input = new QueryOne($this->type, new ResourceId('123'), $params = ['foo' => 'bar']);
+        $query = FetchOneQuery::make($request, $input)
             ->skipValidation();
 
         $this->validator
@@ -197,7 +197,8 @@ class ValidateFetchOneQueryTest extends TestCase
     {
         $request = $this->createMock(Request::class);
 
-        $query = FetchOneQuery::make($request, $this->type, '123')
+        $input = new QueryOne($this->type, new ResourceId('123'), ['blah' => 'blah']);
+        $query = FetchOneQuery::make($request, $input)
             ->withValidated($validated = ['foo' => 'bar']);
 
         $this->validator

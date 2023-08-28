@@ -114,7 +114,7 @@ class DetachRelationshipActionHandlerTest extends TestCase
         $passed = (new DetachRelationshipActionInput($request, $type, $id, $fieldName))
             ->withModel($model = new \stdClass())
             ->withOperation($op)
-            ->withQuery($queryParams)
+            ->withQueryParameters($queryParams)
             ->withHooks($hooks = new \stdClass());
 
         $original = $this->willSendThroughPipeline($passed);
@@ -195,7 +195,7 @@ class DetachRelationshipActionHandlerTest extends TestCase
         $passed = (new DetachRelationshipActionInput($request, $type, $id, $fieldName))
             ->withModel(new \stdClass())
             ->withOperation($op)
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -235,7 +235,7 @@ class DetachRelationshipActionHandlerTest extends TestCase
         $passed = (new DetachRelationshipActionInput($request, $type, $id, $fieldName))
             ->withModel(new \stdClass())
             ->withOperation($op)
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -276,7 +276,7 @@ class DetachRelationshipActionHandlerTest extends TestCase
         $passed = (new DetachRelationshipActionInput($request, $type, $id, $fieldName))
             ->withModel(new \stdClass())
             ->withOperation($op)
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 

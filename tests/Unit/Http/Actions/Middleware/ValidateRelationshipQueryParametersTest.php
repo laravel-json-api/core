@@ -36,6 +36,7 @@ use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\IsRelatable;
 use LaravelJsonApi\Core\Http\Actions\Middleware\ValidateRelationshipQueryParameters;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\UpdateRelationshipActionInput;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -116,7 +117,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
         );
 
         $this->withRelation('author', true, 'users');
-        $this->willValidateToOne('users', $validated = ['include' => 'profile']);
+        $this->willValidateToOne('users', $action->query(), $validated = ['include' => 'profile']);
 
         $expected = $this->createMock(Responsable::class);
 
@@ -124,7 +125,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             $action,
             function (ActionInput&IsRelatable $passed) use ($action, $validated, $expected): Responsable {
                 $this->assertNotSame($action, $passed);
-                $this->assertSame($validated, $passed->query()->toQuery());
+                $this->assertSame($validated, $passed->queryParameters()->toQuery());
                 return $expected;
             },
         );
@@ -145,7 +146,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
         );
 
         $this->withRelation('author', true, 'users');
-        $this->willValidateToOne('users', null);
+        $this->willValidateToOne('users', $action->query(), null);
 
         try {
             $this->middleware->handle(
@@ -171,7 +172,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
         );
 
         $this->withRelation('tags', false, 'blog-tags');
-        $this->willValidateToMany('blog-tags', $validated = ['include' => 'profile']);
+        $this->willValidateToMany('blog-tags', $action->query(), $validated = ['include' => 'profile']);
 
         $expected = $this->createMock(Responsable::class);
 
@@ -179,7 +180,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
             $action,
             function (ActionInput&IsRelatable $passed) use ($action, $validated, $expected): Responsable {
                 $this->assertNotSame($action, $passed);
-                $this->assertSame($validated, $passed->query()->toQuery());
+                $this->assertSame($validated, $passed->queryParameters()->toQuery());
                 return $expected;
             },
         );
@@ -200,7 +201,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
         );
 
         $this->withRelation('tags', false, 'blog-tags');
-        $this->willValidateToMany('blog-tags', null);
+        $this->willValidateToMany('blog-tags', $action->query(), null);
 
         try {
             $this->middleware->handle(
@@ -216,6 +217,7 @@ class ValidateRelationshipQueryParametersTest extends TestCase
     /**
      * @param string $fieldName
      * @param bool $toOne
+     * @param string $inverse
      * @return void
      */
     private function withRelation(string $fieldName, bool $toOne, string $inverse): void
@@ -233,10 +235,11 @@ class ValidateRelationshipQueryParametersTest extends TestCase
 
     /**
      * @param string $type
+     * @param QueryRelationship $query
      * @param array|null $validated
      * @return void
      */
-    private function willValidateToOne(string $type, ?array $validated): void
+    private function willValidateToOne(string $type, QueryRelationship $query, ?array $validated): void
     {
         $this->validators
             ->expects($this->once())
@@ -255,17 +258,18 @@ class ValidateRelationshipQueryParametersTest extends TestCase
 
         $queryOneValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($this->request))
+            ->method('make')
+            ->with($this->identicalTo($this->request), $this->identicalTo($query))
             ->willReturn($this->withValidator($validated));
     }
 
     /**
      * @param string $type
+     * @param QueryRelationship $query
      * @param array|null $validated
      * @return void
      */
-    private function willValidateToMany(string $type, ?array $validated): void
+    private function willValidateToMany(string $type, QueryRelationship $query, ?array $validated): void
     {
         $this->validators
             ->expects($this->once())
@@ -284,8 +288,8 @@ class ValidateRelationshipQueryParametersTest extends TestCase
 
         $queryOneValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($this->request))
+            ->method('make')
+            ->with($this->identicalTo($this->request), $this->identicalTo($query))
             ->willReturn($this->withValidator($validated));
     }
 

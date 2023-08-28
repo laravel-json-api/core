@@ -24,8 +24,8 @@ use LaravelJsonApi\Contracts\Http\Hooks\ShowImplementation;
 use LaravelJsonApi\Core\Bus\Queries\Query\Identifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsIdentifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Values\ResourceId;
-use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchOneQuery extends Query implements IsIdentifiable
 {
@@ -40,33 +40,41 @@ class FetchOneQuery extends Query implements IsIdentifiable
      * Fluent constructor.
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
-     * @param ResourceId|string $id
+     * @param QueryOne $input
      * @return self
      */
-    public static function make(
-        ?Request $request,
-        ResourceType|string $type,
-        ResourceId|string $id,
-    ): self
+    public static function make(?Request $request, QueryOne $input): self
     {
-        return new self($request, $type, $id);
+        return new self($request, $input);
     }
 
     /**
      * FetchOneQuery constructor
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
-     * @param ResourceId|string $id
+     * @param QueryOne $input
      */
     public function __construct(
         ?Request $request,
-        ResourceType|string $type,
-        ResourceId|string $id,
+        private readonly QueryOne $input,
     ) {
-        parent::__construct($request, $type);
-        $this->id = ResourceId::cast($id);
+        parent::__construct($request);
+    }
+
+    /**
+     * @return ResourceId
+     */
+    public function id(): ResourceId
+    {
+        return $this->input->id;
+    }
+
+    /**
+     * @return QueryOne
+     */
+    public function input(): QueryOne
+    {
+        return $this->input;
     }
 
     /**

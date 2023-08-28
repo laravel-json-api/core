@@ -43,7 +43,7 @@ abstract class ActionInput
      * @param Request $request
      * @param ResourceType $type
      */
-    public function __construct(private readonly Request $request, private readonly ResourceType $type)
+    public function __construct(protected readonly Request $request, protected readonly ResourceType $type)
     {
     }
 
@@ -67,7 +67,7 @@ abstract class ActionInput
      * @param QueryParameters $query
      * @return static
      */
-    public function withQuery(QueryParameters $query): static
+    public function withQueryParameters(QueryParameters $query): static
     {
         $copy = clone $this;
         $copy->queryParameters = $query;
@@ -78,7 +78,7 @@ abstract class ActionInput
     /**
      * @return QueryParameters
      */
-    public function query(): QueryParameters
+    public function queryParameters(): QueryParameters
     {
         if ($this->queryParameters) {
             return $this->queryParameters;

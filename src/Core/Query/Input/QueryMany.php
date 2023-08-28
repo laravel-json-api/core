@@ -17,24 +17,20 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Bus\Queries\Query;
+namespace LaravelJsonApi\Core\Query\Input;
 
-trait Relatable
+use LaravelJsonApi\Core\Values\ResourceType;
+
+class QueryMany extends Query
 {
-    use Identifiable;
-
     /**
-     * @var string
-     */
-    private string $fieldName;
-
-    /**
-     * Get the JSON:API field name.
+     * QueryMany constructor
      *
-     * @return string
+     * @param ResourceType $type
+     * @param array $parameters
      */
-    public function fieldName(): string
+    public function __construct(ResourceType $type, array $parameters = [])
     {
-        return $this->fieldName;
+        parent::__construct(QueryCodeEnum::Many, $type, $parameters);
     }
 }

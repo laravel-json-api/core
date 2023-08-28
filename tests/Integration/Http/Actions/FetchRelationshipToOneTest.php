@@ -38,6 +38,7 @@ use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryOneValidator;
 use LaravelJsonApi\Core\Http\Actions\FetchRelationship;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -115,19 +116,26 @@ class FetchRelationshipToOneTest extends TestCase
         $this->route->method('modelOrResourceId')->willReturn('123');
         $this->route->method('fieldName')->willReturn('author');
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'profile',
+        ];
+
         $this->willNotLookupResourceId();
         $this->willNegotiateContent();
         $this->withSchema('posts', 'author', 'users');
         $this->willFindModel('posts', '123', $model = new stdClass());
         $this->willAuthorize('posts', 'author', $model);
-        $this->willValidate('users', $queryParams = [
-            'fields' => ['posts' => 'title,content,author'],
-            'include' => 'profile',
-        ]);
-        $related = $this->willQueryToOne('posts', '123', 'author', $queryParams);
+        $this->willValidate('users', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('123'),
+            'author',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
+        $related = $this->willQueryToOne('posts', '123', 'author', $validatedQueryParams);
 
         $response = $this->action
-            ->withHooks($this->withHooks($model, $related, $queryParams))
+            ->withHooks($this->withHooks($model, $related, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -153,18 +161,28 @@ class FetchRelationshipToOneTest extends TestCase
             ->expects($this->never())
             ->method($this->anything());
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'profile',
+        ];
+
         $this->willLookupResourceId($model = new stdClass(), 'comments', '456');
         $this->willNegotiateContent();
-        $this->withSchema('comments', 'author', 'user');
+        $this->withSchema('comments', 'author', 'users');
         $this->willNotFindModel();
         $this->willAuthorize('comments', 'author', $model);
-        $this->willValidate('user');
+        $this->willValidate('users', new QueryRelationship(
+            new ResourceType('comments'),
+            new ResourceId('456'),
+            'author',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
 
-        $related = $this->willQueryToOne('comments', '456', 'author');
+        $related = $this->willQueryToOne('comments', '456', 'author', $validatedQueryParams);
 
         $response = $this->action
             ->withTarget('comments', $model, 'author')
-            ->withHooks($this->withHooks($model, $related))
+            ->withHooks($this->withHooks($model, $related, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -281,10 +299,11 @@ class FetchRelationshipToOneTest extends TestCase
 
     /**
      * @param string $type
+     * @param QueryRelationship $input
      * @param array $validated
      * @return void
      */
-    private function willValidate(string $type, array $validated = []): void
+    private function willValidate(string $type, QueryRelationship $input, array $validated = []): void
     {
         $this->container->instance(
             ValidatorContainer::class,
@@ -300,7 +319,7 @@ class FetchRelationshipToOneTest extends TestCase
             ->expects($this->once())
             ->method('query')
             ->with(null)
-            ->willReturn($params = ['foo' => 'bar']);
+            ->willReturn($input->parameters);
 
         $validators
             ->expects($this->once())
@@ -316,7 +335,7 @@ class FetchRelationshipToOneTest extends TestCase
         $queryOneValidator
             ->expects($this->once())
             ->method('make')
-            ->with($this->identicalTo($this->request), $this->identicalTo($params))
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

@@ -116,7 +116,7 @@ class UpdateRelationshipActionHandler
     {
         $command = UpdateRelationshipCommand::make($action->request(), $action->operation())
             ->withModel($action->modelOrFail())
-            ->withQuery($action->query())
+            ->withQuery($action->queryParameters())
             ->withHooks($action->hooks())
             ->skipAuthorization();
 
@@ -133,22 +133,14 @@ class UpdateRelationshipActionHandler
      * Execute the query for the update relationship action.
      *
      * @param UpdateRelationshipActionInput $action
-     * @param object $model
      * @return Result
      * @throws JsonApiException
      */
-    private function query(UpdateRelationshipActionInput $action, object $model): Result
+    private function query(UpdateRelationshipActionInput $action): Result
     {
-        $query = new FetchRelationshipQuery(
-            $action->request(),
-            $action->type(),
-            $action->id(),
-            $action->fieldName(),
-        );
-
-        $query = $query
-            ->withModel($model)
-            ->withValidated($action->query())
+        $query = FetchRelationshipQuery::make($action->request(), $action->query())
+            ->withModel($action->modelOrFail())
+            ->withValidated($action->queryParameters())
             ->skipAuthorization();
 
         $result = $this->queries->dispatch($query);

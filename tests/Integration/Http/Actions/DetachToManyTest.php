@@ -45,6 +45,7 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ListOfResourceIdentifiersParser;
 use LaravelJsonApi\Core\Document\Input\Values\ListOfResourceIdentifiers;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Http\Actions\DetachRelationship;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Store\QueryManyHandler;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
@@ -144,9 +145,12 @@ class DetachToManyTest extends TestCase
         $this->willFindModel('posts', '123', $post = new stdClass());
         $this->willAuthorize('posts', $post, 'tags');
         $this->willBeCompliant('posts', 'tags');
-        $this->willValidateQueryParams('blog-tags', $queryParams = [
-            'filter' => ['archived' => 'false'],
-        ]);
+        $this->willValidateQueryParams('blog-tags', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('123'),
+            'tags',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams = ['filter' => ['archived' => 'false']]);
         $identifiers = $this->willParseOperation('posts', '123');
         $this->willValidateOperation('posts', $post, $identifiers, $validated = [
             'tags' => [
@@ -155,10 +159,10 @@ class DetachToManyTest extends TestCase
             ],
         ]);
         $modifiedRelated = $this->willModify('posts', $post, 'tags', $validated['tags']);
-        $related = $this->willQueryToMany('posts', '123', 'tags', $queryParams);
+        $related = $this->willQueryToMany('posts', '123', 'tags', $validatedQueryParams);
 
         $response = $this->action
-            ->withHooks($this->withHooks($post, $modifiedRelated, $queryParams))
+            ->withHooks($this->withHooks($post, $modifiedRelated, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -197,7 +201,12 @@ class DetachToManyTest extends TestCase
         $this->willLookupResourceId($model, 'posts', '999');
         $this->willAuthorize('posts', $model, 'tags');
         $this->willBeCompliant('posts', 'tags');
-        $this->willValidateQueryParams('blog-tags', $queryParams = []);
+        $this->willValidateQueryParams('blog-tags', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('999'),
+            'tags',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams = ['filter' => ['archived' => 'false']]);
         $identifiers = $this->willParseOperation('posts', '999');
         $this->willValidateOperation('posts', $model, $identifiers, $validated = [
             'tags' => [
@@ -206,7 +215,7 @@ class DetachToManyTest extends TestCase
             ],
         ]);
         $this->willModify('posts', $model, 'tags', $validated['tags']);
-        $related = $this->willQueryToMany('posts', '999', 'tags', $queryParams);
+        $related = $this->willQueryToMany('posts', '999', 'tags', $validatedQueryParams);
 
         $response = $this->action
             ->withTarget('posts', $model, 'tags')
@@ -376,10 +385,12 @@ class DetachToManyTest extends TestCase
     }
 
     /**
+     * @param string $inverse
+     * @param QueryRelationship $query
      * @param array $validated
      * @return void
      */
-    private function willValidateQueryParams(string $inverse, array $validated = []): void
+    private function willValidateQueryParams(string $inverse, QueryRelationship $query, array $validated = []): void
     {
         $this->container->instance(
             QueryErrorFactory::class,
@@ -389,6 +400,11 @@ class DetachToManyTest extends TestCase
         $validatorFactory = $this->createMock(ValidatorFactory::class);
         $this->validatorFactories[$inverse] = $validatorFactory;
 
+        $this->request
+            ->expects($this->once())
+            ->method('query')
+            ->willReturn($query->parameters);
+
         $validatorFactory
             ->expects($this->once())
             ->method('queryMany')
@@ -396,8 +412,8 @@ class DetachToManyTest extends TestCase
 
         $queryValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($this->request))
+            ->method('make')
+            ->with($this->identicalTo($this->request), $this->equalTo($query))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

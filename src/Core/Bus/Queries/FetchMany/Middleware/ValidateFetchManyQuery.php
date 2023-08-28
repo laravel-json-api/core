@@ -49,7 +49,7 @@ class ValidateFetchManyQuery implements HandlesFetchManyQueries
             $validator = $this->validatorContainer
                 ->validatorsFor($query->type())
                 ->queryMany()
-                ->make($query->request(), $query->parameters());
+                ->make($query->request(), $query->input());
 
             if ($validator->fails()) {
                 return Result::failed(
@@ -64,7 +64,7 @@ class ValidateFetchManyQuery implements HandlesFetchManyQueries
 
         if ($query->isNotValidated()) {
             $query = $query->withValidated(
-                $query->parameters(),
+                $query->input()->parameters,
             );
         }
 

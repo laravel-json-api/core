@@ -96,7 +96,7 @@ class FetchManyActionHandler
      */
     private function query(FetchManyActionInput $action): Result
     {
-        $query = FetchManyQuery::make($action->request(), $action->type())
+        $query = FetchManyQuery::make($action->request(), $action->query())
             ->withHooks($action->hooks());
 
         $result = $this->dispatcher->dispatch($query);

@@ -20,27 +20,13 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\Query;
 
 use LaravelJsonApi\Core\Store\LazyModel;
-use LaravelJsonApi\Core\Values\ResourceId;
 
 trait Identifiable
 {
     /**
-     * @var ResourceId
-     */
-    private readonly ResourceId $id;
-
-    /**
      * @var object|null
      */
     private ?object $model = null;
-
-    /**
-     * @return ResourceId
-     */
-    public function id(): ResourceId
-    {
-        return $this->id;
-    }
 
     /**
      * Return a new instance with the model set.

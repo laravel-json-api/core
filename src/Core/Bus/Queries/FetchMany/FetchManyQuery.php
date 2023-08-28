@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Core\Bus\Queries\FetchMany;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Hooks\IndexImplementation;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
-use LaravelJsonApi\Core\Values\ResourceType;
+use LaravelJsonApi\Core\Query\Input\QueryMany;
 
 class FetchManyQuery extends Query
 {
@@ -35,14 +35,34 @@ class FetchManyQuery extends Query
      * Fluent constructor.
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
+     * @param QueryMany $input
      * @return self
      */
-    public static function make(?Request $request, ResourceType|string $type): self
+    public static function make(?Request $request, QueryMany $input): self
     {
-        return new self($request, $type);
+        return new self($request, $input);
     }
 
+    /**
+     * FetchManyQuery constructor
+     *
+     * @param Request|null $request
+     * @param QueryMany $input
+     */
+    public function __construct(
+        ?Request $request,
+        private readonly QueryMany $input,
+    ) {
+        parent::__construct($request);
+    }
+
+    /**
+     * @return QueryMany
+     */
+    public function input(): QueryMany
+    {
+        return $this->input;
+    }
 
     /**
      * Set the hooks implementation.

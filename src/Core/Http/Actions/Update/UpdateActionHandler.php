@@ -117,7 +117,7 @@ class UpdateActionHandler
     {
         $command = UpdateCommand::make($action->request(), $action->operation())
             ->withModel($action->modelOrFail())
-            ->withQuery($action->query())
+            ->withQuery($action->queryParameters())
             ->withHooks($action->hooks())
             ->skipAuthorization();
 
@@ -140,9 +140,9 @@ class UpdateActionHandler
      */
     private function query(UpdateActionInput $action, object $model): Result
     {
-        $query = FetchOneQuery::make($action->request(), $action->type(), $action->id())
+        $query = FetchOneQuery::make($action->request(), $action->query())
             ->withModel($model)
-            ->withValidated($action->query())
+            ->withValidated($action->queryParameters())
             ->skipAuthorization();
 
         $result = $this->queries->dispatch($query);

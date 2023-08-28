@@ -24,10 +24,11 @@ use Illuminate\Contracts\Support\Responsable;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
-use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use LaravelJsonApi\Core\Http\Actions\Store\StoreActionInput;
+use LaravelJsonApi\Core\Http\Actions\Update\UpdateActionInput;
 use LaravelJsonApi\Core\Query\QueryParameters;
 
-class ValidateQueryOneParameters implements HandlesActions
+class ValidateQueryOneParameters
 {
     /**
      * ValidateQueryParameters constructor
@@ -42,20 +43,23 @@ class ValidateQueryOneParameters implements HandlesActions
     }
 
     /**
-     * @inheritDoc
+     * @param StoreActionInput|UpdateActionInput $action
+     * @param Closure $next
+     * @return Responsable
+     * @throws JsonApiException
      */
-    public function handle(ActionInput $action, Closure $next): Responsable
+    public function handle(StoreActionInput|UpdateActionInput $action, Closure $next): Responsable
     {
         $validator = $this->validatorContainer
             ->validatorsFor($action->type())
             ->queryOne()
-            ->forRequest($action->request());
+            ->make($action->request(), $action->query());
 
         if ($validator->fails()) {
             throw new JsonApiException($this->errorFactory->make($validator));
         }
 
-        $action = $action->withQuery(
+        $action = $action->withQueryParameters(
             QueryParameters::fromArray($validator->validated()),
         );
 

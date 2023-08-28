@@ -45,6 +45,7 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update as UpdateOperation;
 use LaravelJsonApi\Core\Http\Actions\Update;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -126,22 +127,24 @@ class UpdateTest extends TestCase
         $this->route->method('resourceType')->willReturn('posts');
         $this->route->method('modelOrResourceId')->willReturn('123');
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'author',
+        ];
+
         $this->willNotLookupResourceId();
         $this->willNegotiateContent();
         $this->willFindModel('posts', '123', $initialModel = new stdClass());
         $this->willAuthorize('posts', $initialModel);
         $this->willBeCompliant('posts', '123');
-        $this->willValidateQueryParams('posts', $queryParams = [
-            'fields' => ['posts' => 'title,content,author'],
-            'include' => 'author',
-        ]);
+        $this->willValidateQueryParams('posts', '123', $validatedQueryParams);
         $resource = $this->willParseOperation('posts', '123');
         $this->willValidateOperation($initialModel, $resource, $validated = ['title' => 'Hello World']);
         $updatedModel = $this->willStore('posts', $validated);
-        $model = $this->willQueryOne('posts', '123', $queryParams);
+        $model = $this->willQueryOne('posts', '123', $validatedQueryParams);
 
         $response = $this->action
-            ->withHooks($this->withHooks($initialModel, $updatedModel, $queryParams))
+            ->withHooks($this->withHooks($initialModel, $updatedModel, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -173,6 +176,11 @@ class UpdateTest extends TestCase
             ->expects($this->never())
             ->method($this->anything());
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'author',
+        ];
+
         $model = new \stdClass();
 
         $this->willNegotiateContent();
@@ -180,15 +188,15 @@ class UpdateTest extends TestCase
         $this->willLookupResourceId($model, 'tags', '999');
         $this->willAuthorize('tags', $model);
         $this->willBeCompliant('tags', '999');
-        $this->willValidateQueryParams('tags', $queryParams = []);
+        $this->willValidateQueryParams('tags', '999', $validatedQueryParams);
         $resource = $this->willParseOperation('tags', '999');
         $this->willValidateOperation($model, $resource, $validated = ['name' => 'Lindy Hop']);
         $this->willStore('tags', $validated, $model);
-        $queriedModel = $this->willQueryOne('tags', '999', $queryParams);
+        $queriedModel = $this->willQueryOne('tags', '999', $validatedQueryParams);
 
         $response = $this->action
             ->withTarget('tags', $model)
-            ->withHooks($this->withHooks($model, null, $queryParams))
+            ->withHooks($this->withHooks($model, null, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -335,10 +343,11 @@ class UpdateTest extends TestCase
 
     /**
      * @param string $type
+     * @param string $id
      * @param array $validated
      * @return void
      */
-    private function willValidateQueryParams(string $type, array $validated = []): void
+    private function willValidateQueryParams(string $type, string $id, array $validated = []): void
     {
         $this->container->instance(
             ValidatorContainer::class,
@@ -349,6 +358,17 @@ class UpdateTest extends TestCase
             QueryErrorFactory::class,
             $errorFactory = $this->createMock(QueryErrorFactory::class),
         );
+
+        $input = new QueryOne(
+            new ResourceType($type),
+            new ResourceId($id),
+            ['foo' => 'bar'],
+        );
+
+        $this->request
+            ->expects($this->once())
+            ->method('query')
+            ->willReturn($input->parameters);
 
         $validators
             ->expects($this->atMost(2))
@@ -363,8 +383,8 @@ class UpdateTest extends TestCase
 
         $queryOneValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($this->request))
+            ->method('make')
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

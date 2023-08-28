@@ -46,6 +46,7 @@ use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierOrListOfIdentif
 use LaravelJsonApi\Core\Document\Input\Values\ResourceIdentifier;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -138,16 +139,23 @@ class UpdateToOneTest extends TestCase
         $this->route->method('modelOrResourceId')->willReturn('123');
         $this->route->method('fieldName')->willReturn('author');
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'author',
+        ];
+
         $this->withSchema('posts', 'author', 'users');
         $this->willNotLookupResourceId();
         $this->willNegotiateContent();
         $this->willFindModel('posts', '123', $post = new stdClass());
         $this->willAuthorize('posts', $post, 'author');
         $this->willBeCompliant('posts', 'author');
-        $this->willValidateQueryParams('users', $queryParams = [
-            'fields' => ['posts' => 'title,content,author'],
-            'include' => 'author',
-        ]);
+        $this->willValidateQueryParams('users', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('123'),
+            'author',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
         $identifier = $this->willParseOperation('posts', '123');
         $this->willValidateOperation('posts', $post, $identifier, $validated = [
             'author' => [
@@ -156,10 +164,10 @@ class UpdateToOneTest extends TestCase
             ],
         ]);
         $modifiedRelated = $this->willModify('posts', $post, 'author', $validated['author']);
-        $related = $this->willQueryToOne('posts', '123', 'author', $queryParams);
+        $related = $this->willQueryToOne('posts', '123', 'author', $validatedQueryParams);
 
         $response = $this->action
-            ->withHooks($this->withHooks($post, $modifiedRelated, $queryParams))
+            ->withHooks($this->withHooks($post, $modifiedRelated, $validatedQueryParams))
             ->execute($this->request);
 
         $this->assertSame([
@@ -192,13 +200,23 @@ class UpdateToOneTest extends TestCase
 
         $model = new \stdClass();
 
+        $validatedQueryParams = [
+            'fields' => ['posts' => 'title,content,author'],
+            'include' => 'author',
+        ];
+
         $this->withSchema('posts', 'author', 'users');
         $this->willNegotiateContent();
         $this->willNotFindModel();
         $this->willLookupResourceId($model, 'posts', '999');
         $this->willAuthorize('posts', $model, 'author');
         $this->willBeCompliant('posts', 'author');
-        $this->willValidateQueryParams('users', $queryParams = []);
+        $this->willValidateQueryParams('users', new QueryRelationship(
+            new ResourceType('posts'),
+            new ResourceId('999'),
+            'author',
+            ['foo' => 'bar'],
+        ), $validatedQueryParams);
         $identifier = $this->willParseOperation('posts', '999');
         $this->willValidateOperation('posts', $model, $identifier, $validated = [
             'author' => [
@@ -207,7 +225,7 @@ class UpdateToOneTest extends TestCase
             ],
         ]);
         $this->willModify('posts', $model, 'author', $validated['author']);
-        $related = $this->willQueryToOne('posts', '999', 'author', $queryParams);
+        $related = $this->willQueryToOne('posts', '999', 'author', $validatedQueryParams);
 
         $response = $this->action
             ->withTarget('posts', $model, 'author')
@@ -377,10 +395,12 @@ class UpdateToOneTest extends TestCase
     }
 
     /**
+     * @param string $inverse
+     * @param QueryRelationship $input
      * @param array $validated
      * @return void
      */
-    private function willValidateQueryParams(string $inverse, array $validated = []): void
+    private function willValidateQueryParams(string $inverse, QueryRelationship $input, array $validated = []): void
     {
         $this->container->instance(
             QueryErrorFactory::class,
@@ -390,6 +410,11 @@ class UpdateToOneTest extends TestCase
         $validatorFactory = $this->createMock(ValidatorFactory::class);
         $this->validatorFactories[$inverse] = $validatorFactory;
 
+        $this->request
+            ->expects($this->once())
+            ->method('query')
+            ->willReturn($input->parameters);
+
         $validatorFactory
             ->expects($this->once())
             ->method('queryOne')
@@ -397,8 +422,8 @@ class UpdateToOneTest extends TestCase
 
         $queryOneValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($this->request))
+            ->method('make')
+            ->with($this->identicalTo($this->request), $this->equalTo($input))
             ->willReturn($validator = $this->createMock(Validator::class));
 
         $validator

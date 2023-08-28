@@ -109,7 +109,7 @@ class StoreActionHandlerTest extends TestCase
 
         $passed = (new StoreActionInput($request, $type))
             ->withOperation($op = new Create(null, new ResourceObject($type)))
-            ->withQuery($queryParams)
+            ->withQueryParameters($queryParams)
             ->withHooks($hooks = new \stdClass());
 
         $original = $this->willSendThroughPipeline($passed);
@@ -172,7 +172,7 @@ class StoreActionHandlerTest extends TestCase
 
         $passed = (new StoreActionInput($request, $type))
             ->withOperation(new Create(null, new ResourceObject($type)))
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -218,7 +218,7 @@ class StoreActionHandlerTest extends TestCase
 
         $passed = (new StoreActionInput($request, $type))
             ->withOperation(new Create(null, new ResourceObject($type)))
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -249,7 +249,7 @@ class StoreActionHandlerTest extends TestCase
 
         $passed = (new StoreActionInput($request, $type))
             ->withOperation(new Create(null, new ResourceObject($type)))
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 
@@ -283,7 +283,7 @@ class StoreActionHandlerTest extends TestCase
 
         $passed = (new StoreActionInput($request, $type))
             ->withOperation(new Create(null, new ResourceObject($type)))
-            ->withQuery($this->createMock(QueryParameters::class));
+            ->withQueryParameters($this->createMock(QueryParameters::class));
 
         $original = $this->willSendThroughPipeline($passed);
 

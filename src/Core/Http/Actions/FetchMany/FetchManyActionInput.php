@@ -20,7 +20,27 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\FetchMany;
 
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
+use LaravelJsonApi\Core\Query\Input\QueryMany;
 
 class FetchManyActionInput extends ActionInput
 {
+    /**
+     * @var QueryMany|null
+     */
+    private ?QueryMany $query = null;
+
+    /**
+     * @return QueryMany
+     */
+    public function query(): QueryMany
+    {
+        if ($this->query) {
+            return $this->query;
+        }
+
+        return $this->query = new QueryMany(
+            $this->type,
+            (array) $this->request->query(),
+        );
+    }
 }

@@ -25,7 +25,10 @@ use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware\TriggerShowRelationshipHooks;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 use LaravelJsonApi\Core\Extensions\Atomic\Results\Result as Payload;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Query\QueryParameters;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
 class TriggerShowRelationshipHooksTest extends TestCase
@@ -58,7 +61,8 @@ class TriggerShowRelationshipHooksTest extends TestCase
     public function testItHasNoHooks(): void
     {
         $request = $this->createMock(Request::class);
-        $query = FetchRelationshipQuery::make($request, 'tags', '123', 'videos');
+        $input = new QueryRelationship(new ResourceType('tags'), new ResourceId('123'), 'videos');
+        $query = FetchRelationshipQuery::make($request, $input);
 
         $expected = Result::ok(
             new Payload(null, true),
@@ -86,7 +90,8 @@ class TriggerShowRelationshipHooksTest extends TestCase
         $related = new \ArrayObject();
         $sequence = [];
 
-        $query = FetchRelationshipQuery::make($request, 'posts', '123', 'tags')
+        $input = new QueryRelationship(new ResourceType('posts'), new ResourceId('123'), 'tags');
+        $query = FetchRelationshipQuery::make($request, $input)
             ->withModel($model)
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);
@@ -141,7 +146,8 @@ class TriggerShowRelationshipHooksTest extends TestCase
         $hooks = $this->createMock(ShowRelationshipImplementation::class);
         $sequence = [];
 
-        $query = FetchRelationshipQuery::make($request, 'tags', '123', 'createdBy')
+        $input = new QueryRelationship(new ResourceType('tags'), new ResourceId('123'), 'createdBy');
+        $query = FetchRelationshipQuery::make($request, $input)
             ->withModel($model = new \stdClass())
             ->withValidated($this->queryParameters->toQuery())
             ->withHooks($hooks);

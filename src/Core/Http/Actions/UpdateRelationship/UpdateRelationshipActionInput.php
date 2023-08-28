@@ -25,6 +25,7 @@ use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 use LaravelJsonApi\Core\Http\Actions\Input\ActionInput;
 use LaravelJsonApi\Core\Http\Actions\Input\IsRelatable;
 use LaravelJsonApi\Core\Http\Actions\Input\Relatable;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
 
@@ -36,6 +37,11 @@ class UpdateRelationshipActionInput extends ActionInput implements IsRelatable
      * @var UpdateToOne|UpdateToMany|null
      */
     private UpdateToOne|UpdateToMany|null $operation = null;
+
+    /**
+     * @var QueryRelationship|null
+     */
+    private ?QueryRelationship $query = null;
 
     /**
      * UpdateRelationshipActionInput constructor
@@ -81,5 +87,22 @@ class UpdateRelationshipActionInput extends ActionInput implements IsRelatable
         assert($this->operation !== null, 'Expecting an update relationship operation to be set.');
 
         return $this->operation;
+    }
+
+    /**
+     * @return QueryRelationship
+     */
+    public function query(): QueryRelationship
+    {
+        if ($this->query) {
+            return $this->query;
+        }
+
+        return $this->query = new QueryRelationship(
+            $this->type,
+            $this->id,
+            $this->fieldName,
+            (array) $this->request->query(),
+        );
     }
 }

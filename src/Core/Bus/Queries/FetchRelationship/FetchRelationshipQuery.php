@@ -21,15 +21,15 @@ namespace LaravelJsonApi\Core\Bus\Queries\FetchRelationship;
 
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Http\Hooks\ShowRelationshipImplementation;
+use LaravelJsonApi\Core\Bus\Queries\Query\Identifiable;
 use LaravelJsonApi\Core\Bus\Queries\Query\IsRelatable;
 use LaravelJsonApi\Core\Bus\Queries\Query\Query;
-use LaravelJsonApi\Core\Bus\Queries\Query\Relatable;
+use LaravelJsonApi\Core\Query\Input\QueryRelationship;
 use LaravelJsonApi\Core\Values\ResourceId;
-use LaravelJsonApi\Core\Values\ResourceType;
 
 class FetchRelationshipQuery extends Query implements IsRelatable
 {
-    use Relatable;
+    use Identifiable;
 
     /**
      * @var ShowRelationshipImplementation|null
@@ -40,38 +40,49 @@ class FetchRelationshipQuery extends Query implements IsRelatable
      * Fluent constructor.
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
-     * @param ResourceId|string $id
-     * @param string $fieldName
+     * @param QueryRelationship $input
      * @return self
      */
-    public static function make(
-        ?Request $request,
-        ResourceType|string $type,
-        ResourceId|string $id,
-        string $fieldName,
-    ): self
+    public static function make(?Request $request, QueryRelationship $input): self
     {
-        return new self($request, $type, $id, $fieldName);
+        return new self($request, $input);
     }
 
     /**
      * FetchRelationshipQuery constructor
      *
      * @param Request|null $request
-     * @param ResourceType|string $type
-     * @param ResourceId|string $id
-     * @param string $fieldName
+     * @param QueryRelationship $input
      */
     public function __construct(
         ?Request $request,
-        ResourceType|string $type,
-        ResourceId|string $id,
-        string $fieldName,
+        private readonly QueryRelationship $input,
     ) {
-        parent::__construct($request, $type);
-        $this->id = ResourceId::cast($id);
-        $this->fieldName = $fieldName ?: null;
+        parent::__construct($request);
+    }
+
+    /**
+     * @return ResourceId
+     */
+    public function id(): ResourceId
+    {
+        return $this->input->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function fieldName(): string
+    {
+        return $this->input->fieldName;
+    }
+
+    /**
+     * @return QueryRelationship
+     */
+    public function input(): QueryRelationship
+    {
+        return $this->input;
     }
 
     /**

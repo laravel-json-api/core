@@ -88,8 +88,8 @@ class ValidateQueryOneParametersTest extends TestCase
 
         $queryOneValidator
             ->expects($this->once())
-            ->method('forRequest')
-            ->with($this->identicalTo($request))
+            ->method('make')
+            ->with($this->identicalTo($request), $this->identicalTo($this->action->query()))
             ->willReturn($this->validator);
     }
 
@@ -116,7 +116,7 @@ class ValidateQueryOneParametersTest extends TestCase
             $this->action,
             function (StoreActionInput $passed) use ($validated, $expected): DataResponse {
                 $this->assertNotSame($this->action, $passed);
-                $this->assertSame($validated, $passed->query()->toQuery());
+                $this->assertSame($validated, $passed->queryParameters()->toQuery());
                 return $expected;
             },
         );

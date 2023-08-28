@@ -17,22 +17,25 @@
 
 declare(strict_types=1);
 
-namespace LaravelJsonApi\Core\Http\Actions\Input;
+namespace LaravelJsonApi\Core\Query\Input;
 
-use LaravelJsonApi\Core\Query\Input\QueryRelated;
-use LaravelJsonApi\Core\Query\Input\QueryRelationship;
+use LaravelJsonApi\Core\Values\ResourceId;
+use LaravelJsonApi\Core\Values\ResourceType;
 
-interface IsRelatable extends IsIdentifiable
+class QueryOne extends Query
 {
     /**
-     * Get the JSON:API field name for the target relationship.
+     * QueryOne constructor
      *
-     * @return string
+     * @param ResourceType $type
+     * @param ResourceId $id
+     * @param array $parameters
      */
-    public function fieldName(): string;
-
-    /**
-     * @return QueryRelated|QueryRelationship
-     */
-    public function query(): QueryRelated|QueryRelationship;
+    public function __construct(
+        ResourceType $type,
+        public readonly ResourceId $id,
+        array $parameters = []
+    ) {
+        parent::__construct(QueryCodeEnum::One, $type, $parameters);
+    }
 }

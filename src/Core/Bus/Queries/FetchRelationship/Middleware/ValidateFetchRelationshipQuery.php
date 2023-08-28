@@ -65,7 +65,7 @@ class ValidateFetchRelationshipQuery implements HandlesFetchRelationshipQueries
 
         if ($query->isNotValidated()) {
             $query = $query->withValidated(
-                $query->parameters(),
+                $query->input()->parameters,
             );
         }
 
@@ -86,10 +86,10 @@ class ValidateFetchRelationshipQuery implements HandlesFetchRelationshipQueries
             ->validatorsFor($relation->inverse());
 
         $request = $query->request();
-        $params = $query->parameters();
+        $input = $query->input();
 
         return $relation->toOne() ?
-            $factory->queryOne()->make($request, $params) :
-            $factory->queryMany()->make($request, $params);
+            $factory->queryOne()->make($request, $input) :
+            $factory->queryMany()->make($request, $input);
     }
 }

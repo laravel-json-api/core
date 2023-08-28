@@ -95,13 +95,12 @@ class DetachRelationshipActionHandler
     private function handle(DetachRelationshipActionInput $action): RelationshipResponse
     {
         $commandResult = $this->dispatch($action);
-        $model = $action->modelOrFail();
-        $queryResult = $this->query($action, $model);
+        $queryResult = $this->query($action);
         $payload = $queryResult->payload();
 
         assert($payload->hasData, 'Expecting query result to have data.');
 
-        return RelationshipResponse::make($model, $action->fieldName(), $payload->data)
+        return RelationshipResponse::make($action->modelOrFail(), $action->fieldName(), $payload->data)
             ->withMeta(array_merge($commandResult->meta, $payload->meta))
             ->withQueryParameters($queryResult->query());
     }
@@ -117,7 +116,7 @@ class DetachRelationshipActionHandler
     {
         $command = DetachRelationshipCommand::make($action->request(), $action->operation())
             ->withModel($action->modelOrFail())
-            ->withQuery($action->query())
+            ->withQuery($action->queryParameters())
             ->withHooks($action->hooks())
             ->skipAuthorization();
 
@@ -134,22 +133,14 @@ class DetachRelationshipActionHandler
      * Execute the query for the detach relationship action.
      *
      * @param DetachRelationshipActionInput $action
-     * @param object $model
      * @return Result
      * @throws JsonApiException
      */
-    private function query(DetachRelationshipActionInput $action, object $model): Result
+    private function query(DetachRelationshipActionInput $action): Result
     {
-        $query = new FetchRelationshipQuery(
-            $action->request(),
-            $action->type(),
-            $action->id(),
-            $action->fieldName(),
-        );
-
-        $query = $query
-            ->withModel($model)
-            ->withValidated($action->query())
+        $query = FetchRelationshipQuery::make($action->request(), $action->query())
+            ->withModel($action->modelOrFail())
+            ->withValidated($action->queryParameters())
             ->skipAuthorization();
 
         $result = $this->queries->dispatch($query);

@@ -32,6 +32,7 @@ use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\TriggerShowHooks;
 use LaravelJsonApi\Core\Bus\Queries\FetchOne\Middleware\ValidateFetchOneQuery;
 use LaravelJsonApi\Core\Bus\Queries\Middleware\SetModelIfMissing;
 use LaravelJsonApi\Core\Bus\Queries\Result;
+use LaravelJsonApi\Core\Query\Input\QueryOne;
 use LaravelJsonApi\Core\Support\PipelineFactory;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -75,11 +76,10 @@ class FetchOneQueryHandlerTest extends TestCase
     {
         $original = new FetchOneQuery(
             $request = $this->createMock(Request::class),
-            $type = new ResourceType('comments'),
-            $id = new ResourceId('123'),
+            $in = new QueryOne($type = new ResourceType('comments'), $id = new ResourceId('123')),
         );
 
-        $passed = FetchOneQuery::make($request, $type, $id)
+        $passed = FetchOneQuery::make($request, $in)
             ->withValidated($validated = ['include' => 'user']);
 
         $sequence = [];
