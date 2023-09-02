@@ -21,7 +21,6 @@ namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 
 class CreateParser implements ParsesOperationFromArray
@@ -29,10 +28,13 @@ class CreateParser implements ParsesOperationFromArray
     /**
      * CreateParser constructor
      *
+     * @param HrefParser $hrefParser
      * @param ResourceObjectParser $resourceParser
      */
-    public function __construct(private readonly ResourceObjectParser $resourceParser)
-    {
+    public function __construct(
+        private readonly HrefParser $hrefParser,
+        private readonly ResourceObjectParser $resourceParser,
+    ) {
     }
 
     /**
@@ -41,9 +43,8 @@ class CreateParser implements ParsesOperationFromArray
     public function parse(array $operation): ?Create
     {
         if ($this->isStore($operation)) {
-            $href = $operation['href'] ?? null;
             return new Create(
-                $href ? new Href($operation['href']) : null,
+                $this->hrefParser->nullable($operation['href'] ?? null),
                 $this->resourceParser->parse($operation['data']),
                 $operation['meta'] ?? [],
             );

@@ -24,6 +24,7 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\ParsedHref;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\TestCase;
 
@@ -35,17 +36,17 @@ class CreateTest extends TestCase
     public function testItHasHref(): Create
     {
         $op = new Create(
-            $href = new Href('/posts'),
+            $parsedHref = new ParsedHref(new Href('/posts'), new ResourceType('posts')),
             $resource = new ResourceObject(
-                type: new ResourceType('posts'),
+                type: $type = new ResourceType('posts'),
                 attributes: ['title' => 'Hello World!']
             ),
         );
 
         $this->assertSame(OpCodeEnum::Add, $op->op);
-        $this->assertSame($href, $op->target);
-        $this->assertSame($href, $op->href());
+        $this->assertSame($parsedHref, $op->target);
         $this->assertNull($op->ref());
+        $this->assertSame($type, $op->type());
         $this->assertSame($resource, $op->data);
         $this->assertEmpty($op->meta);
         $this->assertTrue($op->isCreating());
@@ -77,7 +78,6 @@ class CreateTest extends TestCase
 
         $this->assertSame(OpCodeEnum::Add, $op->op);
         $this->assertNull($op->target);
-        $this->assertNull($op->href());
         $this->assertNull($op->ref());
         $this->assertSame($resource, $op->data);
         $this->assertSame($meta, $op->meta);
@@ -94,7 +94,7 @@ class CreateTest extends TestCase
     {
         $expected = [
             'op' => $op->op->value,
-            'href' => $op->href()->value,
+            'href' => $op->target->href->value,
             'data' => $op->data->toArray(),
         ];
 
@@ -128,7 +128,7 @@ class CreateTest extends TestCase
     {
         $expected = [
             'op' => $op->op,
-            'href' => $op->href(),
+            'href' => $op->target->href->value,
             'data' => $op->data,
         ];
 

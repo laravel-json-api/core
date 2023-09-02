@@ -43,13 +43,6 @@ abstract class Command
     private ?array $validated = null;
 
     /**
-     * Get the primary resource type.
-     *
-     * @return ResourceType
-     */
-    abstract public function type(): ResourceType;
-
-    /**
      * Get the operation object.
      *
      * @return Operation
@@ -63,6 +56,14 @@ abstract class Command
      */
     public function __construct(private readonly ?Request $request)
     {
+    }
+
+    /**
+     * @return ResourceType
+     */
+    public function type(): ResourceType
+    {
+        return $this->operation()->type();
     }
 
     /**

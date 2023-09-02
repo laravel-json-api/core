@@ -48,6 +48,13 @@ interface Schema extends Traversable
     public static function resource(): string;
 
     /**
+     * Get the resource type as it appears in URIs.
+     *
+     * @return string
+     */
+    public static function uriType(): string;
+
+    /**
      * Get a repository for the resource.
      *
      * Schemas MUST return a repository if the resource type is retrievable
@@ -58,13 +65,6 @@ interface Schema extends Traversable
      * @return Repository|null
      */
     public function repository(): ?Repository;
-
-    /**
-     * Get the resource type as it appears in URIs.
-     *
-     * @return string
-     */
-    public function uriType(): string;
 
     /**
      * Get a URL for the resource.
@@ -172,6 +172,12 @@ interface Schema extends Traversable
      * @return Relation
      */
     public function relationship(string $name): Relation;
+
+    /**
+     * @param string $uriFieldName
+     * @return Relation|null
+     */
+    public function relationshipForUri(string $uriFieldName): ?Relation;
 
     /**
      * Does the named relationship exist?

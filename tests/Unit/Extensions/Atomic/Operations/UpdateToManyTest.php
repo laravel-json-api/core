@@ -24,6 +24,7 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceIdentifier;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\ParsedHref;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -38,7 +39,12 @@ class UpdateToManyTest extends TestCase
     {
         $op = new UpdateToMany(
             $code = OpCodeEnum::Add,
-            $href = new Href('/posts/123/relationships/tags'),
+            $parsedHref = new ParsedHref(
+                $href = new Href('/posts/123/relationships/tags'),
+                $type = new ResourceType('posts'),
+                $id = new ResourceId('id'),
+                $relationship = 'tags',
+            ),
             $identifiers = new ListOfResourceIdentifiers(
                 new ResourceIdentifier(new ResourceType('tags'), new ResourceId('123')),
             ),
@@ -46,9 +52,9 @@ class UpdateToManyTest extends TestCase
         );
 
         $this->assertSame($code, $op->op);
-        $this->assertSame($href, $op->target);
+        $this->assertSame($parsedHref, $op->target);
         $this->assertSame($href, $op->href());
-        $this->assertNull($op->ref());
+        $this->assertEquals(new Ref(type: $type, id: $id, relationship: $relationship), $op->ref());
         $this->assertSame($identifiers, $op->data);
         $this->assertSame($meta, $op->meta);
         $this->assertFalse($op->isCreating());
@@ -124,14 +130,19 @@ class UpdateToManyTest extends TestCase
     {
         $op = new UpdateToMany(
             $code = OpCodeEnum::Update,
-            $href = new Href('/posts/123/relationships/tags'),
+            $parsedHref = new ParsedHref(
+                $href = new Href('/posts/123/relationships/tags'),
+                $type = new ResourceType('posts'),
+                $id = new ResourceId('id'),
+                $relationship = 'tags',
+            ),
             $identifiers = new ListOfResourceIdentifiers(),
         );
 
         $this->assertSame($code, $op->op);
-        $this->assertSame($href, $op->target);
+        $this->assertSame($parsedHref, $op->target);
         $this->assertSame($href, $op->href());
-        $this->assertNull($op->ref());
+        $this->assertEquals(new Ref(type: $type, id: $id, relationship: $relationship), $op->ref());
         $this->assertSame($identifiers, $op->data);
         $this->assertEmpty($op->meta);
         $this->assertFalse($op->isCreating());
@@ -202,16 +213,21 @@ class UpdateToManyTest extends TestCase
     {
         $op = new UpdateToMany(
             $code = OpCodeEnum::Remove,
-            $href = new Href('/posts/123/relationships/tags'),
+            $parsedHref = new ParsedHref(
+                $href = new Href('/posts/123/relationships/tags'),
+                $type = new ResourceType('posts'),
+                $id = new ResourceId('id'),
+                $relationship = 'tags',
+            ),
             $identifiers = new ListOfResourceIdentifiers(
                 new ResourceIdentifier(new ResourceType('tags'), new ResourceId('123')),
             ),
         );
 
         $this->assertSame($code, $op->op);
-        $this->assertSame($href, $op->target);
+        $this->assertSame($parsedHref, $op->target);
         $this->assertSame($href, $op->href());
-        $this->assertNull($op->ref());
+        $this->assertEquals(new Ref(type: $type, id: $id, relationship: $relationship), $op->ref());
         $this->assertSame($identifiers, $op->data);
         $this->assertEmpty($op->meta);
         $this->assertFalse($op->isCreating());

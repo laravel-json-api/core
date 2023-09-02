@@ -29,7 +29,6 @@ use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -72,7 +71,7 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             $request = $this->createMock(Request::class),
-            new Create(new Href('/posts'), new ResourceObject($this->type)),
+            new Create(null, new ResourceObject($this->type)),
         );
 
         $this->willAuthorize($request, null);
@@ -94,7 +93,7 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             null,
-            new Create(new Href('/posts'), new ResourceObject($this->type)),
+            new Create(null, new ResourceObject($this->type)),
         );
 
         $this->willAuthorize(null, null);
@@ -116,7 +115,7 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             $request = $this->createMock(Request::class),
-            new Create(new Href('/posts'), new ResourceObject($this->type)),
+            new Create(null, new ResourceObject($this->type)),
         );
 
         $this->willAuthorizeAndThrow(
@@ -142,7 +141,7 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = new StoreCommand(
             $request = $this->createMock(Request::class),
-            new Create(new Href('/posts'), new ResourceObject($this->type)),
+            new Create(null, new ResourceObject($this->type)),
         );
 
         $this->willAuthorize($request, $expected = new ErrorList());
@@ -163,7 +162,7 @@ class AuthorizeStoreCommandTest extends TestCase
     {
         $command = StoreCommand::make(
             $this->createMock(Request::class),
-            new Create(new Href('/posts'), new ResourceObject($this->type)),
+            new Create(null, new ResourceObject($this->type)),
         )->skipAuthorization();
 
         $this->authorizerFactory

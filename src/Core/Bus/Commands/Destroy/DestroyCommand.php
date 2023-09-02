@@ -26,7 +26,6 @@ use LaravelJsonApi\Core\Bus\Commands\Command\Identifiable;
 use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Values\ResourceId;
-use LaravelJsonApi\Core\Values\ResourceType;
 
 class DestroyCommand extends Command implements IsIdentifiable
 {
@@ -62,24 +61,10 @@ class DestroyCommand extends Command implements IsIdentifiable
 
     /**
      * @inheritDoc
-     * @TODO support getting resource type from a href.
-     */
-    public function type(): ResourceType
-    {
-        $type = $this->operation->ref()?->type;
-
-        assert($type !== null, 'Expecting a delete operation with a ref.');
-
-        return $type;
-    }
-
-    /**
-     * @inheritDoc
-     * @TODO support getting resource id from a href.
      */
     public function id(): ResourceId
     {
-        $id = $this->operation->ref()?->id;
+        $id = $this->operation->ref()->id;
 
         assert($id !== null, 'Expecting a delete operation with a ref that has an id.');
 

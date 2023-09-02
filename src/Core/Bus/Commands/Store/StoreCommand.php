@@ -24,7 +24,6 @@ use LaravelJsonApi\Contracts\Http\Hooks\StoreImplementation;
 use LaravelJsonApi\Core\Bus\Commands\Command\Command;
 use LaravelJsonApi\Core\Bus\Commands\Command\HasQuery;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
-use LaravelJsonApi\Core\Values\ResourceType;
 
 class StoreCommand extends Command
 {
@@ -58,14 +57,6 @@ class StoreCommand extends Command
         private readonly Create $operation
     ) {
         parent::__construct($request);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function type(): ResourceType
-    {
-        return $this->operation->data->type;
     }
 
     /**

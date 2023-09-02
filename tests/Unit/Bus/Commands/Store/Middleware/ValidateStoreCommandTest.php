@@ -33,7 +33,6 @@ use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Values\ResourceType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -93,7 +92,7 @@ class ValidateStoreCommandTest extends TestCase
     public function testItPassesValidation(): void
     {
         $operation = new Create(
-            target: new Href('/posts'),
+            target: null,
             data: new ResourceObject(type: $this->type),
         );
 
@@ -144,7 +143,7 @@ class ValidateStoreCommandTest extends TestCase
     public function testItFailsValidation(): void
     {
         $operation = new Create(
-            target: new Href('/posts'),
+            target: null,
             data: new ResourceObject(type: $this->type),
         );
 
@@ -191,7 +190,7 @@ class ValidateStoreCommandTest extends TestCase
     public function testItSetsValidatedDataIfNotValidating(): void
     {
         $operation = new Create(
-            target: new Href('/posts'),
+            target: null,
             data: new ResourceObject(type: $this->type),
         );
 
@@ -230,7 +229,7 @@ class ValidateStoreCommandTest extends TestCase
     public function testItDoesNotValidateIfAlreadyValidated(): void
     {
         $operation = new Create(
-            target: new Href('/posts'),
+            target: null,
             data: new ResourceObject(type: $this->type),
         );
 

@@ -73,6 +73,14 @@ interface Container
     public function modelClassFor(string|ResourceType $resourceType): string;
 
     /**
+     * Get the schema resource type for the provided type as it appears in URLs.
+     *
+     * @param string $uriType
+     * @return ResourceType|null
+     */
+    public function schemaTypeForUri(string $uriType): ?ResourceType;
+
+    /**
      * Get a list of all the supported resource types.
      *
      * @return array

@@ -27,7 +27,6 @@ use LaravelJsonApi\Core\Bus\Commands\Command\Identifiable;
 use LaravelJsonApi\Core\Bus\Commands\Command\IsIdentifiable;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
 use LaravelJsonApi\Core\Values\ResourceId;
-use LaravelJsonApi\Core\Values\ResourceType;
 use RuntimeException;
 
 class UpdateCommand extends Command implements IsIdentifiable
@@ -63,14 +62,6 @@ class UpdateCommand extends Command implements IsIdentifiable
         private readonly Update $operation,
     ) {
         parent::__construct($request);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function type(): ResourceType
-    {
-        return $this->operation->data->type;
     }
 
     /**

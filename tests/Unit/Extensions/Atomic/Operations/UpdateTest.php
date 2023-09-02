@@ -24,6 +24,7 @@ use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\ParsedHref;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -37,18 +38,22 @@ class UpdateTest extends TestCase
     public function testItHasHref(): Update
     {
         $op = new Update(
-            $href = new Href('/posts/123'),
+            $parsedHref = new ParsedHref(
+                $href = new Href('/posts/123'),
+                new ResourceType('posts'),
+                new ResourceId('123'),
+            ),
             $resource = new ResourceObject(
-                type: new ResourceType('posts'),
-                id: new ResourceId('123'),
+                type: $type = new ResourceType('posts'),
+                id: $id = new ResourceId('123'),
                 attributes: ['title' => 'Hello World!']
             ),
         );
 
         $this->assertSame(OpCodeEnum::Update, $op->op);
-        $this->assertSame($href, $op->target);
+        $this->assertSame($parsedHref, $op->target);
         $this->assertSame($href, $op->href());
-        $this->assertNull($op->ref());
+        $this->assertEquals(new Ref(type: $type, id: $id), $op->ref());
         $this->assertSame($resource, $op->data);
         $this->assertEmpty($op->meta);
         $this->assertFalse($op->isCreating());
@@ -96,17 +101,19 @@ class UpdateTest extends TestCase
         $op = new Update(
             null,
             $resource = new ResourceObject(
-                type: new ResourceType('posts'),
-                id: new ResourceId('123'),
+                type: $type = new ResourceType('posts'),
+                id: $id = new ResourceId('123'),
                 attributes: ['title' => 'Hello World!']
             ),
             $meta = ['foo' => 'bar'],
         );
 
+        $ref = new Ref(type: $type, id: $id);
+
         $this->assertSame(OpCodeEnum::Update, $op->op);
         $this->assertNull($op->target);
         $this->assertNull($op->href());
-        $this->assertNull($op->ref());
+        $this->assertEquals($ref, $op->ref());
         $this->assertSame($resource, $op->data);
         $this->assertSame($meta, $op->meta);
 

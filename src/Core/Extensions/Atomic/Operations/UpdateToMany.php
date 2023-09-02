@@ -22,7 +22,9 @@ namespace LaravelJsonApi\Core\Extensions\Atomic\Operations;
 use LaravelJsonApi\Core\Document\Input\Values\ListOfResourceIdentifiers;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\ParsedHref;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 class UpdateToMany extends Operation
 {
@@ -30,21 +32,49 @@ class UpdateToMany extends Operation
      * UpdateToMany constructor
      *
      * @param OpCodeEnum $op
-     * @param Ref|Href $target
+     * @param Ref|ParsedHref $target
      * @param ListOfResourceIdentifiers $data
      * @param array $meta
      */
     public function __construct(
         OpCodeEnum $op,
-        Ref|Href $target,
+        public readonly Ref|ParsedHref $target,
         public readonly ListOfResourceIdentifiers $data,
         array $meta = []
     ) {
-        parent::__construct(
-            op: $op,
-            target: $target,
-            meta: $meta,
-        );
+        parent::__construct($op, $meta);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function type(): ResourceType
+    {
+        return $this->ref()->type;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function ref(): Ref
+    {
+        if ($this->target instanceof Ref) {
+            return $this->target;
+        }
+
+        return $this->target->ref();
+    }
+
+    /**
+     * @return Href|null
+     */
+    public function href(): ?Href
+    {
+        if ($this->target instanceof ParsedHref) {
+            return $this->target->href;
+        }
+
+        return null;
     }
 
     /**
@@ -91,7 +121,7 @@ class UpdateToMany extends Operation
         return array_filter([
             'op' => $this->op->value,
             'href' => $this->href()?->value,
-            'ref' => $this->ref()?->toArray(),
+            'ref' => $this->target instanceof Ref ? $this->target->toArray() : null,
             'data' => $this->data->toArray(),
             'meta' => empty($this->meta) ? null : $this->meta,
         ], static fn (mixed $value) => $value !== null);
@@ -105,7 +135,7 @@ class UpdateToMany extends Operation
         return array_filter([
             'op' => $this->op,
             'href' => $this->href(),
-            'ref' => $this->ref(),
+            'ref' => $this->target instanceof Ref ? $this->target : null,
             'data' => $this->data,
             'meta' => empty($this->meta) ? null : $this->meta,
         ], static fn (mixed $value) => $value !== null);

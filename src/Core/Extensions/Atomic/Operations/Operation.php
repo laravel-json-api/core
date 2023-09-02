@@ -21,48 +21,30 @@ namespace LaravelJsonApi\Core\Extensions\Atomic\Operations;
 
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
-use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
+use LaravelJsonApi\Core\Values\ResourceType;
 
 abstract class Operation implements JsonSerializable, Arrayable
 {
     /**
-     * Operation constructor
-     *
-     * @param OpCodeEnum $op
-     * @param Ref|Href|null $target
-     * @param array $meta
+     * @return ResourceType
      */
-    public function __construct(
-        public readonly OpCodeEnum $op,
-        public readonly Ref|Href|null $target = null,
-        public readonly array $meta = [],
-    ) {
-    }
+    abstract public function type(): ResourceType;
 
     /**
      * @return Ref|null
      */
-    public function ref(): ?Ref
-    {
-        if ($this->target instanceof Ref) {
-            return $this->target;
-        }
-
-        return null;
-    }
+    abstract public function ref(): ?Ref;
 
     /**
-     * @return Href|null
+     * Operation constructor
+     *
+     * @param OpCodeEnum $op
+     * @param array $meta
      */
-    public function href(): ?Href
+    public function __construct(public readonly OpCodeEnum $op, public readonly array $meta = [])
     {
-        if ($this->target instanceof Href) {
-            return $this->target;
-        }
-
-        return null;
     }
 
     /**
@@ -112,11 +94,7 @@ abstract class Operation implements JsonSerializable, Arrayable
      */
     public function getFieldName(): ?string
     {
-        if ($ref = $this->ref()) {
-            return $ref->relationship;
-        }
-
-        return $this->href()?->getRelationshipName();
+        return $this->ref()?->relationship;
     }
 
     /**

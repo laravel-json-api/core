@@ -23,6 +23,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Href;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
+use LaravelJsonApi\Core\Extensions\Atomic\Values\ParsedHref;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\Ref;
 use LaravelJsonApi\Core\Values\ResourceId;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -36,13 +37,17 @@ class DeleteTest extends TestCase
     public function testItHasHref(): Delete
     {
         $op = new Delete(
-            $href = new Href('/posts/123'),
+            $parsedHref = new ParsedHref(
+                $href = new Href('/posts/123'),
+                $type = new ResourceType('posts'),
+                $id = new ResourceId('123')
+            ),
         );
 
         $this->assertSame(OpCodeEnum::Remove, $op->op);
-        $this->assertSame($href, $op->target);
+        $this->assertSame($parsedHref, $op->target);
+        $this->assertEquals(new Ref(type: $type, id: $id), $op->ref());
         $this->assertSame($href, $op->href());
-        $this->assertNull($op->ref());
         $this->assertEmpty($op->meta);
         $this->assertFalse($op->isCreating());
         $this->assertFalse($op->isUpdating());
@@ -69,8 +74,8 @@ class DeleteTest extends TestCase
 
         $this->assertSame(OpCodeEnum::Remove, $op->op);
         $this->assertSame($ref, $op->target);
-        $this->assertNull($op->href());
         $this->assertSame($ref, $op->ref());
+        $this->assertNull($op->href());
         $this->assertSame($meta, $op->meta);
 
         return $op;

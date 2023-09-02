@@ -20,6 +20,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Extensions\Atomic\Parsers;
 
 use Generator;
+use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\Document\Input\Parsers\ListOfResourceIdentifiersParser;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceIdentifierParser;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
@@ -32,6 +33,11 @@ class ParsesOperationContainer
      * @var array<string,ParsesOperationFromArray>
      */
     private array $cache = [];
+
+    /**
+     * @var HrefParser|null
+     */
+    private ?HrefParser $hrefParser = null;
 
     /**
      * @var HrefOrRefParser|null
@@ -52,6 +58,15 @@ class ParsesOperationContainer
      * @var ResourceIdentifierParser|null
      */
     private ?ResourceIdentifierParser $identifierParser = null;
+
+    /**
+     * ParsesOperationContainer constructor
+     *
+     * @param Server $server
+     */
+    public function __construct(private readonly Server $server)
+    {
+    }
 
     /**
      * @param OpCodeEnum $op
@@ -87,7 +102,10 @@ class ParsesOperationContainer
     private function make(string $parser): ParsesOperationFromArray
     {
         return $this->cache[$parser] = match ($parser) {
-            CreateParser::class => new CreateParser($this->getResourceObjectParser()),
+            CreateParser::class => new CreateParser(
+                $this->getHrefParser(),
+                $this->getResourceObjectParser(),
+            ),
             UpdateParser::class => new UpdateParser(
                 $this->getTargetParser(),
                 $this->getResourceObjectParser(),
@@ -106,6 +124,18 @@ class ParsesOperationContainer
     }
 
     /**
+     * @return HrefParser
+     */
+    private function getHrefParser(): HrefParser
+    {
+        if ($this->hrefParser) {
+            return $this->hrefParser;
+        }
+
+        return $this->hrefParser = new HrefParser($this->server);
+    }
+
+    /**
      * @return HrefOrRefParser
      */
     private function getTargetParser(): HrefOrRefParser
@@ -114,7 +144,10 @@ class ParsesOperationContainer
             return $this->targetParser;
         }
 
-        return $this->targetParser = new HrefOrRefParser($this->getRefParser());
+        return $this->targetParser = new HrefOrRefParser(
+            $this->getHrefParser(),
+            $this->getRefParser(),
+        );
     }
 
     /**

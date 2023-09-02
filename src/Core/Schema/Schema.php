@@ -55,7 +55,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
      *
      * @var string|null
      */
-    protected ?string $uriType = null;
+    protected static ?string $uriType = null;
 
     /**
      * The key name for the resource "id".
@@ -172,6 +172,18 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     }
 
     /**
+     * @inheritDoc
+     */
+    public static function uriType(): string
+    {
+        if (static::$uriType) {
+            return static::$uriType;
+        }
+
+        return static::$uriType = Str::dasherize(static::type());
+    }
+
+    /**
      * Schema constructor.
      *
      * @param Server $server
@@ -195,18 +207,6 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     public function getIterator(): Traversable
     {
         yield from $this->allFields();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function uriType(): string
-    {
-        if ($this->uriType) {
-            return $this->uriType;
-        }
-
-        return $this->uriType = Str::dasherize($this->type());
     }
 
     /**
@@ -343,6 +343,20 @@ abstract class Schema implements SchemaContract, IteratorAggregate
             $name,
             $this->type()
         ));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function relationshipForUri(string $uriFieldName): ?Relation
+    {
+        foreach ($this->relationships() as $relation) {
+            if ($relation->uriName() === $uriFieldName) {
+                return $relation;
+            }
+        }
+
+        return null;
     }
 
     /**

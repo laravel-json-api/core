@@ -29,7 +29,6 @@ use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToMany;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 use LaravelJsonApi\Core\Support\Contracts;
 use LaravelJsonApi\Core\Values\ResourceId;
-use LaravelJsonApi\Core\Values\ResourceType;
 
 class UpdateRelationshipCommand extends Command implements IsRelatable
 {
@@ -71,24 +70,10 @@ class UpdateRelationshipCommand extends Command implements IsRelatable
 
     /**
      * @inheritDoc
-     * @TODO support operation with a href.
-     */
-    public function type(): ResourceType
-    {
-        $type = $this->operation->ref()?->type;
-
-        assert($type !== null, 'Expecting an update relationship operation with a ref.');
-
-        return $type;
-    }
-
-    /**
-     * @inheritDoc
-     * @TODO support operation with a href
      */
     public function id(): ResourceId
     {
-        $id = $this->operation->ref()?->id;
+        $id = $this->operation->ref()->id;
 
         assert($id !== null, 'Expecting an update relationship operation with a ref that has an id.');
 
@@ -100,14 +85,7 @@ class UpdateRelationshipCommand extends Command implements IsRelatable
      */
     public function fieldName(): string
     {
-        $fieldName = $this->operation->ref()?->relationship ?? $this->operation->href()?->getRelationshipName();
-
-        assert(
-            is_string($fieldName),
-            'Expecting update relationship operation to have a field name.',
-        );
-
-        return $fieldName;
+        return $this->operation->getFieldName();
     }
 
     /**

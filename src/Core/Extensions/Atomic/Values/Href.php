@@ -63,26 +63,6 @@ class Href implements JsonSerializable, Stringable
     }
 
     /**
-     * @return string|null
-     */
-    public function getRelationshipName(): ?string
-    {
-        if (1 === preg_match('/relationships\/([a-zA-Z0-9_\-]+)$/', $this->value, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasRelationshipName(): bool
-    {
-        return $this->getRelationshipName() !== null;
-    }
-
-    /**
      * @inheritDoc
      */
     public function jsonSerialize(): string

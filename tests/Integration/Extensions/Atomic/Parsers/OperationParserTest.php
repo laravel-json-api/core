@@ -19,6 +19,11 @@ declare(strict_types=1);
 
 namespace LaravelJsonApi\Core\Tests\Integration\Extensions\Atomic\Parsers;
 
+use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\ID;
+use LaravelJsonApi\Contracts\Schema\Relation;
+use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Update;
@@ -27,9 +32,21 @@ use LaravelJsonApi\Core\Extensions\Atomic\Operations\UpdateToOne;
 use LaravelJsonApi\Core\Extensions\Atomic\Parsers\OperationParser;
 use LaravelJsonApi\Core\Extensions\Atomic\Values\OpCodeEnum;
 use LaravelJsonApi\Core\Tests\Integration\TestCase;
+use LaravelJsonApi\Core\Values\ResourceType;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class OperationParserTest extends TestCase
 {
+    /**
+     * @var MockObject&SchemaContainer
+     */
+    private SchemaContainer&MockObject $schemas;
+
+    /**
+     * @var MockObject&Schema
+     */
+    private Schema&MockObject $schema;
+
     /**
      * @var OperationParser
      */
@@ -41,6 +58,30 @@ class OperationParserTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->container->instance(
+            Server::class,
+            $server = $this->createMock(Server::class),
+        );
+
+        $this->container->instance(
+            SchemaContainer::class,
+            $this->schemas = $this->createMock(SchemaContainer::class),
+        );
+
+        $server
+            ->method('schemas')
+            ->willReturn($this->schemas);
+
+        $this->schemas
+            ->method('schemaTypeForUri')
+            ->with($this->identicalTo('posts'))
+            ->willReturn($type = new ResourceType('posts'));
+
+        $this->schemas
+            ->method('schemaFor')
+            ->with($this->identicalTo($type))
+            ->willReturn($this->schema = $this->createMock(Schema::class));
+
         $this->parser = $this->container->make(OperationParser::class);
     }
 
@@ -127,12 +168,14 @@ class OperationParserTest extends TestCase
      */
     public function testItParsesUpdateOperationWithHref(): void
     {
+        $this->withId('3a70ad27-ab7c-4f7a-899f-c39a2b318fc9');
+
         $op = $this->parser->parse($json = [
             'op' => 'update',
-            'href' => '/posts/123',
+            'href' => '/posts/3a70ad27-ab7c-4f7a-899f-c39a2b318fc9',
             'data' => [
                 'type' => 'posts',
-                'id' => '123',
+                'id' => '3a70ad27-ab7c-4f7a-899f-c39a2b318fc9',
                 'attributes' => [
                     'title' => 'Hello World',
                 ],
@@ -174,6 +217,8 @@ class OperationParserTest extends TestCase
      */
     public function testItParsesDeleteOperationWithHref(): void
     {
+        $this->withId('123');
+
         $op = $this->parser->parse($json = [
             'op' => 'remove',
             'href' => '/posts/123',
@@ -230,6 +275,9 @@ class OperationParserTest extends TestCase
      */
     public function testItParsesUpdateToOneOperationWithHref(?array $data): void
     {
+        $this->withId('123');
+        $this->withRelationship('author');
+
         $op = $this->parser->parse($json = [
             'op' => 'update',
             'href' => '/posts/123/relationships/author',
@@ -292,6 +340,9 @@ class OperationParserTest extends TestCase
      */
     public function testItParsesUpdateToManyOperationWithHref(OpCodeEnum $code): void
     {
+        $this->withId('123');
+        $this->withRelationship('tags');
+
         $op = $this->parser->parse($json = [
             'op' => $code->value,
             'href' => '/posts/123/relationships/tags',
@@ -371,5 +422,41 @@ class OperationParserTest extends TestCase
         $this->expectException(\AssertionError::class);
         $this->expectExceptionMessage('Operation array must have a valid op code.');
         $this->parser->parse(['op' => 'blah!']);
+    }
+
+    /**
+     * @param string $expected
+     * @return void
+     */
+    private function withId(string $expected): void
+    {
+        $this->schema
+            ->expects($this->once())
+            ->method('id')
+            ->willReturn($id = $this->createMock(ID::class));
+
+        $id
+            ->expects($this->once())
+            ->method('match')
+            ->with($expected)
+            ->willReturn(true);
+    }
+
+    /**
+     * @param string $expected
+     * @return void
+     */
+    private function withRelationship(string $expected): void
+    {
+        $this->schema
+            ->expects($this->once())
+            ->method('relationshipForUri')
+            ->with($expected)
+            ->willReturn($relation = $this->createMock(Relation::class));
+
+        $relation
+            ->expects($this->once())
+            ->method('name')
+            ->willReturn($expected);
     }
 }

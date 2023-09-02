@@ -50,6 +50,11 @@ class Container implements ContainerContract
     /**
      * @var array
      */
+    private array $uriTypes;
+
+    /**
+     * @var array
+     */
     private array $models;
 
     /**
@@ -74,12 +79,15 @@ class Container implements ContainerContract
         $this->container = $container;
         $this->server = $server;
         $this->types = [];
+        $this->uriTypes = [];
         $this->models = [];
         $this->schemas = [];
         $this->aliases = [];
 
         foreach ($schemas as $schemaClass) {
-            $this->types[$schemaClass::type()] = $schemaClass;
+            $type = $schemaClass::type();
+            $this->types[$type] = $schemaClass;
+            $this->uriTypes[$schemaClass::uriType()] = $type;
             $this->models[$schemaClass::model()] = $schemaClass;
         }
 
@@ -153,6 +161,16 @@ class Container implements ContainerContract
             'No JSON:API schema for model %s.',
             is_object($model) ? get_class($model) : $model,
         ));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function schemaTypeForUri(string $uriType): ?ResourceType
+    {
+        $value = $this->uriTypes[$uriType] ?? null;
+
+        return $value ? new ResourceType($value) : null;
     }
 
     /**

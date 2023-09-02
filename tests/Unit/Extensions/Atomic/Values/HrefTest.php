@@ -63,31 +63,4 @@ class HrefTest extends TestCase
         $this->expectException(\LogicException::class);
         new Href($value);
     }
-
-    /**
-     * @return array
-     */
-    public static function relationshipNameProvider(): array
-    {
-        return [
-            ['/posts/123', null],
-            ['/posts/123/relationships/author', 'author'],
-            ['/posts/123/relationships/blog-author', 'blog-author'],
-            ['/posts/123/relationships/blog_author', 'blog_author'],
-            ['/posts/123/relationships/blog-author_123', 'blog-author_123'],
-        ];
-    }
-
-    /**
-     * @param string $href
-     * @param string|null $expected
-     * @return void
-     * @dataProvider relationshipNameProvider
-     */
-    public function testRelationshipName(string $href, ?string $expected): void
-    {
-        $href = new Href($href);
-        $this->assertSame($expected, $href->getRelationshipName());
-        $this->assertSame($expected !== null, $href->hasRelationshipName());
-    }
 }
