@@ -30,8 +30,8 @@ use LaravelJsonApi\Contracts\Routing\Route;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
-use LaravelJsonApi\Contracts\Validation\DestroyErrorFactory;
-use LaravelJsonApi\Contracts\Validation\DestroyValidator;
+use LaravelJsonApi\Contracts\Validation\DeletionErrorFactory;
+use LaravelJsonApi\Contracts\Validation\DeletionValidator;
 use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 use LaravelJsonApi\Core\Http\Actions\Destroy;
@@ -249,8 +249,8 @@ class DestroyTest extends TestCase
         );
 
         $this->container->instance(
-            DestroyErrorFactory::class,
-            $errorFactory = $this->createMock(DestroyErrorFactory::class),
+            DeletionErrorFactory::class,
+            $errorFactory = $this->createMock(DeletionErrorFactory::class),
         );
 
         $validators
@@ -268,7 +268,7 @@ class DestroyTest extends TestCase
         $validatorFactory
             ->expects($this->once())
             ->method('destroy')
-            ->willReturn($destroyValidator = $this->createMock(DestroyValidator::class));
+            ->willReturn($destroyValidator = $this->createMock(DeletionValidator::class));
 
         $destroyValidator
             ->expects($this->once())

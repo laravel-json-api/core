@@ -48,9 +48,9 @@ interface Factory
     /**
      * Get a validator to use when creating a resource.
      *
-     * @return StoreValidator
+     * @return CreationValidator
      */
-    public function store(): StoreValidator;
+    public function store(): CreationValidator;
 
     /**
      * Get a validator to use when updating a resource.
@@ -65,9 +65,9 @@ interface Factory
      * Deletion validation is optional. Implementations can return `null`
      * if deletion validation can be skipped.
      *
-     * @return DestroyValidator|null
+     * @return DeletionValidator|null
      */
-    public function destroy(): ?DestroyValidator;
+    public function destroy(): ?DeletionValidator;
 
     /**
      * Get a validator to use when modifying a resources' relationship.

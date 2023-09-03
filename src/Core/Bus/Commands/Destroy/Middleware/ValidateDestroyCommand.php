@@ -22,8 +22,8 @@ namespace LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
-use LaravelJsonApi\Contracts\Validation\DestroyErrorFactory;
-use LaravelJsonApi\Contracts\Validation\DestroyValidator;
+use LaravelJsonApi\Contracts\Validation\DeletionErrorFactory;
+use LaravelJsonApi\Contracts\Validation\DeletionValidator;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\HandlesDestroyCommands;
 use LaravelJsonApi\Core\Bus\Commands\Result;
@@ -35,11 +35,11 @@ class ValidateDestroyCommand implements HandlesDestroyCommands
      * ValidateDestroyCommand constructor
      *
      * @param ValidatorContainer $validatorContainer
-     * @param DestroyErrorFactory $errorFactory
+     * @param DeletionErrorFactory $errorFactory
      */
     public function __construct(
         private readonly ValidatorContainer $validatorContainer,
-        private readonly DestroyErrorFactory $errorFactory,
+        private readonly DeletionErrorFactory $errorFactory,
     ) {
     }
 
@@ -80,9 +80,9 @@ class ValidateDestroyCommand implements HandlesDestroyCommands
      *
      * @param ResourceType $type
      * @param Request|null $request
-     * @return DestroyValidator|null
+     * @return DeletionValidator|null
      */
-    private function validatorFor(ResourceType $type, ?Request $request): ?DestroyValidator
+    private function validatorFor(ResourceType $type, ?Request $request): ?DeletionValidator
     {
         return $this->validatorContainer
             ->validatorsFor($type)

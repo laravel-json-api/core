@@ -22,7 +22,7 @@ namespace LaravelJsonApi\Contracts\Validation;
 use Illuminate\Contracts\Validation\Validator;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create;
 
-interface StoreValidator
+interface CreationValidator
 {
     /**
      * Extract validation data from the store operation.

@@ -26,7 +26,7 @@ use LaravelJsonApi\Contracts\Schema\Schema;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\Factory;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
-use LaravelJsonApi\Contracts\Validation\StoreValidator;
+use LaravelJsonApi\Contracts\Validation\CreationValidator;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\Middleware\ValidateStoreCommand;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
@@ -256,9 +256,9 @@ class ValidateStoreCommandTest extends TestCase
 
     /**
      * @param Request|null $request
-     * @return MockObject&StoreValidator
+     * @return MockObject&CreationValidator
      */
-    private function willValidate(?Request $request): StoreValidator&MockObject
+    private function willValidate(?Request $request): CreationValidator&MockObject
     {
         $this->validators
             ->expects($this->once())
@@ -275,7 +275,7 @@ class ValidateStoreCommandTest extends TestCase
         $factory
             ->expects($this->once())
             ->method('store')
-            ->willReturn($storeValidator = $this->createMock(StoreValidator::class));
+            ->willReturn($storeValidator = $this->createMock(CreationValidator::class));
 
         return $storeValidator;
     }

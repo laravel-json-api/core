@@ -20,15 +20,25 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Contracts\Validation;
 
 use Illuminate\Contracts\Validation\Validator;
-use LaravelJsonApi\Core\Document\ErrorList;
+use LaravelJsonApi\Core\Extensions\Atomic\Operations\Delete;
 
-interface DestroyErrorFactory
+interface DeletionValidator
 {
     /**
-     * Make JSON:API errors for the provided validator.
+     * Extract validation data for a delete operation.
      *
-     * @param Validator $validator
-     * @return ErrorList
+     * @param Delete $operation
+     * @param object $model
+     * @return array
      */
-    public function make(Validator $validator): ErrorList;
+    public function extract(Delete $operation, object $model): array;
+
+    /**
+     * Make a validator for the delete operation.
+     *
+     * @param Delete $operation
+     * @param object $model
+     * @return Validator
+     */
+    public function make(Delete $operation, object $model): Validator;
 }

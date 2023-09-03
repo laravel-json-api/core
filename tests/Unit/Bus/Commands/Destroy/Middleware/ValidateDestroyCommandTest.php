@@ -22,8 +22,8 @@ namespace LaravelJsonApi\Core\Tests\Unit\Bus\Commands\Destroy\Middleware;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
-use LaravelJsonApi\Contracts\Validation\DestroyErrorFactory;
-use LaravelJsonApi\Contracts\Validation\DestroyValidator;
+use LaravelJsonApi\Contracts\Validation\DeletionErrorFactory;
+use LaravelJsonApi\Contracts\Validation\DeletionValidator;
 use LaravelJsonApi\Contracts\Validation\Factory;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\DestroyCommand;
 use LaravelJsonApi\Core\Bus\Commands\Destroy\Middleware\ValidateDestroyCommand;
@@ -50,9 +50,9 @@ class ValidateDestroyCommandTest extends TestCase
     private ValidatorContainer&MockObject $validators;
 
     /**
-     * @var DestroyErrorFactory&MockObject
+     * @var DeletionErrorFactory&MockObject
      */
-    private DestroyErrorFactory&MockObject $errorFactory;
+    private DeletionErrorFactory&MockObject $errorFactory;
 
     /**
      * @var ValidateDestroyCommand
@@ -70,7 +70,7 @@ class ValidateDestroyCommandTest extends TestCase
 
         $this->middleware = new ValidateDestroyCommand(
             $this->validators = $this->createMock(ValidatorContainer::class),
-            $this->errorFactory = $this->createMock(DestroyErrorFactory::class),
+            $this->errorFactory = $this->createMock(DeletionErrorFactory::class),
         );
     }
 
@@ -303,9 +303,9 @@ class ValidateDestroyCommandTest extends TestCase
     }
 
     /**
-     * @return MockObject&DestroyValidator
+     * @return MockObject&DeletionValidator
      */
-    private function withDestroyValidator(?Request $request): DestroyValidator&MockObject
+    private function withDestroyValidator(?Request $request): DeletionValidator&MockObject
     {
         $this->validators
             ->method('validatorsFor')
@@ -320,7 +320,7 @@ class ValidateDestroyCommandTest extends TestCase
 
         $factory
             ->method('destroy')
-            ->willReturn($destroyValidator = $this->createMock(DestroyValidator::class));
+            ->willReturn($destroyValidator = $this->createMock(DeletionValidator::class));
 
         return $destroyValidator;
     }

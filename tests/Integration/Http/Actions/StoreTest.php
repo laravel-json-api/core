@@ -40,7 +40,7 @@ use LaravelJsonApi\Contracts\Validation\Factory as ValidatorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryErrorFactory;
 use LaravelJsonApi\Contracts\Validation\QueryOneValidator;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
-use LaravelJsonApi\Contracts\Validation\StoreValidator;
+use LaravelJsonApi\Contracts\Validation\CreationValidator;
 use LaravelJsonApi\Core\Document\Input\Parsers\ResourceObjectParser;
 use LaravelJsonApi\Core\Document\Input\Values\ResourceObject;
 use LaravelJsonApi\Core\Extensions\Atomic\Operations\Create as StoreOperation;
@@ -387,7 +387,7 @@ class StoreTest extends TestCase
         $this->validatorFactory
             ->expects($this->once())
             ->method('store')
-            ->willReturn($storeValidator = $this->createMock(StoreValidator::class));
+            ->willReturn($storeValidator = $this->createMock(CreationValidator::class));
 
         $storeValidator
             ->expects($this->once())

@@ -24,7 +24,7 @@ use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Validation\Container as ValidatorContainer;
 use LaravelJsonApi\Contracts\Validation\ResourceErrorFactory;
-use LaravelJsonApi\Contracts\Validation\StoreValidator;
+use LaravelJsonApi\Contracts\Validation\CreationValidator;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
@@ -86,9 +86,9 @@ class ValidateStoreCommand implements HandlesStoreCommands
      *
      * @param ResourceType $type
      * @param Request|null $request
-     * @return StoreValidator
+     * @return CreationValidator
      */
-    private function validatorFor(ResourceType $type, ?Request $request): StoreValidator
+    private function validatorFor(ResourceType $type, ?Request $request): CreationValidator
     {
         return $this->validatorContainer
             ->validatorsFor($type)
