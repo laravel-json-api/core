@@ -81,17 +81,17 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @var array|null
      */
-    private ?array $fields = null;
+    protected ?array $fields = null;
 
     /**
      * @var array|null
      */
-    private ?array $attributes = null;
+    protected ?array $attributes = null;
 
     /**
      * @var array|null
      */
-    private ?array $relations = null;
+    protected ?array $relations = null;
 
     /**
      * @var callable|null
@@ -509,7 +509,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @return array
      */
-    private function allFields(): array
+    protected function allFields(): array
     {
         if (is_array($this->fields)) {
             return $this->fields;
@@ -532,7 +532,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @return array
      */
-    private function allAttributes(): array
+    protected function allAttributes(): array
     {
         if (is_array($this->attributes)) {
             return $this->attributes;
@@ -546,7 +546,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @return array
      */
-    private function allRelations(): array
+    protected function allRelations(): array
     {
         if (is_array($this->relations)) {
             return $this->relations;
@@ -562,7 +562,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
      *
      * @return iterable
      */
-    private function allSortFields(): iterable
+    protected function allSortFields(): iterable
     {
         $id = $this->id();
 
