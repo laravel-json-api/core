@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [3.3.0] - 2023-11-08
+
 ### Added
 
 - Can now create a JSON:API server once, without it being thread-cached. This is required for registering routes, as we
