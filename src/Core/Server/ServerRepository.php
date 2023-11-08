@@ -30,23 +30,22 @@ use Throwable;
 class ServerRepository implements RepositoryContract
 {
     /**
-     * @var AppResolver
+     * @var array<string, ServerContract>
      */
-    private AppResolver $app;
+    private array $cache = [];
 
     /**
-     * @var array
+     * @var array<string, class-string<ServerContract>>
      */
-    private array $cache;
+    private array $classes = [];
 
     /**
      * ServerRepository constructor.
      *
      * @param AppResolver $app
      */
-    public function __construct(AppResolver $app)
+    public function __construct(private readonly AppResolver $app)
     {
-        $this->app = $app;
         $this->cache = [];
     }
 
@@ -59,31 +58,49 @@ class ServerRepository implements RepositoryContract
             throw new InvalidArgumentException('Expecting a non-empty JSON:API server name.');
         }
 
-        if (isset($this->cache[$name])) {
-            return $this->cache[$name];
-        }
+        return $this->cache[$name] =  $this->cache[$name] ?? $this->make($name);
+    }
 
-        $class = $this->config()->get("jsonapi.servers.{$name}");
+    /**
+     * Use a server once, without thread-caching it.
+     *
+     * @param string $name
+     * @return ServerContract
+     * TODO add to interface
+     */
+    public function once(string $name): ServerContract
+    {
+        return $this->make($name);
+    }
 
-        if (empty($class) || !class_exists($class)) {
-            throw new RuntimeException("Server {$name} does not exist in config or is not a valid class.");
-        }
+    /**
+     * @param string $name
+     * @return ServerContract
+     */
+    private function make(string $name): ServerContract
+    {
+        $class = $this->classes[$name] ?? $this->config()->get("jsonapi.servers.{$name}");
+
+        assert(
+            !empty($class) && class_exists($class) && is_a($class, ServerContract::class, true),
+            "JSON:API server '{$name}' does not exist in config or is not a valid class.",
+        );
+
+        $this->classes[$name] = $class;
 
         try {
             $server = new $class($this->app, $name);
         } catch (Throwable $ex) {
             throw new RuntimeException(
-                "Unable to construct server {$name} using class {$class}.",
+                "Unable to construct JSON:API server {$name} using class {$class}.",
                 0,
-                $ex
+                $ex,
             );
         }
 
-        if ($server instanceof ServerContract) {
-            return $this->cache[$name] = $server;
-        }
+        assert($server instanceof ServerContract, "Class {$class} is not a server instance.");
 
-        throw new RuntimeException("Class for server {$name} is not a server instance.");
+        return $server;
     }
 
     /**

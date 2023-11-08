@@ -23,9 +23,8 @@ use LaravelJsonApi\Core\Server\Server as ServerContract;
 
 class TestServer extends ServerContract
 {
-
     /**
-     * @inheritDoc
+     * @return void
      */
     public function serving(): void
     {
