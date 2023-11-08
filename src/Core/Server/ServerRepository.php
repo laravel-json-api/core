@@ -62,11 +62,7 @@ class ServerRepository implements RepositoryContract
     }
 
     /**
-     * Use a server once, without thread-caching it.
-     *
-     * @param string $name
-     * @return ServerContract
-     * TODO add to interface
+     * @inheritDoc
      */
     public function once(string $name): ServerContract
     {

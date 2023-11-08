@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased (4.x)
+
+### Added
+
+- The `once` method has been added to the server repository interface. This previously existed on the concrete class,
+  but has now been added to the interface.
+
 ## Unreleased
 
 ## [3.3.0] - 2023-11-08
