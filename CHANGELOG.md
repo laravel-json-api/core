@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+## [3.3.0] - 2023-11-08
+
+### Added
+
+- Can now create a JSON:API server once, without it being thread-cached. This is required for registering routes, as we
+  do not expect that server instance to be used again after routes are registered. This matches production,
+  where `route:cache` should have been used, so it would be inaccurate to leave the server thread-cached after
+  registering routes in a non-production environment e.g. test.
+
 ## [3.2.0] - 2023-07-20
 
 ### Added

@@ -23,9 +23,8 @@ use LaravelJsonApi\Core\Server\Server as BaseServer;
 
 class TestServer extends BaseServer
 {
-
     /**
-     * @inheritDoc
+     * @return void
      */
     public function serving(): void
     {
