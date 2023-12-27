@@ -57,14 +57,10 @@ class Authorizer implements AuthorizerContract
      */
     public function index(Request $request, string $modelClass): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'viewAny',
-                $modelClass
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'viewAny', 
+            $modelClass
+        );
     }
 
     /**
@@ -72,14 +68,10 @@ class Authorizer implements AuthorizerContract
      */
     public function store(Request $request, string $modelClass): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'create',
-                $modelClass
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'create',
+            $modelClass
+        );
     }
 
     /**
@@ -87,14 +79,10 @@ class Authorizer implements AuthorizerContract
      */
     public function show(Request $request, object $model): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
+            return $this->authorizeAction(
                 'view',
                 $model
             );
-        }
-
-        return true;
     }
 
     /**
@@ -102,14 +90,10 @@ class Authorizer implements AuthorizerContract
      */
     public function update(Request $request, object $model): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'update',
-                $model
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'update',
+            $model
+        );
     }
 
     /**
@@ -117,14 +101,10 @@ class Authorizer implements AuthorizerContract
      */
     public function destroy(Request $request, object $model): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'delete',
-                $model
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'delete',
+            $model
+        );
     }
 
     /**
@@ -132,14 +112,10 @@ class Authorizer implements AuthorizerContract
      */
     public function showRelated(Request $request, object $model, string $fieldName): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'view' . Str::classify($fieldName),
-                $model
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'view' . Str::classify($fieldName),
+            $model
+        );
     }
 
     /**
@@ -155,14 +131,10 @@ class Authorizer implements AuthorizerContract
      */
     public function updateRelationship(Request $request, object $model, string $fieldName): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'update' . Str::classify($fieldName),
-                [$model, $this->createRelation($request, $fieldName)]
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'update' . Str::classify($fieldName),
+            [$model, $this->createRelation($request, $fieldName)]
+        );
     }
 
     /**
@@ -170,14 +142,10 @@ class Authorizer implements AuthorizerContract
      */
     public function attachRelationship(Request $request, object $model, string $fieldName): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'attach' . Str::classify($fieldName),
-                [$model, $this->createRelation($request, $fieldName)]
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'attach' . Str::classify($fieldName),
+            [$model, $this->createRelation($request, $fieldName)]
+        );
     }
 
     /**
@@ -185,14 +153,10 @@ class Authorizer implements AuthorizerContract
      */
     public function detachRelationship(Request $request, object $model, string $fieldName): bool
     {
-        if ($this->mustAuthorize()) {
-            return $this->gate->check(
-                'detach' . Str::classify($fieldName),
-                [$model, $this->createRelation($request, $fieldName)]
-            );
-        }
-
-        return true;
+        return $this->authorizeAction(
+            'detach' . Str::classify($fieldName),
+            [$model, $this->createRelation($request, $fieldName)]
+        );
     }
 
     /**
@@ -227,6 +191,21 @@ class Authorizer implements AuthorizerContract
 
         return false;
     }
+
+    /**
+     * Should default resource authorization be run?
+     *
+     * @return bool
+     */
+    private function authorizeAction(string $action, $resource): bool
+    {
+        if ($this->mustAuthorize()) {
+            return $this->gate->check($action, $resource);
+        }
+
+        return true;
+    }
+
 
     /**
      * @return Schema
