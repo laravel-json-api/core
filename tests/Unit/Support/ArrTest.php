@@ -105,7 +105,7 @@ class ArrTest extends TestCase
     /**
      * @return array
      */
-    public function methodsProvider(): array
+    public static function methodsProvider(): array
     {
         return [
             ['camelize'],

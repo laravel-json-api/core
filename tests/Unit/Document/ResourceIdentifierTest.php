@@ -44,7 +44,7 @@ class ResourceIdentifierTest extends TestCase
     /**
      * @return array
      */
-    public function emptyIdProvider(): array
+    public static function emptyIdProvider(): array
     {
         return [
             [''],
