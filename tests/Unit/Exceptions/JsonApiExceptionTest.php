@@ -91,7 +91,7 @@ class JsonApiExceptionTest extends TestCase
     /**
      * @return array[]
      */
-    public function is4xxProvider(): array
+    public static function is4xxProvider(): array
     {
         return [
             [100, false],
@@ -122,7 +122,7 @@ class JsonApiExceptionTest extends TestCase
     /**
      * @return array[]
      */
-    public function is5xxProvider(): array
+    public static function is5xxProvider(): array
     {
         return [
             [100, false],

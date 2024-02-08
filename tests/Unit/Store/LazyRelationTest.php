@@ -64,7 +64,7 @@ class LazyRelationTest extends TestCase
     /**
      * @return array
      */
-    public function validToOneProvider(): array
+    public static function validToOneProvider(): array
     {
         return [
             'user' => [
@@ -138,7 +138,7 @@ class LazyRelationTest extends TestCase
     /**
      * @return array
      */
-    public function invalidIdentifierProvider(): array
+    public static function invalidIdentifierProvider(): array
     {
         return [
             'no type' => [

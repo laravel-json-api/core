@@ -81,7 +81,7 @@ class IncludePathIteratorTest extends TestCase
     /**
      * @return array[]
      */
-    public function depthProvider(): array
+    public static function depthProvider(): array
     {
         return [
             'one' => [1, ['author', 'comments', 'image']],
@@ -160,7 +160,7 @@ class IncludePathIteratorTest extends TestCase
     /**
      * @return array[]
      */
-    public function polymorphProvider(): array
+    public static function polymorphProvider(): array
     {
         return [
             'one' => [1, ['imageable']],

@@ -35,7 +35,7 @@ class QueryParametersTest extends TestCase
     /**
      * @return array
      */
-    public function keyProvider(): array
+    public static function keyProvider(): array
     {
         return [
             'fields' => ['fields', 'sparseFieldSets'],

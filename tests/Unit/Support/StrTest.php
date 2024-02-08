@@ -26,7 +26,7 @@ class StrTest extends TestCase
     /**
      * @return array
      */
-    public function dasherizeProvider(): array
+    public static function dasherizeProvider(): array
     {
         return [
             'simple' => ['foo', 'foo'],
@@ -49,7 +49,7 @@ class StrTest extends TestCase
     /**
      * @return array
      */
-    public function snakeProvider(): array
+    public static function snakeProvider(): array
     {
         return [
             'simple' => ['foo', 'foo'],
@@ -72,7 +72,7 @@ class StrTest extends TestCase
     /**
      * @return array
      */
-    public function underscoreProvider(): array
+    public static function underscoreProvider(): array
     {
         return [
             ['foo', 'foo'],
@@ -97,7 +97,7 @@ class StrTest extends TestCase
     /**
      * @return array
      */
-    public function camelizeProvider(): array
+    public static function camelizeProvider(): array
     {
         return [
             ['foo', 'foo'],
