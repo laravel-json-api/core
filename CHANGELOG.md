@@ -3,10 +3,13 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## Unreleased (Laravel 11)
+## Unreleased
+
+## [4.0.0] - 2024-03-12
 
 ### Changed
 
+- Package is now licensed under the [MIT License.](./LICENSE)
 - **BREAKING** Package now requires Laravel 11.
 - Minimum PHP version is now `8.2`.
 
