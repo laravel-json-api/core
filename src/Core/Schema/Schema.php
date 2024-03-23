@@ -24,11 +24,10 @@ use LaravelJsonApi\Contracts\Schema\Relation;
 use LaravelJsonApi\Contracts\Schema\Schema as SchemaContract;
 use LaravelJsonApi\Contracts\Schema\SchemaAware as SchemaAwareContract;
 use LaravelJsonApi\Contracts\Schema\Sortable;
+use LaravelJsonApi\Contracts\Schema\StaticSchema\StaticSchema;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Contracts\Store\Repository;
-use LaravelJsonApi\Core\Resources\ResourceResolver;
 use LaravelJsonApi\Core\Support\Arr;
-use LaravelJsonApi\Core\Support\Str;
 use LogicException;
 use Traversable;
 use function array_keys;
@@ -37,18 +36,6 @@ use function sprintf;
 
 abstract class Schema implements SchemaContract, IteratorAggregate
 {
-    /**
-     * @var Server
-     */
-    protected Server $server;
-
-    /**
-     * The resource type as it appears in URIs.
-     *
-     * @var string|null
-     */
-    protected static ?string $uriType = null;
-
     /**
      * The key name for the resource "id".
      *
@@ -93,16 +80,6 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     private ?array $relations = null;
 
     /**
-     * @var callable|null
-     */
-    private static $resourceTypeResolver;
-
-    /**
-     * @var callable|null
-     */
-    private static $resourceResolver;
-
-    /**
      * Get the resource fields.
      *
      * @return iterable
@@ -110,79 +87,23 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     abstract public function fields(): iterable;
 
     /**
-     * Specify the callback to use to guess the resource type from the schema class.
-     *
-     * @param callable $resolver
-     * @return void
-     */
-    public static function guessTypeUsing(callable $resolver): void
-    {
-        static::$resourceTypeResolver = $resolver;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function type(): string
-    {
-        $resolver = static::$resourceTypeResolver ?: new TypeResolver();
-
-        return $resolver(static::class);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function model(): string
-    {
-        if (isset(static::$model)) {
-            return static::$model;
-        }
-
-        throw new LogicException('The model class name must be set.');
-    }
-
-    /**
-     * Specify the callback to use to guess the resource class from the schema class.
-     *
-     * @param callable $resolver
-     * @return void
-     */
-    public static function guessResourceUsing(callable $resolver): void
-    {
-        static::$resourceResolver = $resolver;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function resource(): string
-    {
-        $resolver = static::$resourceResolver ?: new ResourceResolver();
-
-        return $resolver(static::class);
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public static function uriType(): string
-    {
-        if (static::$uriType) {
-            return static::$uriType;
-        }
-
-        return static::$uriType = Str::dasherize(static::type());
-    }
-
-    /**
      * Schema constructor.
      *
      * @param Server $server
+     * @param StaticSchema $static
      */
-    public function __construct(Server $server)
+    public function __construct(
+        protected readonly Server $server,
+        protected readonly StaticSchema $static,
+    ) {
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function type(): string
     {
-        $this->server = $server;
+        return $this->static->getType();
     }
 
     /**
@@ -208,7 +129,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     {
         $extra = Arr::wrap($extra);
 
-        array_unshift($extra, $this->uriType());
+        array_unshift($extra, $this->static->getUriType());
 
         return $this->server->url($extra, $secure);
     }

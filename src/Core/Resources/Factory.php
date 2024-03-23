@@ -14,27 +14,21 @@ namespace LaravelJsonApi\Core\Resources;
 use LaravelJsonApi\Contracts\Resources\Factory as FactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Core\Schema\StaticSchema\StaticContainer;
 use LogicException;
 use Throwable;
 use function sprintf;
 
-class Factory implements FactoryContract
+final readonly class Factory implements FactoryContract
 {
-
-    /**
-     * @var SchemaContainer
-     *
-     */
-    protected SchemaContainer $schemas;
-
     /**
      * Factory constructor.
      *
+     * @param StaticContainer $staticSchemas
      * @param SchemaContainer $schemas
      */
-    public function __construct(SchemaContainer $schemas)
+    public function __construct(private StaticContainer $staticSchemas, private SchemaContainer $schemas)
     {
-        $this->schemas = $schemas;
     }
 
     /**
@@ -72,9 +66,10 @@ class Factory implements FactoryContract
      */
     protected function build(Schema $schema, object $model): JsonApiResource
     {
-        $fqn = $schema->resource();
+        $fqn = $this->staticSchemas
+            ->schemaFor($schema)
+            ->getResourceClass();
 
         return new $fqn($schema, $model);
     }
-
 }

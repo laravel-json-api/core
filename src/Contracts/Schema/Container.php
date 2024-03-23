@@ -15,7 +15,6 @@ use LaravelJsonApi\Core\Values\ResourceType;
 
 interface Container
 {
-
     /**
      * Does a schema exist for the supplied resource type?
      *
@@ -43,18 +42,18 @@ interface Container
     /**
      * Get a schema for the provided model class.
      *
-     * @param string|object $model
+     * @param class-string|object $model
      * @return Schema
      */
-    public function schemaForModel($model): Schema;
+    public function schemaForModel(string|object $model): Schema;
 
     /**
      * Does a schema exist for the provided model class?
      *
-     * @param string|object $model
+     * @param class-string|object $model
      * @return bool
      */
-    public function existsForModel($model): bool;
+    public function existsForModel(string|object $model): bool;
 
     /**
      * Get the fully qualified model class for the provided resource type.

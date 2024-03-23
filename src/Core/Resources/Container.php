@@ -22,22 +22,15 @@ use function is_iterable;
 use function is_object;
 use function sprintf;
 
-class Container implements ContainerContract
+final readonly class Container implements ContainerContract
 {
-
-    /**
-     * @var Factory
-     */
-    private Factory $factory;
-
     /**
      * Container constructor.
      *
      * @param Factory $factory
      */
-    public function __construct(Factory $factory)
+    public function __construct(private Factory $factory)
     {
-        $this->factory = $factory;
     }
 
     /**

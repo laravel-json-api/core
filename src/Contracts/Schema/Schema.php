@@ -17,34 +17,12 @@ use Traversable;
 
 interface Schema extends Traversable
 {
-
     /**
      * Get the JSON:API resource type.
      *
-     * @return string
+     * @return non-empty-string
      */
-    public static function type(): string;
-
-    /**
-     * Get the fully-qualified class name of the model.
-     *
-     * @return string
-     */
-    public static function model(): string;
-
-    /**
-     * Get the fully-qualified class name of the resource.
-     *
-     * @return string
-     */
-    public static function resource(): string;
-
-    /**
-     * Get the resource type as it appears in URIs.
-     *
-     * @return string
-     */
-    public static function uriType(): string;
+    public function type(): string;
 
     /**
      * Get a repository for the resource.

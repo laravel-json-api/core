@@ -13,6 +13,7 @@ namespace LaravelJsonApi\Core\Schema;
 
 use LaravelJsonApi\Contracts\Schema\Container as ContainerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
+use LaravelJsonApi\Contracts\Schema\StaticSchema\StaticContainer;
 use LaravelJsonApi\Contracts\Server\Server;
 use LaravelJsonApi\Core\Support\ContainerResolver;
 use LaravelJsonApi\Core\Values\ResourceType;
@@ -22,33 +23,8 @@ use Throwable;
 use function get_class;
 use function is_object;
 
-class Container implements ContainerContract
+final class Container implements ContainerContract
 {
-    /**
-     * @var ContainerResolver
-     */
-    private ContainerResolver $container;
-
-    /**
-     * @var Server
-     */
-    private Server $server;
-
-    /**
-     * @var array
-     */
-    private array $types;
-
-    /**
-     * @var array
-     */
-    private array $uriTypes;
-
-    /**
-     * @var array
-     */
-    private array $models;
-
     /**
      * @var array
      */
@@ -60,30 +36,22 @@ class Container implements ContainerContract
     private array $aliases;
 
     /**
+     * @var array<class-string, class-string<Schema>>|null
+     */
+    private ?array $models = null;
+
+    /**
      * Container constructor.
      *
      * @param ContainerResolver $container
      * @param Server $server
-     * @param iterable $schemas
+     * @param StaticContainer $staticSchemas
      */
-    public function __construct(ContainerResolver $container, Server $server, iterable $schemas)
-    {
-        $this->container = $container;
-        $this->server = $server;
-        $this->types = [];
-        $this->uriTypes = [];
-        $this->models = [];
-        $this->schemas = [];
-        $this->aliases = [];
-
-        foreach ($schemas as $schemaClass) {
-            $type = $schemaClass::type();
-            $this->types[$type] = $schemaClass;
-            $this->uriTypes[$schemaClass::uriType()] = $type;
-            $this->models[$schemaClass::model()] = $schemaClass;
-        }
-
-        ksort($this->types);
+    public function __construct(
+        private readonly ContainerResolver $container,
+        private readonly Server $server,
+        private readonly StaticContainer $staticSchemas,
+    ) {
     }
 
     /**
@@ -91,9 +59,7 @@ class Container implements ContainerContract
      */
     public function exists(string|ResourceType $resourceType): bool
     {
-        $resourceType = (string) $resourceType;
-
-        return isset($this->types[$resourceType]);
+        return $this->staticSchemas->exists($resourceType);
     }
 
     /**
@@ -101,9 +67,9 @@ class Container implements ContainerContract
      */
     public function schemaFor(string|ResourceType $resourceType): Schema
     {
-        return $this->resolve(
-            $this->schemaClassFor($resourceType),
-        );
+        $class = $this->staticSchemas->schemaClassFor($resourceType);
+
+        return $this->resolve($class);
     }
 
     /**
@@ -111,13 +77,7 @@ class Container implements ContainerContract
      */
     public function schemaClassFor(string|ResourceType $type): string
     {
-        $type = (string) $type;
-
-        if (isset($this->types[$type])) {
-            return $this->types[$type];
-        }
-
-        throw new LogicException("No schema for JSON:API resource type {$resourceType}.");
+        return $this->staticSchemas->schemaClassFor($type);
     }
 
     /**
@@ -125,15 +85,13 @@ class Container implements ContainerContract
      */
     public function modelClassFor(string|ResourceType $resourceType): string
     {
-        return $this
-            ->schemaFor($resourceType)
-            ->model();
+        return $this->staticSchemas->modelClassFor($resourceType);
     }
 
     /**
      * @inheritDoc
      */
-    public function existsForModel($model): bool
+    public function existsForModel(string|object $model): bool
     {
         return !empty($this->resolveModelClassFor($model));
     }
@@ -141,7 +99,7 @@ class Container implements ContainerContract
     /**
      * @inheritDoc
      */
-    public function schemaForModel($model): Schema
+    public function schemaForModel(string|object $model): Schema
     {
         if ($class = $this->resolveModelClassFor($model)) {
             return $this->resolve(
@@ -160,9 +118,7 @@ class Container implements ContainerContract
      */
     public function schemaTypeForUri(string $uriType): ?ResourceType
     {
-        $value = $this->uriTypes[$uriType] ?? null;
-
-        return $value ? new ResourceType($value) : null;
+        return $this->staticSchemas->typeForUri($uriType);
     }
 
     /**
@@ -170,7 +126,7 @@ class Container implements ContainerContract
      */
     public function types(): array
     {
-        return array_keys($this->types);
+        return $this->staticSchemas->types();
     }
 
     /**
@@ -181,6 +137,13 @@ class Container implements ContainerContract
      */
     private function resolveModelClassFor(string|object $model): ?string
     {
+        if ($this->models === null) {
+            $this->models = [];
+            foreach ($this->staticSchemas as $staticSchema) {
+                $this->models[$staticSchema->getModel()] = $staticSchema->getSchemaClass();
+            }
+        }
+
         $model = is_object($model) ? get_class($model) : $model;
         $model = $this->aliases[$model] ?? $model;
 
@@ -226,6 +189,7 @@ class Container implements ContainerContract
             $schema = $this->container->instance()->make($schemaClass, [
                 'schemas' => $this,
                 'server' => $this->server,
+                'static' => $this->staticSchemas->schemaFor($schemaClass),
             ]);
         } catch (Throwable $ex) {
             throw new RuntimeException("Unable to create schema {$schemaClass}.", 0, $ex);
