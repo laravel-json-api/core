@@ -29,6 +29,14 @@ interface StaticContainer extends IteratorAggregate
     public function schemaFor(string|Schema $schema): StaticSchema;
 
     /**
+     * Get a static schema for the specified JSON:API resource type.
+     *
+     * @param ResourceType|string $type
+     * @return StaticSchema
+     */
+    public function schemaForType(ResourceType|string $type): StaticSchema;
+
+    /**
      * Does a schema exist for the supplied JSON:API resource type?
      *
      * @param ResourceType|non-empty-string $type

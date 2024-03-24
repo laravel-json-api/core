@@ -65,6 +65,16 @@ final class StaticContainer implements StaticContainerContract
     /**
      * @inheritDoc
      */
+    public function schemaForType(ResourceType|string $type): StaticSchema
+    {
+        return $this->schemaFor(
+            $this->schemaClassFor($type),
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function exists(ResourceType|string $type): bool
     {
         return isset($this->types[(string) $type]);

@@ -118,6 +118,22 @@ abstract class Server implements ServerContract
     /**
      * @inheritDoc
      */
+    public function statics(): StaticContainerContract
+    {
+        if ($this->staticContainer) {
+            return $this->staticContainer;
+        }
+
+        $staticSchemaFactory = new StaticSchemaFactory();
+
+        return $this->staticContainer = new StaticContainer(
+            $staticSchemaFactory->make($this->allSchemas()),
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function schemas(): SchemaContainerContract
     {
         if ($this->schemas) {
@@ -127,7 +143,7 @@ abstract class Server implements ServerContract
         return $this->schemas = new SchemaContainer(
             $this->app->container(),
             $this,
-            $this->staticSchemas(),
+            $this->statics(),
         );
     }
 
@@ -142,7 +158,7 @@ abstract class Server implements ServerContract
 
         return $this->resources = new ResourceContainer(
             new ResourceFactory(
-                $this->staticSchemas(),
+                $this->statics(),
                 $this->schemas(),
             ),
         );
@@ -231,21 +247,5 @@ abstract class Server implements ServerContract
     protected function app(): Application
     {
         return $this->app->instance();
-    }
-
-    /**
-     * @return StaticContainerContract
-     */
-    private function staticSchemas(): StaticContainerContract
-    {
-        if ($this->staticContainer) {
-            return $this->staticContainer;
-        }
-
-        $staticSchemaFactory = new StaticSchemaFactory();
-
-        return $this->staticContainer = new StaticContainer(
-            $staticSchemaFactory->make($this->allSchemas())
-        );
     }
 }

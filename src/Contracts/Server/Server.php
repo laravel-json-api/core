@@ -13,6 +13,7 @@ use LaravelJsonApi\Contracts\Auth\Container as AuthContainer;
 use LaravelJsonApi\Contracts\Encoder\Encoder;
 use LaravelJsonApi\Contracts\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
+use LaravelJsonApi\Contracts\Schema\StaticSchema\StaticContainer;
 use LaravelJsonApi\Contracts\Store\Store;
 use LaravelJsonApi\Core\Document\JsonApi;
 
@@ -32,6 +33,13 @@ interface Server
      * @return JsonApi
      */
     public function jsonApi(): JsonApi;
+
+    /**
+     * Get the server's static schemas.
+     *
+     * @return StaticContainer
+     */
+    public function statics(): StaticContainer;
 
     /**
      * Get the server's schemas.

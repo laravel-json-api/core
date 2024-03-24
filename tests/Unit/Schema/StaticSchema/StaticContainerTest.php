@@ -44,6 +44,28 @@ class StaticContainerTest extends TestCase
     /**
      * @return void
      */
+    public function testSchemaForType(): void
+    {
+        $a = $this->createSchema('App\JsonApi\V1\Post\PostSchema', 'posts');
+        $b = $this->createSchema('App\JsonApi\V1\Comments\CommentSchema', 'comments');
+        $c = $this->createSchema('App\JsonApi\V1\Tags\TagSchema', 'tags');
+
+        $container = new StaticContainer([$a, $b, $c]);
+
+        $this->assertSame([$a, $b, $c], iterator_to_array($container));
+        $this->assertSame($a, $container->schemaForType('posts'));
+        $this->assertSame($b, $container->schemaForType(new ResourceType('comments')));
+        $this->assertSame($c, $container->schemaForType('tags'));
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unrecognised resource type: foobar');
+
+        $container->schemaForType('foobar');
+    }
+
+    /**
+     * @return void
+     */
     public function testSchemaClassFor(): void
     {
         $container = new StaticContainer([
