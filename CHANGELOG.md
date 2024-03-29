@@ -9,6 +9,12 @@ All notable changes to this project will be documented in this file. This projec
 
 - The `once` method has been added to the server repository interface. This previously existed on the concrete class,
   but has now been added to the interface.
+- The schema `ID` contract now has a `matchAll()` method for matching multiple ids at once.
+
+### Changed
+
+- **BREAKING** The `match()` method on the schema `ID` contract now accepts an optional delimiter as its second
+  argument. When receiving a delimiter, the input value can have one-to-many ids separated by the provided delimiter.
 
 ## Unreleased
 

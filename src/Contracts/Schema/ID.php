@@ -31,10 +31,22 @@ interface ID extends Field
     /**
      * Does the value match the pattern?
      *
+     * If a delimiter is provided, the value can hold one-to-many ids separated
+     * by the provided delimiter.
+     *
      * @param string $value
+     * @param string $delimiter
      * @return bool
      */
-    public function match(string $value): bool;
+    public function match(string $value, string $delimiter = ''): bool;
+
+    /**
+     * Do all the values match the pattern?
+     *
+     * @param array<string> $values
+     * @return bool
+     */
+    public function matchAll(array $values): bool;
 
     /**
      * Does the resource accept client generated ids?

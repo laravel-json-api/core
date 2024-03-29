@@ -79,13 +79,42 @@ trait MatchesIds
     }
 
     /**
-     * Does the value match the ID's pattern?
+     * Does the value match the pattern?
      *
-     * @param string $resourceId
+     * If a delimiter is provided, the value can hold one-to-many ids separated
+     * by the provided delimiter.
+     *
+     * @param string $value
+     * @param string $delimiter
      * @return bool
      */
-    public function match(string $resourceId): bool
+    public function match(string $value, string $delimiter = ''): bool
     {
-        return 1 === preg_match("/^{$this->pattern}$/{$this->flags}", $resourceId);
+        if (strlen($delimiter) > 0) {
+            $delimiter = preg_quote($delimiter);
+            return 1 === preg_match(
+                "/^{$this->pattern}({$delimiter}{$this->pattern})*$/{$this->flags}",
+                $value,
+            );
+        }
+
+        return 1 === preg_match("/^{$this->pattern}$/{$this->flags}", $value);
+    }
+
+    /**
+     * Do all the values match the pattern?
+     *
+     * @param array<string> $values
+     * @return bool
+     */
+    public function matchAll(array $values): bool
+    {
+        foreach ($values as $value) {
+            if ($this->match($value) === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
