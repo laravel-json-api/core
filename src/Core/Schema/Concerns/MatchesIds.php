@@ -13,7 +13,6 @@ namespace LaravelJsonApi\Core\Schema\Concerns;
 
 trait MatchesIds
 {
-
     /**
      * @var string
      */
@@ -39,7 +38,7 @@ trait MatchesIds
      *
      * @return $this
      */
-    public function uuid(): self
+    public function uuid(): static
     {
         return $this->matchAs('[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}');
     }
@@ -49,7 +48,7 @@ trait MatchesIds
      *
      * @return $this
      */
-    public function ulid(): self
+    public function ulid(): static
     {
         return $this->matchAs('[0-7][0-9a-hjkmnp-tv-zA-HJKMNP-TV-Z]{25}');
     }
@@ -60,7 +59,7 @@ trait MatchesIds
      * @param string $pattern
      * @return $this
      */
-    public function matchAs(string $pattern): self
+    public function matchAs(string $pattern): static
     {
         $this->pattern = $pattern;
 
@@ -72,7 +71,7 @@ trait MatchesIds
      *
      * @return $this
      */
-    public function matchCase(): self
+    public function matchCase(): static
     {
         $this->flags = 'D';
 
