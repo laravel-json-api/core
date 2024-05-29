@@ -14,6 +14,7 @@ namespace LaravelJsonApi\Core\Responses\Internal;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use LaravelJsonApi\Core\Document\Links;
 use LaravelJsonApi\Core\Resources\JsonApiResource;
 use LaravelJsonApi\Core\Responses\Concerns\HasEncodingParameters;
 use LaravelJsonApi\Core\Responses\Concerns\HasRelationship;
@@ -52,6 +53,7 @@ class RelatedResourceResponse implements Responsable
     {
         $encoder = $this->server()->encoder();
 
+        $links = $this->allLinks();
         $document = $encoder
             ->withRequest($request)
             ->withIncludePaths($this->includePaths($request))
@@ -59,7 +61,7 @@ class RelatedResourceResponse implements Responsable
             ->withResource($this->related)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->allMeta())
-            ->withLinks($this->allLinks())
+            ->withLinks($this->allLinks()->relatedAsSelf())
             ->toJson($this->encodeOptions);
 
         return new Response(

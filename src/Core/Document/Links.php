@@ -191,6 +191,14 @@ class Links implements Serializable, IteratorAggregate, Countable, ArrayAccess
         return $this->has('related');
     }
 
+    public function relatedAsSelf(): self
+    {
+        if($this->forget('self')->hasRelated()){
+            $this->push(Link::fromArray('self', $this->getRelated()->toArray()));
+        }
+        return $this->forget('related');
+    }
+
     /**
      * Push links into the collection.
      *
