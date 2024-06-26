@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [4.1.0] - 2024-06-26
+
+### Fixed
+
+- [#17](https://github.com/laravel-json-api/core/pull/17) Fix incorrect `self` link in related resource responses, and
+  remove `related` link that should not exist. This has been incorrect for some time, but is definitely what
+  the [spec defines here.](https://jsonapi.org/format/1.0/#document-top-level)
+
 ## [4.0.0] - 2024-03-12
 
 ### Changed
