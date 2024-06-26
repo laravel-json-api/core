@@ -60,7 +60,7 @@ class RelatedResourceCollectionResponse implements Responsable
             ->withResources($this->related)
             ->withJsonApi($this->jsonApi())
             ->withMeta($this->allMeta())
-            ->withLinks($this->allLinks()->relatedAsSelf())
+            ->withLinks($this->allLinks())
             ->toJson($this->encodeOptions);
 
         return new Response(
@@ -68,5 +68,18 @@ class RelatedResourceCollectionResponse implements Responsable
             Response::HTTP_OK,
             $this->headers()
         );
+    }
+
+    /**
+     * Get all links.
+     *
+     * @return Links
+     */
+    private function allLinks(): Links
+    {
+        return $this
+            ->linksForRelationship()
+            ->relatedAsSelf()
+            ->merge($this->links());
     }
 }
