@@ -154,11 +154,12 @@ trait IsResponsable
      * Set response headers.
      *
      * @param array $headers
+     * @param bool $merge
      * @return $this
      */
     public function withHeaders(array $headers): self
     {
-        $this->headers = $headers;
+        $this->headers = array_merge($this->headers, $headers);
 
         return $this;
     }
