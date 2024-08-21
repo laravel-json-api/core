@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+
+- Response classes now have a `withoutHeaders()` method to remove headers from the response.
+
+### Fixed
+
+- [#18](https://github.com/laravel-json-api/core/pull/18) Ensure headers are merged when using the `withHeaders()`
+  method on the JSON:API response classes. This was previously not merging headers, which was not correct and therefore
+  this is a bug fix. If you were relying on this behaviour, use the new `withoutHeaders()` method to remove any headers.
+
 ## [4.1.0] - 2024-06-26
 
 ### Fixed

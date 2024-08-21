@@ -154,12 +154,26 @@ trait IsResponsable
      * Set response headers.
      *
      * @param array $headers
-     * @param bool $merge
      * @return $this
      */
     public function withHeaders(array $headers): self
     {
         $this->headers = array_merge($this->headers, $headers);
+
+        return $this;
+    }
+
+    /**
+     * Remove response headers.
+     *
+     * @param string ...$headers
+     * @return $this
+     */
+    public function withoutHeaders(string ...$headers): self
+    {
+        foreach ($headers as $header) {
+            unset($this->headers[$header]);
+        }
 
         return $this;
     }
@@ -171,7 +185,7 @@ trait IsResponsable
     {
         return array_merge(
             ['Content-Type' => 'application/vnd.api+json'],
-            $this->headers ?: [],
+            $this->headers,
         );
     }
 
