@@ -294,4 +294,23 @@ JSON;
 
         $this->assertSame(['related' => $related], $links->all());
     }
+
+    public function testRelatedToSelfWithRelated(): void
+    {
+        $links = new Links(
+            new Link('self', '/api/posts/1/relationships/author'),
+            new Link('related', '/api/posts/1/author'),
+        );
+
+        $this->assertEquals(['self' => new Link('self', '/api/posts/1/author'),], $links->relatedAsSelf()->all());
+    }
+
+    public function testRelatedToSelfWithoutRelated(): void
+    {
+        $links = new Links(
+            new Link('self', '/api/posts/1/relationships/author'),
+        );
+
+        $this->assertTrue($links->relatedAsSelf()->isEmpty());
+    }
 }

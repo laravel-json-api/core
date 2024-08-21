@@ -40,7 +40,22 @@ trait HasHeaders
      */
     public function withHeaders(array $headers): static
     {
-        $this->headers = $headers;
+        $this->headers = [...$this->headers, ...$headers];
+
+        return $this;
+    }
+
+    /**
+     * Remove response headers.
+     *
+     * @param string ...$headers
+     * @return $this
+     */
+    public function withoutHeaders(string ...$headers): static
+    {
+        foreach ($headers as $header) {
+            unset($this->headers[$header]);
+        }
 
         return $this;
     }
