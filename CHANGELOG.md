@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [4.2.0] - 2024-08-21
+
 ### Added
 
 - Response classes now have a `withoutHeaders()` method to remove headers from the response.
