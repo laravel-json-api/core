@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [4.3.0] - 2024-11-26
+
+### Added
+
+- [#19](https://github.com/laravel-json-api/core/pull/19) The `Authorizer` contract now allows all methods to return a
+  `bool` or an authorizer response.
+
 ### Fixed
 
 - Removed deprecation notices in PHP 8.4.
