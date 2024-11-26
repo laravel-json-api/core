@@ -143,7 +143,7 @@ trait IsResponsable
      * @param string|null $value
      * @return $this
      */
-    public function withHeader(string $name, string $value = null): self
+    public function withHeader(string $name, ?string $value = null): self
     {
         $this->headers[$name] = $value;
 

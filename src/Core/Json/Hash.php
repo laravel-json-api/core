@@ -55,7 +55,7 @@ class Hash implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Json
      *
      * @param array|null $value
      */
-    public function __construct(array $value = null)
+    public function __construct(?array $value = null)
     {
         $this->value = $value ?: [];
     }

@@ -158,12 +158,12 @@ class QueryParameters implements QueryParametersContract, Arrayable
      * @param array|null $unrecognised
      */
     public function __construct(
-        IncludePaths $includePaths = null,
-        FieldSets $fieldSets = null,
-        SortFields $sortFields = null,
-        array $page = null,
-        FilterParameters $filters = null,
-        array $unrecognised = null
+        ?IncludePaths $includePaths = null,
+        ?FieldSets $fieldSets = null,
+        ?SortFields $sortFields = null,
+        ?array $page = null,
+        ?FilterParameters $filters = null,
+        ?array $unrecognised = null
     ) {
         $this->includePaths = $includePaths;
         $this->fieldSets = $fieldSets;

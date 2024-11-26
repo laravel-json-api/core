@@ -34,7 +34,7 @@ class JsonApi implements Serializable
      * @param string|null $version
      * @return JsonApi
      */
-    public static function make(string $version = null): self
+    public static function make(?string $version = null): self
     {
         return new self($version);
     }
@@ -113,7 +113,7 @@ class JsonApi implements Serializable
      *
      * @param string|null $version
      */
-    public function __construct(string $version = null)
+    public function __construct(?string $version = null)
     {
         $this->version = $version ?: null;
     }

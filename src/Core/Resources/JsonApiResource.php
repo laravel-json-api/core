@@ -309,7 +309,7 @@ class JsonApiResource implements ArrayAccess, Responsable
      * @param string|null $keyName
      * @return Relation
      */
-    protected function relation(string $fieldName, string $keyName = null): Relation
+    protected function relation(string $fieldName, ?string $keyName = null): Relation
     {
         $field = $this->schema->isRelationship($fieldName) ? $this->schema->relationship($fieldName) : null;
 
