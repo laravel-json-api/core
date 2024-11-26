@@ -34,7 +34,7 @@ class ExtendedQueryParameters extends QueryParameters
      * @param string|null $name
      * @return string
      */
-    public static function withCount(string $name = null): string
+    public static function withCount(?string $name = null): string
     {
         if (empty($name)) {
             return self::$withCount;
@@ -59,12 +59,12 @@ class ExtendedQueryParameters extends QueryParameters
      * @param array|null $unrecognised
      */
     public function __construct(
-        IncludePaths $includePaths = null,
-        FieldSets $fieldSets = null,
-        SortFields $sortFields = null,
-        array $page = null,
-        FilterParameters $filters = null,
-        array $unrecognised = null
+        ?IncludePaths $includePaths = null,
+        ?FieldSets $fieldSets = null,
+        ?SortFields $sortFields = null,
+        ?array $page = null,
+        ?FilterParameters $filters = null,
+        ?array $unrecognised = null
     ) {
         parent::__construct(
             $includePaths,

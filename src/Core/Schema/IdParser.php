@@ -44,7 +44,7 @@ final class IdParser implements IdEncoderContract
      * @param ID|null $field
      * @return static
      */
-    public static function make(ID $field = null): self
+    public static function make(?ID $field = null): self
     {
         return new self($field);
     }

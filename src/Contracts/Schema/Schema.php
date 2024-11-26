@@ -72,7 +72,7 @@ interface Schema extends Traversable
      * @param bool|null $secure
      * @return string
      */
-    public function url($extra = [], bool $secure = null): string;
+    public function url($extra = [], ?bool $secure = null): string;
 
     /**
      * Do resources of this type have a `self` link?

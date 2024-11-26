@@ -159,7 +159,7 @@ abstract class Server implements ServerContract
     /**
      * @inheritDoc
      */
-    public function url($extra = [], bool $secure = null): string
+    public function url($extra = [], ?bool $secure = null): string
     {
         $tail = Collection::make(Arr::wrap($extra))
             ->map(fn($value) => ($value instanceof UrlRoutable) ? $value->getRouteKey() : $value)
