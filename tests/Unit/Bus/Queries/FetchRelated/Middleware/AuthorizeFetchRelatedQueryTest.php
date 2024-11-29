@@ -199,7 +199,7 @@ class AuthorizeFetchRelatedQueryTest extends TestCase
         ?Request $request,
         object $model,
         string $fieldName,
-        ErrorList $expected = null
+        ?ErrorList $expected = null
     ): void
     {
         $this->authorizerFactory

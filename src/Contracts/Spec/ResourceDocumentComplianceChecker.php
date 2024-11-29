@@ -24,7 +24,7 @@ interface ResourceDocumentComplianceChecker
      * @param ResourceId|string|null $id
      * @return $this
      */
-    public function mustSee(ResourceType|string $type, ResourceId|string $id = null): static;
+    public function mustSee(ResourceType|string $type, ResourceId|string|null $id = null): static;
 
     /**
      * Check whether the provided content passes compliance with the JSON:API spec.

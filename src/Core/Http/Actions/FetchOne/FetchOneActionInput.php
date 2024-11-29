@@ -40,7 +40,7 @@ class FetchOneActionInput extends ActionInput implements IsIdentifiable
         Request $request,
         ResourceType $type,
         ResourceId $id,
-        object $model = null,
+        ?object $model = null,
     ) {
         parent::__construct($request, $type);
         $this->id = $id;

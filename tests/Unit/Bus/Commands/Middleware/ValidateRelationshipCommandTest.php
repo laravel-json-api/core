@@ -95,7 +95,7 @@ class ValidateRelationshipCommandTest extends TestCase
     {
         return [
             'update' => [
-                function (ResourceType $type, Request $request = null): UpdateRelationshipCommand {
+                function (ResourceType $type, ?Request $request = null): UpdateRelationshipCommand {
                     $operation = new UpdateToOne(
                         new Ref(type: $type, id: new ResourceId('123'), relationship: 'author'),
                         new ResourceIdentifier(new ResourceType('users'), new ResourceId('456')),
@@ -105,7 +105,7 @@ class ValidateRelationshipCommandTest extends TestCase
                 },
             ],
             'attach' => [
-                function (ResourceType $type, Request $request = null): AttachRelationshipCommand {
+                function (ResourceType $type, ?Request $request = null): AttachRelationshipCommand {
                     $operation = new UpdateToMany(
                         OpCodeEnum::Add,
                         new Ref(type: $type, id: new ResourceId('123'), relationship: 'tags'),
@@ -116,7 +116,7 @@ class ValidateRelationshipCommandTest extends TestCase
                 },
             ],
             'detach' => [
-                function (ResourceType $type, Request $request = null): DetachRelationshipCommand {
+                function (ResourceType $type, ?Request $request = null): DetachRelationshipCommand {
                     $operation = new UpdateToMany(
                         OpCodeEnum::Remove,
                         new Ref(type: $type, id: new ResourceId('123'), relationship: 'tags'),

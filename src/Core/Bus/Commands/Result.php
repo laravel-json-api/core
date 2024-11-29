@@ -29,7 +29,7 @@ class Result implements ResultContract
      * @param Payload|null $payload
      * @return self
      */
-    public static function ok(Payload $payload = null): self
+    public static function ok(?Payload $payload = null): self
     {
         return new self(true, $payload ?? new Payload(null, false));
     }

@@ -42,7 +42,7 @@ class FetchRelatedActionInput extends ActionInput implements IsRelatable
         ResourceType $type,
         ResourceId $id,
         string $fieldName,
-        object $model = null,
+        ?object $model = null,
     ) {
         parent::__construct($request, $type);
         $this->id = $id;

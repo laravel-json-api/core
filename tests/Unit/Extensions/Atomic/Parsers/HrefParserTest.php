@@ -184,7 +184,7 @@ class HrefParserTest extends TestCase
      * @param string|null $relationship
      * @return void
      */
-    private function withSchema(ParsedHref $expected, ResourceType $type = null, string $relationship = null): void
+    private function withSchema(ParsedHref $expected, ?ResourceType $type = null, ?string $relationship = null): void
     {
         $type = $type ?? $expected->type;
 

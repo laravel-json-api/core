@@ -64,7 +64,7 @@ class Container implements ContainerContract
     public function __construct(
         private readonly ContainerResolver $container,
         private readonly SchemaContainer $schemas,
-        callable $resolver = null
+        ?callable $resolver = null
     ) {
         $this->resolver = $resolver ?? self::resolver();
     }

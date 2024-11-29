@@ -27,7 +27,7 @@ class HttpNotAcceptableException extends HttpException
      */
     public function __construct(
         string $message = '',
-        Throwable $previous = null,
+        ?Throwable $previous = null,
         array $headers = [],
         int $code = 0
     ) {

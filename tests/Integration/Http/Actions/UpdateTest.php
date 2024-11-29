@@ -500,7 +500,7 @@ class UpdateTest extends TestCase
      * @param object|null $model
      * @return stdClass
      */
-    private function willStore(string $type, array $validated, object $model = null): object
+    private function willStore(string $type, array $validated, ?object $model = null): object
     {
         $model = $model ?? new \stdClass();
 

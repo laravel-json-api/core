@@ -25,7 +25,7 @@ trait HasHeaders
      * @param string|null $value
      * @return $this
      */
-    public function withHeader(string $name, string $value = null): static
+    public function withHeader(string $name, ?string $value = null): static
     {
         $this->headers[$name] = $value;
 
