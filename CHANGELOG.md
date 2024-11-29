@@ -18,6 +18,31 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.0.0] - 2024-11-29
+
+### Added
+
+- **BREAKING**: [#21](https://github.com/laravel-json-api/core/pull/21) The `Authorizer` contract now allows all methods
+  to return a `bool` or an Illuminate authorization response.
+
+## [4.3.1] - 2024-11-29
+
+### Fixed
+
+- Reverted [#19](https://github.com/laravel-json-api/core/pull/19) as the changes were breaking, so should not have been
+  released as a minor version.
+
+## [4.3.0] - 2024-11-26
+
+### Added
+
+- [#19](https://github.com/laravel-json-api/core/pull/19) The `Authorizer` contract now allows all methods to return a
+  `bool` or an authorizer response.
+
+### Fixed
+
+- Removed deprecation notices in PHP 8.4.
+
 ## [4.2.0] - 2024-08-21
 
 ### Added

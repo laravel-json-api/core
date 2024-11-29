@@ -91,8 +91,8 @@ class Relation implements JsonApiRelation
         object $resource,
         ?string $baseUri,
         string $fieldName,
-        string $keyName = null,
-        string $uriName = null
+        ?string $keyName = null,
+        ?string $uriName = null
     ) {
         $this->resource = $resource;
         $this->baseUri = $baseUri;

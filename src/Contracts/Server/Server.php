@@ -90,5 +90,5 @@ interface Server
      * @param bool|null $secure
      * @return string
      */
-    public function url($extra = [], bool $secure = null): string;
+    public function url($extra = [], ?bool $secure = null): string;
 }

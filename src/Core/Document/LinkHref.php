@@ -56,7 +56,7 @@ class LinkHref implements JsonSerializable
      * @param string $uri
      * @param iterable|null $query
      */
-    public function __construct(string $uri, iterable $query = null)
+    public function __construct(string $uri, ?iterable $query = null)
     {
         if (empty($uri)) {
             throw new UnexpectedValueException('Expecting a non-empty string URI.');

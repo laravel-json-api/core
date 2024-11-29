@@ -25,7 +25,7 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "illuminate/auth": "^11.0",
+        "illuminate/auth": "^11.33",
         "illuminate/contracts": "^11.0",
         "illuminate/http": "^11.0",
         "illuminate/pipeline": "^11.0",
@@ -47,8 +47,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "4.x-dev",
-            "dev-next": "5.x-dev"
+            "dev-develop": "5.x-dev",
+            "dev-next": "6.x-dev"
         }
     },
     "minimum-stability": "stable",
