@@ -87,7 +87,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function update(Request $request, object $model): bool|Response
+    public function update(?Request $request, object $model): bool|Response
     {
         if ($this->mustAuthorize()) {
             return $this->gate->inspect(
@@ -102,7 +102,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function destroy(Request $request, object $model): bool|Response
+    public function destroy(?Request $request, object $model): bool|Response
     {
         if ($this->mustAuthorize()) {
             return $this->gate->inspect(
@@ -117,7 +117,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function showRelated(Request $request, object $model, string $fieldName): bool|Response
+    public function showRelated(?Request $request, object $model, string $fieldName): bool|Response
     {
         if ($this->mustAuthorize()) {
             return $this->gate->inspect(
@@ -132,7 +132,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function showRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function showRelationship(?Request $request, object $model, string $fieldName): bool|Response
     {
         return $this->showRelated($request, $model, $fieldName);
     }
@@ -140,7 +140,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function updateRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function updateRelationship(?Request $request, object $model, string $fieldName): bool|Response
     {
         if ($this->mustAuthorize()) {
             return $this->gate->inspect(
@@ -155,7 +155,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function attachRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function attachRelationship(?Request $request, object $model, string $fieldName): bool|Response
     {
         if ($this->mustAuthorize()) {
             return $this->gate->inspect(
@@ -170,7 +170,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function detachRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function detachRelationship(?Request $request, object $model, string $fieldName): bool|Response
     {
         if ($this->mustAuthorize()) {
             return $this->gate->inspect(
@@ -197,16 +197,16 @@ class Authorizer implements AuthorizerContract
     /**
      * Create a lazy relation object.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param string $fieldName
      * @return LazyRelation
      */
-    private function createRelation(Request $request, string $fieldName): LazyRelation
+    private function createRelation(?Request $request, string $fieldName): LazyRelation
     {
         return new LazyRelation(
             $this->service->server(),
             $this->schema()->relationship($fieldName),
-            $request->json()->all()
+            $request?->json()->all() ?? [],
         );
     }
 

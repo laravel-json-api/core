@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Auth;
 
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
@@ -44,7 +45,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $this->modelClass,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -67,7 +68,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $this->modelClass,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -90,7 +91,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $model,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -113,7 +114,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $model,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -136,7 +137,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $model,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -160,7 +161,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $fieldName,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -184,7 +185,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $fieldName,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -208,7 +209,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $fieldName,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -232,7 +233,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $fieldName,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -256,7 +257,7 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
             $fieldName,
         );
 
-        return $passes ? null : $this->failed();
+        return $this->parse($passes);
     }
 
     /**
@@ -267,6 +268,23 @@ final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
         if ($errors = $this->detachRelationship($request, $model, $fieldName)) {
             throw new JsonApiException($errors);
         }
+    }
+
+    /**
+     * @param bool|Response $result
+     * @return ErrorList|null
+     * @throws AuthenticationException
+     * @throws AuthorizationException
+     * @throws HttpExceptionInterface
+     */
+    private function parse(bool|Response $result): ?ErrorList
+    {
+        if ($result instanceof Response) {
+            $result->authorize();
+            return null;
+        }
+
+        return $result ? null : $this->failed();
     }
 
     /**
