@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Auth;
 
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Auth\Access\Response;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
 use LaravelJsonApi\Contracts\Schema\Schema;
@@ -48,10 +47,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function index(Request $request, string $modelClass): bool|Response
+    public function index(Request $request, string $modelClass): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'viewAny',
                 $modelClass
             );
@@ -63,10 +62,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function store(Request $request, string $modelClass): bool|Response
+    public function store(Request $request, string $modelClass): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'create',
                 $modelClass
             );
@@ -78,10 +77,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function show(Request $request, object $model): bool|Response
+    public function show(Request $request, object $model): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'view',
                 $model
             );
@@ -93,10 +92,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function update(Request $request, object $model): bool|Response
+    public function update(Request $request, object $model): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'update',
                 $model
             );
@@ -108,10 +107,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function destroy(Request $request, object $model): bool|Response
+    public function destroy(Request $request, object $model): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'delete',
                 $model
             );
@@ -123,10 +122,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function showRelated(Request $request, object $model, string $fieldName): bool|Response
+    public function showRelated(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'view' . Str::classify($fieldName),
                 $model
             );
@@ -138,7 +137,7 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function showRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function showRelationship(Request $request, object $model, string $fieldName): bool
     {
         return $this->showRelated($request, $model, $fieldName);
     }
@@ -146,10 +145,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function updateRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function updateRelationship(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'update' . Str::classify($fieldName),
                 [$model, $this->createRelation($request, $fieldName)]
             );
@@ -161,10 +160,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function attachRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function attachRelationship(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'attach' . Str::classify($fieldName),
                 [$model, $this->createRelation($request, $fieldName)]
             );
@@ -176,10 +175,10 @@ class Authorizer implements AuthorizerContract
     /**
      * @inheritDoc
      */
-    public function detachRelationship(Request $request, object $model, string $fieldName): bool|Response
+    public function detachRelationship(Request $request, object $model, string $fieldName): bool
     {
         if ($this->mustAuthorize()) {
-            return $this->gate->inspect(
+            return $this->gate->check(
                 'detach' . Str::classify($fieldName),
                 [$model, $this->createRelation($request, $fieldName)]
             );
