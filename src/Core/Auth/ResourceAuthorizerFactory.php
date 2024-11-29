@@ -12,10 +12,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Auth;
 
 use LaravelJsonApi\Contracts\Auth\Container as AuthorizerContainer;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory as ResourceAuthorizerFactoryContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Values\ResourceType;
 
-class ResourceAuthorizerFactory
+final readonly class ResourceAuthorizerFactory implements ResourceAuthorizerFactoryContract
 {
     /**
      * ResourceAuthorizerFactory constructor
@@ -24,16 +25,13 @@ class ResourceAuthorizerFactory
      * @param SchemaContainer $schemaContainer
      */
     public function __construct(
-        private readonly AuthorizerContainer $authorizerContainer,
-        private readonly SchemaContainer $schemaContainer,
+        private AuthorizerContainer $authorizerContainer,
+        private SchemaContainer $schemaContainer,
     ) {
     }
 
     /**
-     * Return a new resource authorizer instance.
-     *
-     * @param ResourceType|string $type
-     * @return ResourceAuthorizer
+     * @inheritDoc
      */
     public function make(ResourceType|string $type): ResourceAuthorizer
     {

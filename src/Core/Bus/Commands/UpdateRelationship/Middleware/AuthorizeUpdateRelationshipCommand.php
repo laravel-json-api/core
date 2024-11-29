@@ -12,19 +12,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\Middleware;
 
 use Closure;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\HandlesUpdateRelationshipCommands;
 use LaravelJsonApi\Core\Bus\Commands\UpdateRelationship\UpdateRelationshipCommand;
 
-class AuthorizeUpdateRelationshipCommand implements HandlesUpdateRelationshipCommands
+final readonly class AuthorizeUpdateRelationshipCommand implements HandlesUpdateRelationshipCommands
 {
     /**
      * AuthorizeUpdateRelationshipCommand constructor
      *
      * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
+    public function __construct(private ResourceAuthorizerFactory $authorizerFactory)
     {
     }
 

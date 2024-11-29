@@ -14,8 +14,10 @@ namespace LaravelJsonApi\Core\Tests\Integration;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 use Illuminate\Contracts\Translation\Translator;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory as ResourceAuthorizerFactoryContract;
 use LaravelJsonApi\Contracts\Bus\Commands\Dispatcher as CommandDispatcherContract;
 use LaravelJsonApi\Contracts\Bus\Queries\Dispatcher as QueryDispatcherContract;
+use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Commands\Dispatcher as CommandDispatcher;
 use LaravelJsonApi\Core\Bus\Queries\Dispatcher as QueryDispatcher;
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -46,5 +48,6 @@ class TestCase extends BaseTestCase
         /** Laravel JSON:API */
         $this->container->bind(CommandDispatcherContract::class, CommandDispatcher::class);
         $this->container->bind(QueryDispatcherContract::class, QueryDispatcher::class);
+        $this->container->bind(ResourceAuthorizerFactoryContract::class, ResourceAuthorizerFactory::class);
     }
 }

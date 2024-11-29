@@ -13,9 +13,9 @@ namespace LaravelJsonApi\Core\Tests\Unit\Bus\Queries\FetchMany\Middleware;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizer;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Contracts\Query\QueryParameters;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizer;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\FetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware\AuthorizeFetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\Result;

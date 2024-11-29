@@ -13,8 +13,8 @@ namespace LaravelJsonApi\Core\Tests\Unit\Http\Actions\UpdateRelationship\Middlew
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizer;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizer;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\Middleware\AuthorizeUpdateRelationshipAction;
 use LaravelJsonApi\Core\Http\Actions\UpdateRelationship\UpdateRelationshipActionInput;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;

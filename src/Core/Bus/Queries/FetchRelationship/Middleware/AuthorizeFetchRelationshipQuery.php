@@ -12,19 +12,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\FetchRelationship\Middleware;
 
 use Closure;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\FetchRelationshipQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchRelationship\HandlesFetchRelationshipQueries;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 
-class AuthorizeFetchRelationshipQuery implements HandlesFetchRelationshipQueries
+final readonly class AuthorizeFetchRelationshipQuery implements HandlesFetchRelationshipQueries
 {
     /**
      * AuthorizeFetchRelatedQuery constructor
      *
      * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
+    public function __construct(private ResourceAuthorizerFactory $authorizerFactory)
     {
     }
 

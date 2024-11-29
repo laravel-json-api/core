@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 interface Authorizer
 {
     /**
-     * Authorize the index controller action.
+     * Authorize a JSON:API index query.
      *
      * @param Request|null $request
      * @param string $modelClass
@@ -49,72 +49,72 @@ interface Authorizer
     public function show(?Request $request, object $model): bool|Response;
 
     /**
-     * Authorize the update controller action.
+     * Authorize a JSON:API update command.
      *
      * @param object $model
-     * @param Request $request
+     * @param Request|null $request
      * @return bool|Response
      */
-    public function update(Request $request, object $model): bool|Response;
+    public function update(?Request $request, object $model): bool|Response;
 
     /**
-     * Authorize the destroy controller action.
+     * Authorize a JSON:API destroy command.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param object $model
      * @return bool|Response
      */
-    public function destroy(Request $request, object $model): bool|Response;
+    public function destroy(?Request $request, object $model): bool|Response;
 
     /**
-     * Authorize the show-related controller action.
+     * Authorize a JSON:API show related query.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param object $model
      * @param string $fieldName
      * @return bool|Response
      */
-    public function showRelated(Request $request, object $model, string $fieldName): bool|Response;
+    public function showRelated(?Request $request, object $model, string $fieldName): bool|Response;
 
     /**
-     * Authorize the show-relationship controller action.
+     * Authorize a JSON:API show relationship query.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param object $model
      * @param string $fieldName
      * @return bool|Response
      */
-    public function showRelationship(Request $request, object $model, string $fieldName): bool|Response;
+    public function showRelationship(?Request $request, object $model, string $fieldName): bool|Response;
 
     /**
-     * Authorize the update-relationship controller action.
+     * Authorize a JSON:API update relationship command.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param object $model
      * @param string $fieldName
      * @return bool|Response
      */
-    public function updateRelationship(Request $request, object $model, string $fieldName): bool|Response;
+    public function updateRelationship(?Request $request, object $model, string $fieldName): bool|Response;
 
     /**
-     * Authorize the attach-relationship controller action.
+     * Authorize a JSON:API attach relationship command.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param object $model
      * @param string $fieldName
      * @return bool|Response
      */
-    public function attachRelationship(Request $request, object $model, string $fieldName): bool|Response;
+    public function attachRelationship(?Request $request, object $model, string $fieldName): bool|Response;
 
     /**
-     * Authorize the detach-relationship controller action.
+     * Authorize a JSON:API detach relationship command.
      *
-     * @param Request $request
+     * @param Request|null $request
      * @param object $model
      * @param string $fieldName
      * @return bool|Response
      */
-    public function detachRelationship(Request $request, object $model, string $fieldName): bool|Response;
+    public function detachRelationship(?Request $request, object $model, string $fieldName): bool|Response;
 
     /**
      * Get JSON:API errors describing the failure, or throw an appropriate exception.

@@ -12,19 +12,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Commands\Store\Middleware;
 
 use Closure;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Commands\Result;
 use LaravelJsonApi\Core\Bus\Commands\Store\HandlesStoreCommands;
 use LaravelJsonApi\Core\Bus\Commands\Store\StoreCommand;
 
-class AuthorizeStoreCommand implements HandlesStoreCommands
+final readonly class AuthorizeStoreCommand implements HandlesStoreCommands
 {
     /**
      * AuthorizeStoreCommand constructor
      *
      * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
+    public function __construct(private ResourceAuthorizerFactory $authorizerFactory)
     {
     }
 

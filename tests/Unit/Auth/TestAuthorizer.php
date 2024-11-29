@@ -12,10 +12,11 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Tests\Unit\Auth;
 
 use Illuminate\Http\Request;
+use LaravelJsonApi\Contracts\Auth\Authorizer;
 use LaravelJsonApi\Core\Document\Error;
 use LaravelJsonApi\Core\Document\ErrorList;
 
-class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
+class TestAuthorizer implements Authorizer
 {
     /**
      * @inheritDoc
@@ -44,7 +45,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function update(Request $request, object $model): bool
+    public function update(?Request $request, object $model): bool
     {
         // TODO: Implement update() method.
     }
@@ -52,7 +53,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function destroy(Request $request, object $model): bool
+    public function destroy(?Request $request, object $model): bool
     {
         // TODO: Implement destroy() method.
     }
@@ -60,7 +61,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function showRelated(Request $request, object $model, string $fieldName): bool
+    public function showRelated(?Request $request, object $model, string $fieldName): bool
     {
         // TODO: Implement showRelated() method.
     }
@@ -68,7 +69,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function showRelationship(Request $request, object $model, string $fieldName): bool
+    public function showRelationship(?Request $request, object $model, string $fieldName): bool
     {
         // TODO: Implement showRelationship() method.
     }
@@ -76,7 +77,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function updateRelationship(Request $request, object $model, string $fieldName): bool
+    public function updateRelationship(?Request $request, object $model, string $fieldName): bool
     {
         // TODO: Implement updateRelationship() method.
     }
@@ -84,7 +85,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function attachRelationship(Request $request, object $model, string $fieldName): bool
+    public function attachRelationship(?Request $request, object $model, string $fieldName): bool
     {
         // TODO: Implement attachRelationship() method.
     }
@@ -92,7 +93,7 @@ class TestAuthorizer implements \LaravelJsonApi\Contracts\Auth\Authorizer
     /**
      * @inheritDoc
      */
-    public function detachRelationship(Request $request, object $model, string $fieldName): bool
+    public function detachRelationship(?Request $request, object $model, string $fieldName): bool
     {
         // TODO: Implement detachRelationship() method.
     }

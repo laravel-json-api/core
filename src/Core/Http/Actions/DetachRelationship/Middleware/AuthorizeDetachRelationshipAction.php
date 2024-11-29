@@ -12,20 +12,20 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Http\Actions\DetachRelationship\Middleware;
 
 use Closure;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Http\Actions\DetachRelationship\DetachRelationshipActionInput;
 use LaravelJsonApi\Core\Http\Actions\DetachRelationship\HandlesDetachRelationshipActions;
 use LaravelJsonApi\Core\Responses\NoContentResponse;
 use LaravelJsonApi\Core\Responses\RelationshipResponse;
 
-class AuthorizeDetachRelationshipAction implements HandlesDetachRelationshipActions
+final readonly class AuthorizeDetachRelationshipAction implements HandlesDetachRelationshipActions
 {
     /**
      * AuthorizeDetachRelationshipAction constructor
      *
      * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
+    public function __construct(private ResourceAuthorizerFactory $authorizerFactory)
     {
     }
 

@@ -12,19 +12,19 @@ declare(strict_types=1);
 namespace LaravelJsonApi\Core\Bus\Queries\FetchMany\Middleware;
 
 use Closure;
-use LaravelJsonApi\Core\Auth\ResourceAuthorizerFactory;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizerFactory;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\FetchManyQuery;
 use LaravelJsonApi\Core\Bus\Queries\FetchMany\HandlesFetchManyQueries;
 use LaravelJsonApi\Core\Bus\Queries\Result;
 
-class AuthorizeFetchManyQuery implements HandlesFetchManyQueries
+final readonly class AuthorizeFetchManyQuery implements HandlesFetchManyQueries
 {
     /**
      * AuthorizeFetchOneQuery constructor
      *
      * @param ResourceAuthorizerFactory $authorizerFactory
      */
-    public function __construct(private readonly ResourceAuthorizerFactory $authorizerFactory)
+    public function __construct(private ResourceAuthorizerFactory $authorizerFactory)
     {
     }
 

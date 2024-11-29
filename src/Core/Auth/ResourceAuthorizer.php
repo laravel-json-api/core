@@ -15,11 +15,12 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use LaravelJsonApi\Contracts\Auth\Authorizer as AuthorizerContract;
+use LaravelJsonApi\Contracts\Auth\ResourceAuthorizer as ResourceAuthorizerContract;
 use LaravelJsonApi\Core\Document\ErrorList;
 use LaravelJsonApi\Core\Exceptions\JsonApiException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
-class ResourceAuthorizer
+final readonly class ResourceAuthorizer implements ResourceAuthorizerContract
 {
     /**
      * ResourceAuthorizer constructor
@@ -28,19 +29,13 @@ class ResourceAuthorizer
      * @param string $modelClass
      */
     public function __construct(
-        private readonly AuthorizerContract $authorizer,
-        private readonly string $modelClass,
+        private AuthorizerContract $authorizer,
+        private string $modelClass,
     ) {
     }
 
     /**
-     * Authorize a JSON:API index query.
-     *
-     * @param Request|null $request
-     * @return ErrorList|null
-     * @throws AuthenticationException
-     * @throws AuthorizationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function index(?Request $request): ?ErrorList
     {
@@ -53,13 +48,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API index query or fail.
-     *
-     * @param Request|null $request
-     * @return void
-     * @throws AuthenticationException
-     * @throws AuthorizationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function indexOrFail(?Request $request): void
     {
@@ -69,13 +58,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API store operation.
-     *
-     * @param Request|null $request
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function store(?Request $request): ?ErrorList
     {
@@ -88,13 +71,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API store operation or fail.
-     *
-     * @param Request|null $request
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function storeOrFail(?Request $request): void
     {
@@ -104,14 +81,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API show query.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function show(?Request $request, object $model): ?ErrorList
     {
@@ -124,14 +94,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API show query, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function showOrFail(?Request $request, object $model): void
     {
@@ -141,14 +104,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API update command.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function update(?Request $request, object $model): ?ErrorList
     {
@@ -161,14 +117,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API update command, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function updateOrFail(?Request $request, object $model): void
     {
@@ -178,14 +127,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API destroy command.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function destroy(?Request $request, object $model): ?ErrorList
     {
@@ -198,14 +140,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API destroy command, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function destroyOrFail(?Request $request, object $model): void
     {
@@ -215,15 +150,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API show related query.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function showRelated(?Request $request, object $model, string $fieldName): ?ErrorList
     {
@@ -237,15 +164,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API show related query, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function showRelatedOrFail(?Request $request, object $model, string $fieldName): void
     {
@@ -255,15 +174,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API show relationship query.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function showRelationship(?Request $request, object $model, string $fieldName): ?ErrorList
     {
@@ -277,15 +188,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API show relationship query, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function showRelationshipOrFail(?Request $request, object $model, string $fieldName): void
     {
@@ -295,15 +198,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API update relationship command.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function updateRelationship(?Request $request, object $model, string $fieldName): ?ErrorList
     {
@@ -317,15 +212,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API update relationship command, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function updateRelationshipOrFail(?Request $request, object $model, string $fieldName): void
     {
@@ -335,15 +222,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API attach relationship command.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function attachRelationship(?Request $request, object $model, string $fieldName): ?ErrorList
     {
@@ -357,15 +236,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API attach relationship command, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function attachRelationshipOrFail(?Request $request, object $model, string $fieldName): void
     {
@@ -375,15 +246,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API detach relationship command.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return ErrorList|null
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function detachRelationship(?Request $request, object $model, string $fieldName): ?ErrorList
     {
@@ -397,15 +260,7 @@ class ResourceAuthorizer
     }
 
     /**
-     * Authorize a JSON:API detach relationship command, or fail.
-     *
-     * @param Request|null $request
-     * @param object $model
-     * @param string $fieldName
-     * @return void
-     * @throws AuthorizationException
-     * @throws AuthenticationException
-     * @throws HttpExceptionInterface
+     * @inheritDoc
      */
     public function detachRelationshipOrFail(?Request $request, object $model, string $fieldName): void
     {
