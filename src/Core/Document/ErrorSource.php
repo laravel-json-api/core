@@ -19,7 +19,6 @@ use function is_null;
 
 class ErrorSource implements Serializable
 {
-
     use Concerns\Serializable;
 
     /**
@@ -71,7 +70,7 @@ class ErrorSource implements Serializable
      * @param string|null $pointer
      * @param string|null $parameter
      */
-    public function __construct(string $pointer = null, string $parameter = null)
+    public function __construct(?string $pointer = null, ?string $parameter = null)
     {
         $this->pointer = $pointer;
         $this->parameter = $parameter;

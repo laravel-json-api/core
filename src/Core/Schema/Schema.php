@@ -223,7 +223,7 @@ abstract class Schema implements SchemaContract, IteratorAggregate
     /**
      * @inheritDoc
      */
-    public function url($extra = [], bool $secure = null): string
+    public function url($extra = [], ?bool $secure = null): string
     {
         $extra = Arr::wrap($extra);
 
