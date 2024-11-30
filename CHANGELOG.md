@@ -12,6 +12,12 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING**: [#21](https://github.com/laravel-json-api/core/pull/21) The `Authorizer` contract now allows all methods
   to return a `bool` or an Illuminate authorization response.
 
+## [4.3.2] - 2024-11-30
+
+### Fixed
+
+- Remove more PHP 8.4 deprecation notices.
+
 ## [4.3.1] - 2024-11-29
 
 ### Fixed

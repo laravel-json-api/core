@@ -63,7 +63,7 @@ class JsonApiService
      * @param string|null $name
      * @return Server
      */
-    public function server(string $name = null): Server
+    public function server(?string $name = null): Server
     {
         if (is_string($name)) {
             return $this->servers()->server($name);
