@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.0.1] - 2024-11-30
+
+### Fixed
+
+- Removed more PHP 8.4 deprecation notices.
+
 ## [5.0.0] - 2024-11-29
 
 ### Added
