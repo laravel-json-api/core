@@ -43,6 +43,8 @@ class PaginatedIdentifierResponse extends ResourceIdentifierCollectionResponse
     public function meta(): Hash
     {
         return Hash::cast($this->page->meta())->merge(
+            Hash::cast(parent::metaForRelationship())
+        )->merge(
             parent::meta()
         );
     }
