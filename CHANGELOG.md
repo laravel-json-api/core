@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.0.2] - 2025-01-11
+
+### Fixed
+
+- [#23](https://github.com/laravel-json-api/core/pull/23) Ensure relationship meta is included in paginated relationship
+  responses.
+
 ## [5.0.1] - 2024-11-30
 
 ### Fixed
