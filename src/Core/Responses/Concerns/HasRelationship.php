@@ -48,7 +48,7 @@ trait HasRelationship
      *
      * @return array|null
      */
-    private function metaForRelationship(): ?array
+    protected function metaForRelationship(): ?array
     {
         if ($this->hasRelationMeta && $relation = $this->relation()) {
             return $relation->meta();
