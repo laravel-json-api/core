@@ -77,7 +77,7 @@ class ErrorSource implements Serializable
      * @param string|null $parameter
      * @param string|null $header
      */
-    public function __construct(string $pointer = null, string $parameter = null, string $header = null)
+    public function __construct(?string $pointer = null, ?string $parameter = null, ?string $header = null)
     {
         $this->pointer = $pointer;
         $this->parameter = $parameter;
