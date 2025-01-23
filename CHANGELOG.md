@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.1.0] - 2025-01-23
+
+### Added
+
+- [#24](https://github.com/laravel-json-api/core/pull/24) Add `header` property to error source object.
+
 ## [5.0.2] - 2025-01-11
 
 ### Fixed
