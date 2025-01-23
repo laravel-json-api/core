@@ -32,6 +32,11 @@ class ErrorSource implements Serializable
     private ?string $parameter;
 
     /**
+     * @var string|null
+     */
+    private ?string $header;
+
+    /**
      * @param ErrorSource|array|null $value
      * @return ErrorSource
      */
@@ -60,7 +65,8 @@ class ErrorSource implements Serializable
     {
         return new self(
             $source['pointer'] ?? null,
-            $source['parameter'] ?? null
+            $source['parameter'] ?? null,
+            $source['header'] ?? null,
         );
     }
 
@@ -69,11 +75,13 @@ class ErrorSource implements Serializable
      *
      * @param string|null $pointer
      * @param string|null $parameter
+     * @param string|null $header
      */
-    public function __construct(?string $pointer = null, ?string $parameter = null)
+    public function __construct(?string $pointer = null, ?string $parameter = null, ?string $header = null)
     {
         $this->pointer = $pointer;
         $this->parameter = $parameter;
+        $this->header = $header;
     }
 
     /**
@@ -150,11 +158,46 @@ class ErrorSource implements Serializable
     }
 
     /**
+     * A string indicating which request header caused the error.
+     *
+     * @return string|null
+     */
+    public function header(): ?string
+    {
+        return $this->header;
+    }
+
+    /**
+     * Add a string indicating which request header caused the error.
+     *
+     * @param string|null $header
+     * @return $this
+     */
+    public function setHeader(?string $header): self
+    {
+        $this->header = $header;
+
+        return $this;
+    }
+
+    /**
+     * Remove the source header.
+     *
+     * @return $this
+     */
+    public function withoutHeader(): self
+    {
+        $this->header = null;
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty(): bool
     {
-        return empty($this->pointer) && empty($this->parameter);
+        return empty($this->pointer) && empty($this->parameter) && empty($this->header);
     }
 
     /**
@@ -173,6 +216,7 @@ class ErrorSource implements Serializable
         return array_filter([
             'parameter' => $this->parameter,
             'pointer' => $this->pointer,
+            'header' => $this->header,
         ]);
     }
 
