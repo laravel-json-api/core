@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Changed
+
+- Improve exception message when resource container cannot resolve a value to a JSON:API resource.
+
 ## [5.2.0] - 2025-02-24
 
 ### Added
