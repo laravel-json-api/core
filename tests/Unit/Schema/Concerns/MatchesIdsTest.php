@@ -41,6 +41,7 @@ class MatchesIdsTest extends TestCase
 
         $this->assertSame($id, $id->uuid());
         $this->assertSame('[\da-fA-F]{8}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{4}-[\da-fA-F]{12}', $id->pattern());
+        $this->assertTrue($id->match('FCA1509E-9178-45FD-8A2B-AE819d34f7E6'));
         $this->assertTrue($id->match('fca1509e-9178-45fd-8a2b-ae819d34f7e6'));
         $this->assertFalse($id->match('fca1509e917845fd8a2bae819d34f7e6'));
     }
