@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [5.2.2] - 2026-02-05
+
+### Fixed
+
+- [#27](https://github.com/laravel-json-api/core/pull/27) Update UUID regex to be case-insensitive. This also means the
+  regex now matches Laravel's UUID route parameter regex, which is where the regex in this pacakge was originally
+  derived from.
+
 ## [5.2.1] - 2025-10-10
 
 ### Changed
