@@ -23,6 +23,7 @@ use LaravelJsonApi\Contracts\Resources\Container as ResourceContainerContract;
 use LaravelJsonApi\Contracts\Schema\Container as SchemaContainerContract;
 use LaravelJsonApi\Contracts\Server\Server as ServerContract;
 use LaravelJsonApi\Contracts\Store\Store as StoreContract;
+use LaravelJsonApi\Core\Attributes\ServeSchema;
 use LaravelJsonApi\Core\Document\JsonApi;
 use LaravelJsonApi\Core\Resources\Container as ResourceContainer;
 use LaravelJsonApi\Core\Resources\Factory as ResourceFactory;
@@ -30,6 +31,8 @@ use LaravelJsonApi\Core\Schema\Container as SchemaContainer;
 use LaravelJsonApi\Core\Store\Store;
 use LaravelJsonApi\Core\Support\AppResolver;
 use LogicException;
+use ReflectionAttribute;
+use ReflectionClass;
 
 abstract class Server implements ServerContract
 {
@@ -65,7 +68,13 @@ abstract class Server implements ServerContract
      *
      * @return array
      */
-    abstract protected function allSchemas(): array;
+    protected function allSchemas(): array
+    {
+        return (new Collection((new ReflectionClass(static::class))->getAttributes(ServeSchema::class)))
+            ->map(fn (ReflectionAttribute $attribute): array => $attribute->getArguments())
+            ->flatten()
+            ->all();
+    }
 
     /**
      * Server constructor.
